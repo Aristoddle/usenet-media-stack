@@ -1,0 +1,29 @@
+# Example Samba configuration
+[global]
+workgroup = WORKGROUP
+server string = Ubuntu Media Server
+security = user
+map to guest = Bad User
+dns proxy = no
+min protocol = SMB2
+hosts allow = 192.168.0.0/16 127.0.0.1
+hosts deny = 0.0.0.0/0
+socket options = TCP_NODELAY IPTOS_LOWDELAY
+read raw = yes
+write raw = yes
+oplocks = yes
+max xmit = 65535
+dead time = 15
+getwd cache = yes
+
+[MediaRoot]
+path = /media/joe
+browsable = yes
+writable = yes
+guest ok = yes
+read only = no
+create mask = 0777
+directory mask = 0777
+force user = joe
+follow symlinks = yes
+wide links = yes
