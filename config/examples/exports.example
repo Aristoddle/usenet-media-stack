@@ -1,0 +1,2 @@
+# Example NFS exports configuration
+/media/joe *(rw,sync,no_subtree_check,no_root_squash,insecure)
