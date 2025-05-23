@@ -1,0 +1,62 @@
+# Configuration directories with sensitive data
+config/*/
+
+# Download directories
+downloads/
+media/
+
+# Log files
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Backup files
+*.bak
+*.backup
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker volumes
+volumes/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Private keys and certificates
+*.key
+*.pem
+*.crt
+*.p12
+
+# Allow config templates
+!config/templates/
+!config/examples/
+
+# Allow documentation
+!README.md
+!docs/ 

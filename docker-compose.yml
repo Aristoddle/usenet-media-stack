@@ -1,0 +1,293 @@
+# Usenet and Media Automation Stack
+# Configuration for Docker Compose
+#
+# This file includes ALL services for a complete media management solution:
+# - SABnzbd: Usenet downloader (http://localhost:8080)
+# - Transmission: BitTorrent client (http://localhost:9091)
+# - Sonarr: TV show management (http://localhost:8989)
+# - Radarr: Movie management (http://localhost:7878)
+# - Bazarr: Subtitle management (http://localhost:6767)
+# - Prowlarr: Indexer management (http://localhost:9696)
+# - Whisparr: AR content management (http://localhost:6969)
+# - Readarr: Ebook management (http://localhost:8787)
+# - Mylar3: Comic book management (http://localhost:8090)
+# - YacReader: Comic reader and library server (http://localhost:8082)
+# - Jackett: Indexer proxy (http://localhost:9117)
+#
+# Media Storage Configuration (JBOD Setup):
+#
+# Configuration and Downloads:
+# - ~/usenet/config/[service]: Service configuration files
+# - ~/usenet/downloads: Centralized download location
+#
+# Media Storage Layout:
+# Fast Storage (Primary):
+# - /media/joe/Fast_8TB_[1-3]: High-performance storage for new content
+# - /media/joe/Fast_4TB_[1-5]: Additional fast storage
+#
+# Archive Storage:
+# - /media/joe/Slow_4TB_[1-2]: Archival storage for less accessed content
+# - /media/joe/Slow_2TB_[1-2]: Additional archive storage
+#
+# MergerFS Integration (Optional):
+# To create a unified view of all media, install mergerfs and add to /etc/fstab:
+# /media/joe/Fast_*:/media/joe/Slow_* /mnt/media fuse.mergerfs defaults,allow_other,use_ino 0 0
+#
+# Note for *Arr Services:
+# Configure multiple root folders in Radarr/Sonarr pointing to appropriate storage:
+# - High quality/4K content -> Fast drives
+# - Standard content -> Mix of fast/slow drives
+# - Archival content -> Slow drives
+#
+
+services:
+  # ================================
+  # Whisparr - TV & Movie AR Management
+  # Access at http://localhost:6969
+  # ================================
+  whisparr:
+    image: hotio/whisparr:nightly
+    container_name: whisparr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/whisparr:/config
+      - ~/usenet/downloads:/downloads
+      - ~/usenet/media/movies:/movies
+      - ~/usenet/media/tv:/tv
+    ports:
+      - 6969:6969
+    restart: unless-stopped
+
+  # ================================
+  # Readarr - Ebook Management
+  # Access at http://localhost:8787
+  # ================================
+  readarr:
+    image: hotio/readarr:latest
+    container_name: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/readarr:/config
+      - ~/usenet/downloads:/downloads
+      - ~/usenet/media/books:/books
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+
+  # ================================
+  # Mylar3 - Comic Book Management
+  # Access at http://localhost:8090
+  # ================================
+  mylar:
+    image: linuxserver/mylar3:latest
+    container_name: mylar
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/mylar:/config
+      - ~/usenet/downloads:/downloads
+      - ~/usenet/media/comics:/comics
+    ports:
+      - 8090:8090
+    restart: unless-stopped
+
+  # ================================
+  # YacReader - Comic Reader & Library Server
+  # Web UI access at http://localhost:8082/comicStreaming/
+  # Library management at http://localhost:8082
+  # ================================
+  yacreader:
+    image: yacreader/yacreaderlibraryserver:latest
+    container_name: yacreader
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/yacreader:/config
+      - ~/usenet/media/comics:/comics
+    ports:
+      - 8082:8080
+    restart: unless-stopped
+
+  # ================================
+  # SABnzbd - Usenet Downloader
+  # Access at http://localhost:8080
+  # ================================
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1000  # User ID
+      - PGID=1000  # Group ID
+      - TZ=Etc/UTC # Timezone - change to your timezone
+    volumes:
+      - ~/usenet/config/sabnzbd:/config
+      - ~/usenet/downloads:/downloads
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+  # ================================
+  # Transmission - BitTorrent Client
+  # Access at http://localhost:9092
+  # ================================
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/transmission:/config
+      - ~/usenet/downloads:/downloads
+      - ~/usenet/downloads/watch:/watch
+    ports:
+      - 9092:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+  # ================================
+  # Sonarr - TV Show Management
+  # Access at http://localhost:8989
+  # ================================
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/sonarr:/config
+      - ~/usenet/downloads:/downloads
+      # Fast Storage (Primary)
+      - /media/joe/Fast_8TB_1:/tv/fast1:ro
+      - /media/joe/Fast_8TB_2:/tv/fast2:ro
+      - /media/joe/Fast_8TB_3:/tv/fast3:ro
+      - /media/joe/Fast_4TB_1:/tv/fast4:ro
+      - /media/joe/Fast_4TB_2:/tv/fast5:ro
+      # Archive Storage
+      - /media/joe/Slow_4TB_1:/tv/slow1:ro
+      - /media/joe/Slow_4TB_2:/tv/slow2:ro
+      - /media/joe/Slow_2TB_1:/tv/slow3:ro
+      - /media/joe/Slow_2TB_2:/tv/slow4:ro
+      # Optional: MergerFS unified view (uncomment if using mergerfs)
+      #- /mnt/media/tv:/tv:ro
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+  # ================================
+  # Radarr - Movie Management
+  # Access at http://localhost:7878
+  # ================================
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/radarr:/config
+      - ~/usenet/downloads:/downloads
+      # Fast Storage (Primary)
+      - /media/joe/Fast_8TB_1:/movies/fast1:ro
+      - /media/joe/Fast_8TB_2:/movies/fast2:ro
+      - /media/joe/Fast_8TB_3:/movies/fast3:ro
+      - /media/joe/Fast_4TB_1:/movies/fast4:ro
+      - /media/joe/Fast_4TB_2:/movies/fast5:ro
+      # Archive Storage
+      - /media/joe/Slow_4TB_1:/movies/slow1:ro
+      - /media/joe/Slow_4TB_2:/movies/slow2:ro
+      - /media/joe/Slow_2TB_1:/movies/slow3:ro
+      - /media/joe/Slow_2TB_2:/movies/slow4:ro
+      # Optional: MergerFS unified view (uncomment if using mergerfs)
+      #- /mnt/media/movies:/movies:ro
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  # ================================
+  # Bazarr - Subtitle Management
+  # Access at http://localhost:6767
+  # ================================
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/bazarr:/config
+      # Fast Storage (Primary)
+      - /media/joe/Fast_8TB_1:/movies/fast1:ro
+      - /media/joe/Fast_8TB_2:/movies/fast2:ro
+      - /media/joe/Fast_8TB_3:/movies/fast3:ro
+      - /media/joe/Fast_4TB_1:/movies/fast4:ro
+      - /media/joe/Fast_4TB_2:/movies/fast5:ro
+      - /media/joe/Fast_8TB_1:/tv/fast1:ro
+      - /media/joe/Fast_8TB_2:/tv/fast2:ro
+      - /media/joe/Fast_8TB_3:/tv/fast3:ro
+      - /media/joe/Fast_4TB_1:/tv/fast4:ro
+      - /media/joe/Fast_4TB_2:/tv/fast5:ro
+      # Archive Storage
+      - /media/joe/Slow_4TB_1:/movies/slow1:ro
+      - /media/joe/Slow_4TB_2:/movies/slow2:ro
+      - /media/joe/Slow_2TB_1:/movies/slow3:ro
+      - /media/joe/Slow_2TB_2:/movies/slow4:ro
+      - /media/joe/Slow_4TB_1:/tv/slow1:ro
+      - /media/joe/Slow_4TB_2:/tv/slow2:ro
+      - /media/joe/Slow_2TB_1:/tv/slow3:ro
+      - /media/joe/Slow_2TB_2:/tv/slow4:ro
+      # Optional: MergerFS unified view (uncomment if using mergerfs)
+      #- /mnt/media/movies:/movies:ro
+      #- /mnt/media/tv:/tv:ro
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+  # ================================
+  # Prowlarr - Indexer Manager
+  # Access at http://localhost:9696
+  # ================================
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  # ================================
+  # Jackett - Indexer Proxy (Fallback)
+  # Access at http://localhost:9117
+  # ================================
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/usenet/config/jackett:/config
+      - ~/usenet/downloads/jackett:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+
