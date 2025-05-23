@@ -1,0 +1,164 @@
+# Optimized Docker Resource Configuration
+# Based on: AMD Ryzen 7 7840HS (16 threads), 30GB RAM, current 93% memory usage
+
+# MEMORY PRESSURE MITIGATION:
+# Current: 28GB/30GB used (critical)
+# Strategy: Reduce memory limits while maintaining functionality
+
+# HIGH PRIORITY SERVICES (Critical for media automation)
+sonarr:
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'        # Was 2.0, reduced
+        memory: 512M       # Adequate for TV management
+      reservations:
+        cpus: '0.25'
+        memory: 256M
+
+radarr:
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'        # Was 2.0, reduced  
+        memory: 512M       # Adequate for movie management
+      reservations:
+        cpus: '0.25'
+        memory: 256M
+
+prowlarr:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5'        # Indexer management
+        memory: 256M       # Was 512M, reduced
+      reservations:
+        cpus: '0.1'
+        memory: 128M
+
+# DOWNLOAD CLIENTS (I/O intensive)
+sabnzbd:
+  deploy:
+    resources:
+      limits:
+        cpus: '2.0'        # Keep high for download processing
+        memory: 1G         # Was 2G, reduced but adequate
+      reservations:
+        cpus: '0.5'
+        memory: 512M
+
+transmission:
+  deploy:
+    resources:
+      limits:
+        cpus: '1.5'        # Keep high for torrent handling
+        memory: 512M       # Was 1G, reduced
+      reservations:
+        cpus: '0.25'
+        memory: 256M
+
+# SPECIALIZED SERVICES
+bazarr:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5'        # Subtitle processing
+        memory: 256M       # Was 512M, reduced
+      reservations:
+        cpus: '0.1'
+        memory: 128M
+
+readarr:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5'        # Book management (lighter usage)
+        memory: 256M       # Was 512M, reduced
+      reservations:
+        cpus: '0.1'
+        memory: 128M
+
+# MONITORING (Essential but not resource heavy)
+netdata:
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'        # Monitoring needs CPU access
+        memory: 256M       # Was 1G, significantly reduced
+      reservations:
+        cpus: '0.1'
+        memory: 128M
+
+portainer:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.5'        # Management UI
+        memory: 128M       # Was 256M, reduced
+      reservations:
+        cpus: '0.1'
+        memory: 64M
+
+# LOW PRIORITY SERVICES (Can be heavily constrained)
+jackett:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.25'       # Was 0.5, reduced
+        memory: 128M       # Was 256M, reduced
+      reservations:
+        cpus: '0.1'
+        memory: 64M
+
+mylar:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.25'       # Comic management (low usage)
+        memory: 128M       # Was 256M, reduced
+      reservations:
+        cpus: '0.1'
+        memory: 64M
+
+whisparr:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.25'       # Adult content management
+        memory: 128M       # Was 512M, heavily reduced
+      reservations:
+        cpus: '0.1'
+        memory: 64M
+
+yacreader:
+  deploy:
+    resources:
+      limits:
+        cpus: '0.25'       # Reading server
+        memory: 128M       # Was 256M, reduced
+      reservations:
+        cpus: '0.1'
+        memory: 64M
+
+# TOTAL MEMORY ALLOCATION SUMMARY:
+# High Priority: 2.5GB (sonarr 512M + radarr 512M + prowlarr 256M + sabnzbd 1G + transmission 512M)
+# Medium Priority: 512M (bazarr 256M + readarr 256M)  
+# Monitoring: 384M (netdata 256M + portainer 128M)
+# Low Priority: 512M (jackett 128M + mylar 128M + whisparr 128M + yacreader 128M)
+# TOTAL: ~4GB reserved (vs current ~7GB), frees up 3GB for system
+
+# STORAGE OPTIMIZATION RECOMMENDATIONS:
+# CRITICAL: Several drives at 95-100% capacity
+# - Fast_4TB_1: 93% (OK for now)
+# - Fast_4TB_3: 95% (Critical) 
+# - Fast_4TB_4: 95% (Critical)
+# - Fast_4TB_5: 95% (Critical)
+# - Fast_8TB_1: 97% (Critical)
+# - Fast_8TB_2: 99% (Critical) 
+# - Slow_4TB_1: 100% (Critical)
+
+# IMMEDIATE ACTIONS NEEDED:
+# 1. Clean up Slow_4TB_1 (100% full)
+# 2. Move data from Fast_8TB_2 (99% full) to Fast_8TB_3 (35% used)
+# 3. Set up automated cleanup scripts for downloads folder
+# 4. Configure retention policies in *arr applications 
