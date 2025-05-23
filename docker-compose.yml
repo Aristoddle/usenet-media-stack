@@ -1,293 +1,722 @@
-# Usenet and Media Automation Stack
-# Configuration for Docker Compose
+# Complete Home Media Automation & Network Sharing Stack
+# Version: 2.0 - Docker Swarm Ready with Integrated Samba/NFS
 #
-# This file includes ALL services for a complete media management solution:
-# - SABnzbd: Usenet downloader (http://localhost:8080)
-# - Transmission: BitTorrent client (http://localhost:9091)
-# - Sonarr: TV show management (http://localhost:8989)
-# - Radarr: Movie management (http://localhost:7878)
-# - Bazarr: Subtitle management (http://localhost:6767)
-# - Prowlarr: Indexer management (http://localhost:9696)
-# - Whisparr: AR content management (http://localhost:6969)
-# - Readarr: Ebook management (http://localhost:8787)
-# - Mylar3: Comic book management (http://localhost:8090)
-# - YacReader: Comic reader and library server (http://localhost:8082)
-# - Jackett: Indexer proxy (http://localhost:9117)
+# This unified stack provides:
+# - Complete *arr media automation suite
+# - Integrated Samba (SMB/CIFS) file sharing
+# - NFS exports for Linux/Unix clients  
+# - Hot-swap storage support with JBOD architecture
+# - Docker Swarm compatibility for multi-device deployment
+# - Resource constraints and placement for different device types
 #
-# Media Storage Configuration (JBOD Setup):
+# Services included:
+# DOWNLOADERS:  SABnzbd (8080), Transmission (9092)
+# AUTOMATION:   Sonarr (8989), Radarr (7878), Bazarr (6767), Prowlarr (9696)
+# SPECIALIZED:  Whisparr (6969), Readarr (8787), Mylar3 (8090), YacReader (8082)
+# INDEXERS:     Jackett (9117)
+# SHARING:      Samba (139,445), NFS (2049)
+# MONITORING:   Netdata (19999), Portainer (9000)
 #
-# Configuration and Downloads:
-# - ~/usenet/config/[service]: Service configuration files
-# - ~/usenet/downloads: Centralized download location
+# JBOD Storage Architecture:
+# Fast Storage (Primary): /media/joe/Fast_8TB_[1-3], /media/joe/Fast_4TB_[1-5]
+# Archive Storage: /media/joe/Slow_4TB_[1-2], /media/joe/Slow_2TB_[1-2]
 #
-# Media Storage Layout:
-# Fast Storage (Primary):
-# - /media/joe/Fast_8TB_[1-3]: High-performance storage for new content
-# - /media/joe/Fast_4TB_[1-5]: Additional fast storage
+# Network Requirements:
+# - Trusted subnet: 192.168.0.0/16 (adjust for your network)
+# - Firewall: UFW rules for ports 139,445,2049,111 from trusted hosts
 #
-# Archive Storage:
-# - /media/joe/Slow_4TB_[1-2]: Archival storage for less accessed content
-# - /media/joe/Slow_2TB_[1-2]: Additional archive storage
+# Multi-Device Deployment Notes:
+# - Use Docker Swarm for orchestration across multiple devices
+# - Place storage-heavy services on devices with local storage
+# - Place CPU-intensive services on more powerful devices
+# - Use overlay networks for service communication
 #
-# MergerFS Integration (Optional):
-# To create a unified view of all media, install mergerfs and add to /etc/fstab:
-# /media/joe/Fast_*:/media/joe/Slow_* /mnt/media fuse.mergerfs defaults,allow_other,use_ino 0 0
-#
-# Note for *Arr Services:
-# Configure multiple root folders in Radarr/Sonarr pointing to appropriate storage:
-# - High quality/4K content -> Fast drives
-# - Standard content -> Mix of fast/slow drives
-# - Archival content -> Slow drives
-#
+# Resource Classification:
+# LOW:    Bazarr, Jackett, YacReader, Samba, NFS
+# MEDIUM: Sonarr, Radarr, Prowlarr, Readarr, Mylar3, Whisparr
+# HIGH:   SABnzbd, Transmission (during active downloads)
+
+version: '3.8'
+
+# Define networks for service isolation and Swarm compatibility
+networks:
+  media_network:
+    driver: overlay
+    driver_opts:
+      encrypted: "true"
+    attachable: true
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  
+  sharing_network:
+    driver: overlay
+    driver_opts:
+      encrypted: "false"  # SMB/NFS need unencrypted for compatibility
+    attachable: true
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+# Define volumes for configuration persistence across Swarm nodes
+volumes:
+  sabnzbd_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=storage-node,rw,nfsvers=4
+      device: ":/storage/config/sabnzbd"
+  
+  transmission_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=storage-node,rw,nfsvers=4
+      device: ":/storage/config/transmission"
+  
+  # Additional configs follow same pattern
+  sonarr_config:
+    driver: local
+  radarr_config:
+    driver: local
+  bazarr_config:
+    driver: local
+  prowlarr_config:
+    driver: local
+  
+  # Shared storage volumes
+  downloads_volume:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: /home/joe/usenet/downloads
+  
+  media_fast_volume:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: /media/joe
+  
+  # Portainer persistent data
+  portainer_data:
+    driver: local
 
 services:
   # ================================
-  # Whisparr - TV & Movie AR Management
-  # Access at http://localhost:6969
+  # SAMBA FILE SHARING SERVICE
+  # Provides SMB/CIFS shares for Windows, macOS, Linux clients
+  # Access: \\server-ip\ShareName
   # ================================
-  whisparr:
-    image: hotio/whisparr:nightly
-    container_name: whisparr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - ~/usenet/config/whisparr:/config
-      - ~/usenet/downloads:/downloads
-      - ~/usenet/media/movies:/movies
-      - ~/usenet/media/tv:/tv
+  samba:
+    image: dperson/samba:latest
+    container_name: samba
+    hostname: media-server
+    networks:
+      - sharing_network
     ports:
-      - 6969:6969
+      - target: 139
+        published: 139
+        protocol: tcp
+        mode: host
+      - target: 445
+        published: 445
+        protocol: tcp
+        mode: host
+    environment:
+      - TZ=Etc/UTC
+      - USERID=1000
+      - GROUPID=1000
+    command: >
+      -u "joe;joe" 
+      -s "Media;/media;yes;no;no;joe;joe;joe" 
+      -s "Downloads;/downloads;yes;no;no;joe;joe;joe"
+      -s "TV;/tv;yes;no;no;joe;joe;joe"
+      -s "Movies;/movies;yes;no;no;joe;joe;joe"
+      -s "Books;/books;yes;no;no;joe;joe;joe"
+      -s "Comics;/comics;yes;no;no;joe;joe;joe"
+      -s "Config;/config;yes;no;no;joe;joe;joe"
+      -p
+      -w "WORKGROUP"
+      -n
+    volumes:
+      - /media/joe:/media:rw
+      - downloads_volume:/downloads:rw
+      - /home/joe/usenet/downloads:/downloads:rw
+      - /home/joe/usenet/config:/config:rw
+      # Mount all storage drives for flexible sharing
+      - /media/joe/Fast_8TB_1:/tv/fast1:rw
+      - /media/joe/Fast_8TB_2:/tv/fast2:rw
+      - /media/joe/Fast_8TB_3:/tv/fast3:rw
+      - /media/joe/Fast_4TB_1:/movies/fast1:rw
+      - /media/joe/Fast_4TB_2:/movies/fast2:rw
+      - /media/joe/Slow_4TB_1:/movies/archive1:rw
+      - /media/joe/Slow_4TB_2:/movies/archive2:rw
+      - /media/joe/Slow_2TB_1:/tv/archive1:rw
+      - /media/joe/Slow_2TB_2:/tv/archive2:rw
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "smbclient", "-L", "localhost", "-U", "%"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ================================
-  # Readarr - Ebook Management
-  # Access at http://localhost:8787
+  # NFS SERVER SERVICE  
+  # Provides NFS exports for Linux/Unix clients
+  # Mount: mount -t nfs server-ip:/media/joe /mount/point
   # ================================
-  readarr:
-    image: hotio/readarr:latest
-    container_name: readarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - ~/usenet/config/readarr:/config
-      - ~/usenet/downloads:/downloads
-      - ~/usenet/media/books:/books
+  nfs-server:
+    image: erichough/nfs-server:latest
+    container_name: nfs-server
+    hostname: nfs-server
+    networks:
+      - sharing_network
     ports:
-      - 8787:8787
+      - target: 2049
+        published: 2049
+        protocol: tcp
+        mode: host
+      - target: 111
+        published: 111
+        protocol: tcp
+        mode: host
+      - target: 111
+        published: 111
+        protocol: udp
+        mode: host
+      - target: 32765
+        published: 32765
+        protocol: tcp
+        mode: host
+      - target: 32767
+        published: 32767
+        protocol: udp
+        mode: host
+    cap_add:
+      - SYS_ADMIN
+    privileged: true
+    volumes:
+      - /media/joe:/media/joe:rw
+      - /home/joe/usenet/downloads:/downloads:rw
+      - /home/joe/usenet/config:/config:rw
+    environment:
+      - SHARED_DIRECTORY=/media/joe
+      - SHARED_DIRECTORY_2=/downloads
+      - SHARED_DIRECTORY_3=/config
+      - SYNC=true
+      - PERMITTED=192.168.0.0/16
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   # ================================
-  # Mylar3 - Comic Book Management
-  # Access at http://localhost:8090
+  # SYSTEM MONITORING WITH NETDATA
+  # Real-time system monitoring dashboard
+  # Access at http://localhost:19999
   # ================================
-  mylar:
-    image: linuxserver/mylar3:latest
-    container_name: mylar
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - ~/usenet/config/mylar:/config
-      - ~/usenet/downloads:/downloads
-      - ~/usenet/media/comics:/comics
+  netdata:
+    image: netdata/netdata:latest
+    container_name: netdata
+    hostname: netdata-media-server
+    networks:
+      - media_network
     ports:
-      - 8090:8090
+      - "19999:19999"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+    environment:
+      - DOCKER_HOST=/var/run/docker.sock
     restart: unless-stopped
+    deploy:
+      mode: global  # Run on every Swarm node
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
 
   # ================================
-  # YacReader - Comic Reader & Library Server
-  # Web UI access at http://localhost:8082/comicStreaming/
-  # Library management at http://localhost:8082
+  # PORTAINER SWARM MANAGEMENT
+  # Docker Swarm management interface  
+  # Access at http://localhost:9000
   # ================================
-  yacreader:
-    image: yacreader/yacreaderlibraryserver:latest
-    container_name: yacreader
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - ~/usenet/config/yacreader:/config
-      - ~/usenet/media/comics:/comics
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    networks:
+      - media_network
     ports:
-      - 8082:8080
+      - "9000:9000"
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   # ================================
   # SABnzbd - Usenet Downloader
   # Access at http://localhost:8080
+  # Resource Intensive: Place on powerful nodes
   # ================================
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
+    hostname: sabnzbd
+    networks:
+      - media_network
     environment:
-      - PUID=1000  # User ID
-      - PGID=1000  # Group ID
-      - TZ=Etc/UTC # Timezone - change to your timezone
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-      - ~/usenet/config/sabnzbd:/config
-      - ~/usenet/downloads:/downloads
+      - sabnzbd_config:/config
+      - downloads_volume:/downloads
     ports:
-      - 8080:8080
+      - "8080:8080"
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance == high
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # ================================
   # Transmission - BitTorrent Client
   # Access at http://localhost:9092
+  # Resource Intensive: Place on powerful nodes
   # ================================
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
+    hostname: transmission
+    networks:
+      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
+      - TRANSMISSION_WEB_HOME=/transmission-web-control/
     volumes:
-      - ~/usenet/config/transmission:/config
-      - ~/usenet/downloads:/downloads
-      - ~/usenet/downloads/watch:/watch
+      - transmission_config:/config
+      - downloads_volume:/downloads
+      - /home/joe/usenet/downloads/watch:/watch
     ports:
-      - 9092:9091
-      - 51413:51413
-      - 51413:51413/udp
+      - "9092:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance == high
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
   # ================================
   # Sonarr - TV Show Management
   # Access at http://localhost:8989
+  # Medium Resource Usage
   # ================================
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
+    hostname: sonarr
+    networks:
+      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ~/usenet/config/sonarr:/config
-      - ~/usenet/downloads:/downloads
-      # Fast Storage (Primary)
-      - /media/joe/Fast_8TB_1:/tv/fast1:ro
-      - /media/joe/Fast_8TB_2:/tv/fast2:ro
-      - /media/joe/Fast_8TB_3:/tv/fast3:ro
-      - /media/joe/Fast_4TB_1:/tv/fast4:ro
-      - /media/joe/Fast_4TB_2:/tv/fast5:ro
-      # Archive Storage
-      - /media/joe/Slow_4TB_1:/tv/slow1:ro
-      - /media/joe/Slow_4TB_2:/tv/slow2:ro
-      - /media/joe/Slow_2TB_1:/tv/slow3:ro
-      - /media/joe/Slow_2TB_2:/tv/slow4:ro
-      # Optional: MergerFS unified view (uncomment if using mergerfs)
-      #- /mnt/media/tv:/tv:ro
+      - sonarr_config:/config
+      - downloads_volume:/downloads
+      # Multi-drive TV storage mounts
+      - /media/joe/Fast_8TB_1:/tv/fast1:rw
+      - /media/joe/Fast_8TB_2:/tv/fast2:rw
+      - /media/joe/Fast_8TB_3:/tv/fast3:rw
+      - /media/joe/Fast_4TB_1:/tv/fast4:rw
+      - /media/joe/Fast_4TB_2:/tv/fast5:rw
+      - /media/joe/Slow_4TB_1:/tv/slow1:rw
+      - /media/joe/Slow_4TB_2:/tv/slow2:rw
+      - /media/joe/Slow_2TB_1:/tv/slow3:rw
+      - /media/joe/Slow_2TB_2:/tv/slow4:rw
     ports:
-      - 8989:8989
+      - "8989:8989"
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    depends_on:
+      - sabnzbd
+      - transmission
+
   # ================================
   # Radarr - Movie Management
   # Access at http://localhost:7878
+  # Medium Resource Usage
   # ================================
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
+    hostname: radarr
+    networks:
+      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ~/usenet/config/radarr:/config
-      - ~/usenet/downloads:/downloads
-      # Fast Storage (Primary)
-      - /media/joe/Fast_8TB_1:/movies/fast1:ro
-      - /media/joe/Fast_8TB_2:/movies/fast2:ro
-      - /media/joe/Fast_8TB_3:/movies/fast3:ro
-      - /media/joe/Fast_4TB_1:/movies/fast4:ro
-      - /media/joe/Fast_4TB_2:/movies/fast5:ro
-      # Archive Storage
-      - /media/joe/Slow_4TB_1:/movies/slow1:ro
-      - /media/joe/Slow_4TB_2:/movies/slow2:ro
-      - /media/joe/Slow_2TB_1:/movies/slow3:ro
-      - /media/joe/Slow_2TB_2:/movies/slow4:ro
-      # Optional: MergerFS unified view (uncomment if using mergerfs)
-      #- /mnt/media/movies:/movies:ro
+      - radarr_config:/config
+      - downloads_volume:/downloads
+      # Multi-drive Movie storage mounts
+      - /media/joe/Fast_8TB_1:/movies/fast1:rw
+      - /media/joe/Fast_8TB_2:/movies/fast2:rw
+      - /media/joe/Fast_8TB_3:/movies/fast3:rw
+      - /media/joe/Fast_4TB_1:/movies/fast4:rw
+      - /media/joe/Fast_4TB_2:/movies/fast5:rw
+      - /media/joe/Slow_4TB_1:/movies/slow1:rw
+      - /media/joe/Slow_4TB_2:/movies/slow2:rw
+      - /media/joe/Slow_2TB_1:/movies/slow3:rw
+      - /media/joe/Slow_2TB_2:/movies/slow4:rw
     ports:
-      - 7878:7878
+      - "7878:7878"
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    depends_on:
+      - sabnzbd
+      - transmission
 
   # ================================
   # Bazarr - Subtitle Management
   # Access at http://localhost:6767
+  # Low Resource Usage - Can run anywhere
   # ================================
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
+    hostname: bazarr
+    networks:
+      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ~/usenet/config/bazarr:/config
-      # Fast Storage (Primary)
-      - /media/joe/Fast_8TB_1:/movies/fast1:ro
-      - /media/joe/Fast_8TB_2:/movies/fast2:ro
-      - /media/joe/Fast_8TB_3:/movies/fast3:ro
-      - /media/joe/Fast_4TB_1:/movies/fast4:ro
-      - /media/joe/Fast_4TB_2:/movies/fast5:ro
-      - /media/joe/Fast_8TB_1:/tv/fast1:ro
-      - /media/joe/Fast_8TB_2:/tv/fast2:ro
-      - /media/joe/Fast_8TB_3:/tv/fast3:ro
-      - /media/joe/Fast_4TB_1:/tv/fast4:ro
-      - /media/joe/Fast_4TB_2:/tv/fast5:ro
-      # Archive Storage
-      - /media/joe/Slow_4TB_1:/movies/slow1:ro
-      - /media/joe/Slow_4TB_2:/movies/slow2:ro
-      - /media/joe/Slow_2TB_1:/movies/slow3:ro
-      - /media/joe/Slow_2TB_2:/movies/slow4:ro
-      - /media/joe/Slow_4TB_1:/tv/slow1:ro
-      - /media/joe/Slow_4TB_2:/tv/slow2:ro
-      - /media/joe/Slow_2TB_1:/tv/slow3:ro
-      - /media/joe/Slow_2TB_2:/tv/slow4:ro
-      # Optional: MergerFS unified view (uncomment if using mergerfs)
-      #- /mnt/media/movies:/movies:ro
-      #- /mnt/media/tv:/tv:ro
+      - bazarr_config:/config
+      # Same storage mounts as Sonarr/Radarr for subtitle access
+      - /media/joe/Fast_8TB_1:/movies/fast1:rw
+      - /media/joe/Fast_8TB_2:/movies/fast2:rw
+      - /media/joe/Fast_8TB_3:/movies/fast3:rw
+      - /media/joe/Fast_4TB_1:/movies/fast4:rw
+      - /media/joe/Fast_4TB_2:/movies/fast5:rw
+      - /media/joe/Fast_8TB_1:/tv/fast1:rw
+      - /media/joe/Fast_8TB_2:/tv/fast2:rw
+      - /media/joe/Fast_8TB_3:/tv/fast3:rw
+      - /media/joe/Fast_4TB_1:/tv/fast4:rw
+      - /media/joe/Fast_4TB_2:/tv/fast5:rw
+      - /media/joe/Slow_4TB_1:/movies/slow1:rw
+      - /media/joe/Slow_4TB_2:/movies/slow2:rw
+      - /media/joe/Slow_2TB_1:/movies/slow3:rw
+      - /media/joe/Slow_2TB_2:/movies/slow4:rw
+      - /media/joe/Slow_4TB_1:/tv/slow1:rw
+      - /media/joe/Slow_4TB_2:/tv/slow2:rw
+      - /media/joe/Slow_2TB_1:/tv/slow3:rw
+      - /media/joe/Slow_2TB_2:/tv/slow4:rw
     ports:
-      - 6767:6767
+      - "6767:6767"
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    depends_on:
+      - sonarr
+      - radarr
 
   # ================================
   # Prowlarr - Indexer Manager
   # Access at http://localhost:9696
+  # Medium Resource Usage
   # ================================
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
+    hostname: prowlarr
+    networks:
+      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ~/usenet/config/prowlarr:/config
+      - prowlarr_config:/config
     ports:
-      - 9696:9696
+      - "9696:9696"
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance != low
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # ================================
+  # Whisparr - Adult Content Management
+  # Access at http://localhost:6969
+  # Medium Resource Usage
+  # ================================
+  whisparr:
+    image: hotio/whisparr:nightly
+    container_name: whisparr
+    hostname: whisparr
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/joe/usenet/config/whisparr:/config
+      - downloads_volume:/downloads
+      - /home/joe/usenet/media/movies:/movies
+      - /home/joe/usenet/media/tv:/tv
+    ports:
+      - "6969:6969"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ================================
+  # Readarr - Ebook Management
+  # Access at http://localhost:8787
+  # Low Resource Usage
+  # ================================
+  readarr:
+    image: hotio/readarr:latest
+    container_name: readarr
+    hostname: readarr
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/joe/usenet/config/readarr:/config
+      - downloads_volume:/downloads
+      - /home/joe/usenet/media/books:/books
+    ports:
+      - "8787:8787"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ================================
+  # Mylar3 - Comic Book Management
+  # Access at http://localhost:8090
+  # Low Resource Usage
+  # ================================
+  mylar:
+    image: linuxserver/mylar3:latest
+    container_name: mylar
+    hostname: mylar
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/joe/usenet/config/mylar:/config
+      - downloads_volume:/downloads
+      - /home/joe/usenet/media/comics:/comics
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ================================
+  # YacReader - Comic Reader & Library Server
+  # Access at http://localhost:8082
+  # Low Resource Usage
+  # ================================
+  yacreader:
+    image: yacreader/yacreaderlibraryserver:latest
+    container_name: yacreader
+    hostname: yacreader
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/joe/usenet/config/yacreader:/config
+      - /home/joe/usenet/media/comics:/comics
+    ports:
+      - "8082:8080"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
 
   # ================================
   # Jackett - Indexer Proxy (Fallback)
   # Access at http://localhost:9117
+  # Low Resource Usage
   # ================================
   jackett:
     image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
+    hostname: jackett
+    networks:
+      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ~/usenet/config/jackett:/config
-      - ~/usenet/downloads/jackett:/downloads
+      - /home/joe/usenet/config/jackett:/config
+      - /home/joe/usenet/downloads/jackett:/downloads
     ports:
-      - 9117:9117
+      - "9117:9117"
     restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
 

@@ -1,185 +1,617 @@
-# Complete Media Automation Stack (Usenet + *arr Services)
+# Complete Home Media Automation & Network Sharing Stack
 
-A comprehensive Docker Compose setup for automated media management using the *arr family of applications.
+**Version 2.0** - Docker Swarm Ready with Integrated Samba/NFS
 
-## 🚀 Quick Start
+A unified, production-ready media automation stack that combines the complete *arr suite with integrated file sharing services, designed for multi-device deployment and optimal resource utilization.
 
-```bash
-# Clone this repository
-git clone https://github.com/Aristoddle/home-media-server.git
-cd home-media-server
+## 🏗️ **Architecture Overview**
 
-# Start all services
-docker-compose up -d
+This stack provides a complete media ecosystem with:
 
-# Check status
-docker-compose ps
+### **Media Automation Suite**
+- **Content Discovery & Management**: Sonarr (TV), Radarr (Movies), Readarr (Books), Mylar3 (Comics)
+- **Download Automation**: SABnzbd (Usenet), Transmission (BitTorrent)
+- **Subtitle Management**: Bazarr with multi-language support
+- **Indexer Management**: Prowlarr (primary), Jackett (fallback)
+- **Content Reading**: YacReader for comics/books
+- **Adult Content**: Whisparr (optional)
+
+### **File Sharing & Network Services**
+- **SMB/CIFS Shares**: Windows, macOS, Linux client support via Samba
+- **NFS Exports**: Linux/Unix native sharing
+- **Multi-protocol Access**: Same content accessible via multiple protocols
+
+### **System Monitoring & Management**
+- **Real-time Monitoring**: Netdata with system metrics
+- **Container Orchestration**: Portainer for Docker Swarm management
+- **Resource Optimization**: Automatic service placement based on node capabilities
+
+## 📊 **Storage Architecture: JBOD (Just a Bunch of Disks)**
+
+### **Fast Storage Tier (Primary)**
+```
+/media/joe/Fast_8TB_[1-3]    # High-performance drives for new/active content
+/media/joe/Fast_4TB_[1-5]    # Additional fast storage for frequently accessed media
 ```
 
-## 📋 Services Included
-
-| Service | Port | Purpose | Web Interface |
-|---------|------|---------|---------------|
-| **SABnzbd** | 8080 | Usenet downloader | http://localhost:8080 |
-| **Transmission** | 9092 | BitTorrent client | http://localhost:9092 |
-| **Sonarr** | 8989 | TV show management | http://localhost:8989 |
-| **Radarr** | 7878 | Movie management | http://localhost:7878 |
-| **Bazarr** | 6767 | Subtitle management | http://localhost:6767 |
-| **Prowlarr** | 9696 | Indexer management | http://localhost:9696 |
-| **Whisparr** | 6969 | Adult content management | http://localhost:6969 |
-| **Readarr** | 8787 | Ebook management | http://localhost:8787 |
-| **Mylar3** | 8090 | Comic book management | http://localhost:8090 |
-| **YacReader** | 8082 | Comic reader & library | http://localhost:8082 |
-| **Jackett** | 9117 | Indexer proxy (fallback) | http://localhost:9117 |
-
-## 💾 Storage Architecture
-
-This setup uses a **JBOD (Just a Bunch of Disks)** configuration with intelligent tiering:
-
-### Fast Storage (Primary)
-- `/media/joe/Fast_8TB_[1-3]` - High-performance storage for new content
-- `/media/joe/Fast_4TB_[1-5]` - Additional fast storage
-
-### Archive Storage  
-- `/media/joe/Slow_4TB_[1-2]` - Archival storage for less accessed content
-- `/media/joe/Slow_2TB_[1-2]` - Additional archive storage
-
-### Directory Structure
+### **Archive Storage Tier**
 ```
-~/usenet/
-├── config/           # Service configurations
-│   ├── sonarr/
-│   ├── radarr/
-│   ├── sabnzbd/
-│   └── ...
-├── downloads/        # Centralized download location
-└── media/           # Local media (if not using external drives)
-    ├── movies/
-    ├── tv/
-    ├── books/
-    └── comics/
+/media/joe/Slow_4TB_[1-2]    # Long-term archival storage
+/media/joe/Slow_2TB_[1-2]    # Additional archive capacity
 ```
 
-## ⚙️ Configuration
+### **Storage Strategy**
+- **New/Popular Content**: Fast drives for optimal streaming performance
+- **Archive Content**: Slower drives for cost-effective long-term storage
+- **Hot-swap Ready**: JBOD supports drive replacement without downtime
+- **Flexible Expansion**: Add drives as needed without array rebuilds
 
-### First Time Setup
+## 🌐 **Network Architecture**
 
-1. **Start the stack:**
+### **Service Networks**
+- **Media Network** (`172.20.0.0/16`): Encrypted overlay for *arr services
+- **Sharing Network** (`172.21.0.0/16`): Unencrypted for SMB/NFS compatibility
+
+### **Port Configuration**
+```
+Media Management:
+  8989  - Sonarr (TV Shows)
+  7878  - Radarr (Movies)  
+  6767  - Bazarr (Subtitles)
+  9696  - Prowlarr (Indexers)
+  9117  - Jackett (Fallback indexers)
+
+Download Clients:
+  8080  - SABnzbd (Usenet)
+  9092  - Transmission (BitTorrent)
+
+Specialized Services:
+  8787  - Readarr (Books)
+  8090  - Mylar3 (Comics)
+  8082  - YacReader (Comic reader)
+  6969  - Whisparr (Adult content)
+
+Monitoring & Management:
+  19999 - Netdata (System monitoring)
+  9000  - Portainer (Container management)
+
+File Sharing:
+  139   - SMB (NetBIOS)
+  445   - SMB (Direct)
+  2049  - NFS
+  111   - NFS Portmapper
+```
+
+## 🚀 **Quick Start Guide**
+
+### **Single Node Deployment**
+
+1. **Clone and Setup**
    ```bash
-   docker-compose up -d
+   cd /home/joe/usenet
+   ./manage.sh start
    ```
 
-2. **Configure each service:**
-   - Open each web interface and complete initial setup
-   - Configure download paths to `/downloads`
-   - Set up indexers in Prowlarr first, then sync to other services
+2. **Access Services**
+   - Navigate to http://localhost:9000 (Portainer) for container management
+   - Configure indexers in Prowlarr: http://localhost:9696
+   - Setup download clients in Sonarr/Radarr
 
-3. **Storage Configuration:**
-   - In Sonarr/Radarr, add multiple root folders pointing to different drives
-   - Use fast drives for high-quality/4K content
-   - Use slow drives for standard/archival content
-
-### MergerFS Integration (Optional)
-
-For a unified storage view, install MergerFS:
-
-```bash
-# Install MergerFS
-sudo apt install mergerfs
-
-# Add to /etc/fstab
-/media/joe/Fast_*:/media/joe/Slow_* /mnt/media fuse.mergerfs defaults,allow_other,use_ino 0 0
-
-# Mount
-sudo mount -a
-```
-
-Then uncomment the MergerFS volume lines in `docker-compose.yml`.
-
-## 🔧 Management Commands
-
-```bash
-# Start all services
-docker-compose up -d
-
-# Stop all services  
-docker-compose down
-
-# View logs
-docker-compose logs -f [service_name]
-
-# Update services
-docker-compose pull
-docker-compose up -d
-
-# Restart a specific service
-docker-compose restart sonarr
-
-# Check service status
-docker-compose ps
-```
-
-## 📊 System Requirements
-
-- **CPU**: 4+ cores recommended
-- **RAM**: 8GB minimum, 16GB recommended
-- **Storage**: Varies based on media collection size
-- **Network**: Unlimited bandwidth recommended for Usenet
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-1. **Permission Errors:**
+3. **File Sharing Access**
    ```bash
-   sudo chown -R 1000:1000 ~/usenet/config
-   sudo chown -R 1000:1000 ~/usenet/downloads
+   # Windows/macOS
+   \\your-server-ip\Media
+   
+   # Linux SMB mount
+   mount -t cifs //your-server-ip/Media /mnt/media -o guest
+   
+   # Linux NFS mount  
+   mount -t nfs your-server-ip:/media/joe /mnt/media
    ```
 
-2. **Service Won't Start:**
+### **Multi-Device Docker Swarm Deployment**
+
+1. **Initialize Swarm on Main Node** (storage server)
    ```bash
-   docker-compose logs [service_name]
+   ./manage.sh init-swarm
    ```
 
-3. **Storage Issues:**
-   - Check drive mounts: `df -h`
-   - Verify permissions on media directories
+2. **Join Additional Nodes**
+   ```bash
+   # On other devices, use the join token provided
+   ./manage.sh join-swarm <worker-token> <manager-ip>
+   ```
 
-### Health Checks
+3. **Label Nodes for Optimal Placement**
+   ```bash
+   ./manage.sh label-nodes
+   ```
 
-```bash
-# Check all container status
-docker-compose ps
+4. **Deploy Stack to Swarm**
+   ```bash
+   ./manage.sh start  # Automatically detects Swarm mode
+   ```
 
-# Check system resources
-docker stats
+## 🖥️ **Multi-Device Deployment Strategies**
 
-# View service logs
-docker-compose logs -f --tail=50
+### **Node Classification System**
+
+#### **Storage Node** (Primary Server)
+- **Role**: Manager node with local storage
+- **Services**: All storage-dependent services, Samba, NFS
+- **Requirements**: Large storage capacity, moderate CPU/RAM
+- **Labels**: `storage=true`, `performance=high`
+
+#### **Compute Node** (Powerful Desktop/Server)
+- **Role**: Worker node for CPU-intensive tasks
+- **Services**: Download clients, transcoding, indexer management
+- **Requirements**: High CPU/RAM, minimal storage needs
+- **Labels**: `performance=high`
+
+#### **IoT/Edge Node** (Raspberry Pi, Mini PC)
+- **Role**: Worker node for lightweight services
+- **Services**: Monitoring, simple web interfaces
+- **Requirements**: Low power, minimal resources
+- **Labels**: `performance=low`
+
+### **Example Multi-Device Setup**
+
+```yaml
+# Node 1: Main Server (Storage + High Performance)
+- Role: Manager
+- Storage: 8x HDDs in JBOD configuration
+- Services: Samba, NFS, Sonarr, Radarr, Bazarr
+- Resources: 16GB RAM, 8-core CPU
+
+# Node 2: Download Station (High Performance)
+- Role: Worker  
+- Storage: Fast SSD for temporary downloads
+- Services: SABnzbd, Transmission, Prowlarr
+- Resources: 32GB RAM, 12-core CPU
+
+# Node 3: Monitoring Station (Low Power)
+- Role: Worker
+- Storage: SD card/eMMC
+- Services: Netdata, Portainer Agent
+- Resources: 4GB RAM, ARM CPU (Raspberry Pi)
 ```
 
-## 🔐 Security Notes
+## 🛠️ **Management Operations**
 
-- All services run as user 1000:1000 for security
-- Consider using a VPN for BitTorrent traffic
-- Regularly update containers for security patches
-- Use strong passwords for web interfaces
+### **Daily Operations**
+```bash
+# Check system health
+./manage.sh system-health
 
-## 📖 Additional Resources
+# View service status
+./manage.sh status
 
-- [Sonarr Wiki](https://wiki.servarr.com/sonarr)
-- [Radarr Wiki](https://wiki.servarr.com/radarr)
-- [SABnzbd Documentation](https://sabnzbd.org/wiki/)
-- [Prowlarr Documentation](https://wiki.servarr.com/prowlarr)
+# Monitor specific service
+./manage.sh logs sonarr
 
-## 📝 License
+# Restart problematic service
+./manage.sh restart-service radarr
+```
 
-This configuration is provided as-is under the MIT License.
+### **Maintenance Tasks**
+```bash
+# Update all services
+./manage.sh update
 
-## 🤝 Contributing
+# Backup configurations
+./manage.sh backup-configs
 
-Feel free to submit issues and enhancement requests!
+# Network diagnostics
+./manage.sh network-diag
+
+# Create new file share
+./manage.sh create-share "4K-Movies" "/media/joe/Fast_8TB_1/4K"
+```
+
+### **Scaling Operations**
+```bash
+# Add worker node to existing swarm
+./manage.sh join-swarm <token> <manager-ip>
+
+# Label new node for specific workloads
+./manage.sh label-nodes
+
+# Monitor swarm health
+docker node ls
+docker service ls
+```
+
+## 📁 **File Organization & Access**
+
+### **Directory Structure**
+```
+/media/joe/
+├── Fast_8TB_1/           # Primary TV storage
+│   ├── TV-Shows/
+│   └── 4K-TV/
+├── Fast_8TB_2/           # Primary Movie storage  
+│   ├── Movies/
+│   └── 4K-Movies/
+├── Fast_4TB_[1-5]/       # Additional fast storage
+├── Slow_4TB_[1-2]/       # Archive storage
+└── Slow_2TB_[1-2]/       # Archive storage
+
+/home/joe/usenet/
+├── downloads/            # Active downloads
+├── config/              # Service configurations
+├── backups/             # Configuration backups
+└── docker-compose.yml   # Stack definition
+```
+
+### **SMB/CIFS Shares**
+| Share Name | Path | Purpose | Access |
+|------------|------|---------|--------|
+| Media | `/media/joe` | All media content | Read/Write |
+| Downloads | `/downloads` | Active downloads | Read/Write |
+| TV | `/tv/*` | TV shows across drives | Read/Write |
+| Movies | `/movies/*` | Movies across drives | Read/Write |
+| Books | `/books` | Ebook collection | Read/Write |
+| Comics | `/comics` | Comic collection | Read/Write |
+| Config | `/config` | Service configs | Admin only |
+
+### **NFS Exports**
+| Export Path | Client Access | Options |
+|-------------|---------------|---------|
+| `/media/joe` | `192.168.0.0/16` | `rw,sync,no_subtree_check` |
+| `/downloads` | `192.168.0.0/16` | `rw,sync,no_subtree_check` |
+| `/config` | `192.168.0.0/16` | `rw,sync,no_subtree_check` |
+
+## 🔧 **Service Configuration Guide**
+
+### **Initial Setup Sequence**
+
+1. **Configure Prowlarr** (http://localhost:9696)
+   - Add indexers for Usenet and BitTorrent
+   - Configure API keys
+   - Test indexer connectivity
+
+2. **Setup Download Clients**
+   - **SABnzbd** (http://localhost:8080): Configure Usenet provider
+   - **Transmission** (http://localhost:9092): Configure VPN if needed
+
+3. **Configure *arr Services**
+   - **Sonarr**: Add TV root folders, link to download clients
+   - **Radarr**: Add movie root folders, configure quality profiles
+   - **Bazarr**: Connect to Sonarr/Radarr, configure subtitle providers
+
+4. **Optional Services**
+   - **Readarr**: Configure for ebook management
+   - **Mylar3**: Setup comic book automation
+   - **Whisparr**: Configure if adult content desired
+
+### **Root Folder Configuration**
+
+Configure multiple root folders in Sonarr/Radarr for optimal storage utilization:
+
+```
+TV Shows Root Folders:
+  /tv/fast1     - Fast_8TB_1 (New/Popular shows)
+  /tv/fast2     - Fast_8TB_2 (Ongoing series)
+  /tv/fast3     - Fast_8TB_3 (4K content)
+  /tv/slow1     - Slow_4TB_1 (Archive/Completed)
+  /tv/slow2     - Slow_4TB_2 (Archive/Completed)
+
+Movie Root Folders:
+  /movies/fast1 - Fast_8TB_1 (New releases/4K)
+  /movies/fast2 - Fast_8TB_2 (Popular movies)
+  /movies/slow1 - Slow_4TB_1 (Archive movies)
+  /movies/slow2 - Slow_4TB_2 (Archive movies)
+```
+
+## 🛡️ **Security & Network Configuration**
+
+### **Firewall Setup (UFW)**
+```bash
+# Allow SSH
+sudo ufw allow ssh
+
+# Media services (adjust subnet for your network)
+sudo ufw allow from 192.168.0.0/16 to any port 8080,8989,7878,6767,9696
+
+# File sharing
+sudo ufw allow from 192.168.0.0/16 to any port 139,445,2049,111
+
+# Monitoring (optional - restrict as needed)
+sudo ufw allow from 192.168.0.0/16 to any port 19999,9000
+
+# Enable firewall
+sudo ufw enable
+```
+
+### **Docker Swarm Security**
+- **Encrypted Networks**: Media services use encrypted overlay networks
+- **TLS Communication**: All inter-node communication is encrypted
+- **Node Authentication**: Swarm tokens provide secure node joining
+- **Service Isolation**: Each service runs in isolated containers
+
+### **File Sharing Security**
+- **Network Restriction**: SMB/NFS limited to trusted subnet
+- **User Authentication**: Optional user-based access control
+- **Guest Access**: Configurable guest access for ease of use
+
+## 📈 **Performance Optimization**
+
+### **Resource Allocation Strategy**
+
+#### **High-Priority Services** (Performance-critical)
+- **SABnzbd**: 2 CPU cores, 2GB RAM during downloads
+- **Transmission**: 1.5 CPU cores, 1GB RAM for seeding
+- **Prowlarr**: 0.5 CPU cores, 512MB RAM for indexing
+
+#### **Medium-Priority Services** (Steady-state)
+- **Sonarr/Radarr**: 1 CPU core, 1GB RAM each
+- **Bazarr**: 0.5 CPU cores, 512MB RAM
+- **Samba/NFS**: 0.5 CPU cores, 512MB RAM
+
+#### **Low-Priority Services** (Background)
+- **Readarr/Mylar3**: 0.5 CPU cores, 512MB RAM
+- **YacReader**: 0.25 CPU cores, 256MB RAM
+- **Jackett**: 0.25 CPU cores, 256MB RAM
+
+### **Storage Performance Tips**
+
+1. **Fast Tier Optimization**
+   - Use for actively downloaded content
+   - Configure as primary in download clients
+   - Set as default for new content
+
+2. **Archive Tier Usage**
+   - Move completed/watched content
+   - Use for long-term storage
+   - Schedule regular cleanup
+
+3. **JBOD Best Practices**
+   - Monitor individual drive health
+   - Plan for drive replacement/expansion
+   - Use drive-specific mount points
+
+## 🔍 **Monitoring & Troubleshooting**
+
+### **Health Monitoring**
+
+#### **System-Level Monitoring**
+```bash
+# Real-time system monitoring
+# Access Netdata at http://localhost:19999
+
+# Manual system checks
+./manage.sh system-health
+./manage.sh network-diag
+```
+
+#### **Service-Level Monitoring**
+```bash
+# Check all services
+./manage.sh status
+
+# Monitor specific service logs
+./manage.sh logs sonarr
+
+# Check file sharing services
+./manage.sh sharing-info
+```
+
+### **Common Issues & Solutions**
+
+#### **Download Issues**
+```bash
+# Check download clients
+./manage.sh logs sabnzbd
+./manage.sh logs transmission
+
+# Restart download services
+./manage.sh restart-service sabnzbd
+```
+
+#### **File Sharing Issues**
+```bash
+# Test Samba connectivity
+smbclient -L localhost -N
+
+# Test NFS exports
+showmount -e localhost
+
+# Restart sharing services
+./manage.sh restart-service samba
+./manage.sh restart-service nfs-server
+```
+
+#### **Storage Issues**
+```bash
+# Check disk usage
+df -h /media/joe/*
+
+# Check mount points
+mount | grep /media/joe
+
+# Monitor I/O
+iotop
+```
+
+### **Log Locations**
+- **Docker Logs**: `docker logs <container_name>`
+- **System Logs**: `/var/log/syslog`
+- **Service Configs**: `/home/joe/usenet/config/`
+- **Backup Logs**: `/home/joe/usenet/backups/`
+
+## 🚀 **Scaling & Expansion**
+
+### **Adding Storage**
+
+1. **Physical Drive Addition**
+   ```bash
+   # Format new drive
+   sudo mkfs.ext4 /dev/sdX
+   
+   # Create mount point
+   sudo mkdir /media/joe/New_Drive
+   
+   # Add to /etc/fstab
+   echo "/dev/sdX /media/joe/New_Drive ext4 defaults 0 2" | sudo tee -a /etc/fstab
+   
+   # Mount drive
+   sudo mount -a
+   ```
+
+2. **Update Docker Compose**
+   ```yaml
+   # Add new volume mount to relevant services
+   volumes:
+     - /media/joe/New_Drive:/movies/new_drive:rw
+   ```
+
+3. **Configure in *arr Services**
+   - Add new root folder in Sonarr/Radarr
+   - Set appropriate quality profiles
+   - Configure storage preferences
+
+### **Adding Compute Nodes**
+
+1. **Prepare New Node**
+   ```bash
+   # Install Docker
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sh get-docker.sh
+   
+   # Copy management script
+   scp manage.sh user@new-node:/path/to/script/
+   ```
+
+2. **Join Swarm**
+   ```bash
+   # On manager node, get join token
+   docker swarm join-token worker
+   
+   # On new node
+   ./manage.sh join-swarm <token> <manager-ip>
+   ```
+
+3. **Label and Deploy**
+   ```bash
+   # Label node based on capabilities
+   ./manage.sh label-nodes
+   
+   # Services automatically deploy based on constraints
+   ```
+
+### **Service Expansion**
+
+#### **Additional Media Types**
+- **Lidarr**: Music management (add to compose file)
+- **LazyLibrarian**: Additional book management
+- **Headphones**: Music discovery and download
+
+#### **Enhancement Services**
+- **Overseerr**: User request management
+- **Tautulli**: Plex analytics (if using Plex)
+- **Ombi**: Media request platform
+
+#### **Backup Solutions**
+- **Duplicati**: Automated cloud backups
+- **Restic**: Efficient backup solution
+- **Syncthing**: P2P file synchronization
+
+## 🔄 **Backup & Recovery**
+
+### **Configuration Backup**
+```bash
+# Automated backup
+./manage.sh backup-configs
+
+# Manual backup
+tar czf backup_$(date +%Y%m%d).tar.gz /home/joe/usenet/config/
+```
+
+### **Data Backup Strategy**
+
+1. **Configuration Data** (Critical)
+   - Service configurations
+   - Docker compose files
+   - Database files
+   - **Frequency**: Daily
+
+2. **Media Metadata** (Important)
+   - *arr databases
+   - Custom artwork
+   - **Frequency**: Weekly
+
+3. **Media Files** (Replaceable)
+   - Movies, TV shows, etc.
+   - Can be re-downloaded
+   - **Frequency**: Optional/None
+
+### **Disaster Recovery**
+
+1. **Service Recovery**
+   ```bash
+   # Stop current stack
+   ./manage.sh stop
+   
+   # Restore configuration
+   tar xzf backup_20231215.tar.gz -C /
+   
+   # Restart stack
+   ./manage.sh start
+   ```
+
+2. **Complete System Recovery**
+   ```bash
+   # Reinstall Docker
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sh get-docker.sh
+   
+   # Restore code and configs
+   git clone <your-fork> /home/joe/usenet
+   tar xzf config_backup.tar.gz -C /home/joe/usenet/
+   
+   # Start services
+   cd /home/joe/usenet
+   ./manage.sh start
+   ```
+
+## 📚 **Additional Resources**
+
+### **Community & Documentation**
+- **Servarr Wiki**: https://wiki.servarr.com/
+- **Docker Swarm Docs**: https://docs.docker.com/engine/swarm/
+- **Samba Documentation**: https://www.samba.org/samba/docs/
+- **NFS Documentation**: https://nfs.sourceforge.net/
+
+### **Recommended Reading**
+- JBOD vs RAID configurations
+- Docker Swarm networking
+- Media organization best practices
+- Usenet vs BitTorrent strategies
 
 ---
 
-**Note:** This setup is designed for personal use. Ensure compliance with local laws regarding content downloading and sharing. 
+## 📝 **Quick Reference Commands**
+
+```bash
+# Daily Operations
+./manage.sh start              # Start all services
+./manage.sh status             # Check service health
+./manage.sh system-health      # System overview
+
+# Troubleshooting
+./manage.sh logs <service>     # View service logs
+./manage.sh restart-service <service>  # Restart specific service
+./manage.sh network-diag       # Network diagnostics
+
+# Maintenance
+./manage.sh update             # Update all services
+./manage.sh backup-configs     # Backup configurations
+./manage.sh create-share <name> <path>  # Create new share
+
+# Multi-Device
+./manage.sh init-swarm         # Initialize Docker Swarm
+./manage.sh join-swarm <token> <ip>  # Join existing swarm
+./manage.sh label-nodes        # Label nodes for placement
+```
+
+**🎯 This stack is designed for production use with emphasis on reliability, scalability, and ease of management across multiple devices.** 
