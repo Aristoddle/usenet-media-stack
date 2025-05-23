@@ -41,19 +41,13 @@ version: '3.8'
 # Define networks for service isolation and Swarm compatibility
 networks:
   media_network:
-    driver: overlay
-    driver_opts:
-      encrypted: "true"
-    attachable: true
+    driver: bridge
     ipam:
       config:
         - subnet: 172.20.0.0/16
   
   sharing_network:
-    driver: overlay
-    driver_opts:
-      encrypted: "false"  # SMB/NFS need unencrypted for compatibility
-    attachable: true
+    driver: bridge
     ipam:
       config:
         - subnet: 172.21.0.0/16
@@ -63,26 +57,42 @@ volumes:
   sabnzbd_config:
     driver: local
     driver_opts:
-      type: nfs
-      o: addr=storage-node,rw,nfsvers=4
-      device: ":/storage/config/sabnzbd"
+      type: bind
+      o: bind
+      device: /home/joe/usenet/config/sabnzbd
   
   transmission_config:
     driver: local
     driver_opts:
-      type: nfs
-      o: addr=storage-node,rw,nfsvers=4
-      device: ":/storage/config/transmission"
+      type: bind
+      o: bind
+      device: /home/joe/usenet/config/transmission
   
   # Additional configs follow same pattern
   sonarr_config:
     driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: /home/joe/usenet/config/sonarr
   radarr_config:
     driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: /home/joe/usenet/config/radarr
   bazarr_config:
     driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: /home/joe/usenet/config/bazarr
   prowlarr_config:
     driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: /home/joe/usenet/config/prowlarr
   
   # Shared storage volumes
   downloads_volume:
@@ -116,14 +126,8 @@ services:
     networks:
       - sharing_network
     ports:
-      - target: 139
-        published: 139
-        protocol: tcp
-        mode: host
-      - target: 445
-        published: 445
-        protocol: tcp
-        mode: host
+      - "139:139"
+      - "445:445"
     environment:
       - TZ=Etc/UTC
       - USERID=1000
@@ -188,26 +192,11 @@ services:
     networks:
       - sharing_network
     ports:
-      - target: 2049
-        published: 2049
-        protocol: tcp
-        mode: host
-      - target: 111
-        published: 111
-        protocol: tcp
-        mode: host
-      - target: 111
-        published: 111
-        protocol: udp
-        mode: host
-      - target: 32765
-        published: 32765
-        protocol: tcp
-        mode: host
-      - target: 32767
-        published: 32767
-        protocol: udp
-        mode: host
+      - "2049:2049"
+      - "111:111"
+      - "111:111/udp"
+      - "32765:32765"
+      - "32767:32767/udp"
     cap_add:
       - SYS_ADMIN
     privileged: true
