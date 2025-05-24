@@ -1,8 +1,48 @@
-# Complete Home Media Automation & Network Sharing Stack
+# 🎬 Usenet Media Automation Stack
 
-**Version 2.0** - Docker Swarm Ready with Integrated Samba/NFS
+**Version 2.0** - A complete, production-ready media automation system with one-command deployment
 
-A unified, production-ready media automation stack that combines the complete *arr suite with integrated file sharing services, designed for multi-device deployment and optimal resource utilization.
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-Private-red)]()
+[![Maintenance](https://img.shields.io/badge/Maintained-Yes-green)]()
+
+## 🚀 One-Command Setup
+
+```bash
+git clone https://github.com/Aristoddle/usenet-media-stack.git
+cd usenet-media-stack
+./one-click-setup.sh
+```
+
+That's it! Your complete media automation system is now running.
+
+## 📚 Documentation
+
+- **[Quick Start Guide](QUICK_START.md)** - Get running in 5 minutes
+- **[Complete Documentation](COMPLETE_DOCUMENTATION.md)** - Everything you need to know
+- **[Technical Reference](TECHNICAL_REFERENCE.md)** - Deep dive for developers
+- **[Media Services Setup](MEDIA_SERVICES_SETUP.md)** - Jellyfin, Overseerr, and more
+- **[Stack Recommendations](STACK_RECOMMENDATIONS.md)** - Additional tools to consider
+
+## 🏗️ What's Included
+
+### Core Services
+- **Media Management**: Sonarr, Radarr, Lidarr, Readarr, Mylar3, Bazarr
+- **Download Automation**: SABnzbd (Usenet), Transmission (Torrents)
+- **Indexer Management**: Prowlarr, Jackett
+- **Media Streaming**: Jellyfin, Overseerr, Tautulli
+- **File Sharing**: Samba, NFS
+- **Monitoring**: Netdata, Portainer
+- **Post-Processing**: Unpackerr
+
+### Key Features
+- ✅ **One-click deployment** - Everything configured automatically
+- ✅ **Passwordless local access** - Convenient for home networks
+- ✅ **JBOD support** - Intelligent drive management for any storage setup
+- ✅ **1Password integration** - Secure credential management
+- ✅ **Docker Swarm ready** - Scale across multiple machines
+- ✅ **Pre-configured providers** - Newshosting, UsenetExpress, Frugalusenet
+- ✅ **Ready-to-use indexers** - NZBgeek, NZBFinder, NZBsu, NZBPlanet
 
 ## 🏗️ **Architecture Overview**
 
