@@ -13,6 +13,7 @@
 #   manage      Service management (start/stop/status/logs)
 #   test        Run test suite
 #   validate    Pre-deployment validation
+#   deps        Check dependencies
 #   creds       Extract credentials from 1Password
 #   backup      Backup configuration
 #   restore     Restore from backup
@@ -72,6 +73,15 @@ main() {
 
     case "$command" in
         setup|deploy)
+            # Run dependency check first unless skipped
+            if [[ "${1:-}" != "--skip-deps" ]]; then
+                info "Checking dependencies..."
+                if ! "$SCRIPT_DIR/check-dependencies.sh"; then
+                    error "Please install missing dependencies first"
+                    exit 1
+                fi
+                echo ""
+            fi
             exec "$SCRIPT_DIR/one-click-setup.sh" "$@"
             ;;
         manage|mgmt)
@@ -82,6 +92,9 @@ main() {
             ;;
         validate|check)
             exec "$SCRIPT_DIR/validate-deployment.sh" "$@"
+            ;;
+        deps|dependencies)
+            exec "$SCRIPT_DIR/check-dependencies.sh" "$@"
             ;;
         creds|credentials)
             exec "$SCRIPT_DIR/extract-usenet-creds.sh" "$@"

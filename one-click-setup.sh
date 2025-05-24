@@ -138,14 +138,32 @@ preflight_checks() {
     # Check Docker
     if ! command -v docker &> /dev/null; then
         error "Docker is not installed"
+        echo "Install with: curl -fsSL https://get.docker.com | sh"
+        echo "Or see: https://docs.docker.com/engine/install/"
         exit 1
     fi
     
     if ! docker ps &> /dev/null; then
         error "Docker daemon is not running"
+        echo "Start with: sudo systemctl start docker"
         exit 1
     fi
     success "Docker is running"
+    
+    # Check required tools
+    local missing_tools=()
+    for tool in curl jq; do
+        if ! command -v "$tool" &> /dev/null; then
+            missing_tools+=("$tool")
+        fi
+    done
+    
+    if [[ ${#missing_tools[@]} -gt 0 ]]; then
+        error "Missing required tools: ${missing_tools[*]}"
+        echo "Install with: sudo apt install ${missing_tools[*]}"
+        exit 1
+    fi
+    success "All required tools installed"
     
     # Check disk space
     local disk_usage=$(df -h "$SCRIPT_DIR" | awk 'NR==2 {print $5}' | sed 's/%//')
