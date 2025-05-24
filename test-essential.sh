@@ -5,6 +5,9 @@
 
 set -euo pipefail
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
 # Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -73,7 +76,7 @@ echo -e "\n${YELLOW}Common Issues:${NC}"
 
 # Check for duplicate functions in one-click-setup.sh
 echo -n "• No duplicate functions: "
-if ! grep -E "^[a-zA-Z_]+\(\)" one-click-setup.sh | sort | uniq -d | grep -q .; then
+if ! command grep -E "^[a-zA-Z_]+\(\)" one-click-setup.sh | sort | uniq -d | command grep -q .; then
     echo -e "${GREEN}PASS${NC}"
 else
     echo -e "${RED}FAIL${NC} - Found duplicate functions"
@@ -83,7 +86,7 @@ TESTS=$((TESTS + 1))
 
 # Check for hardcoded /home/joe paths
 echo -n "• No hardcoded paths: "
-if ! grep -r "/home/joe" --include="*.sh" . 2>/dev/null | grep -v "^Binary" | grep -q .; then
+if ! command grep -r "/home/joe" --include="*.sh" . 2>/dev/null | command grep -v "^Binary" | command grep -v "test-essential.sh" | command grep -q .; then
     echo -e "${GREEN}PASS${NC}"
 else
     echo -e "${RED}FAIL${NC} - Found hardcoded /home/joe paths"

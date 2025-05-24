@@ -5,6 +5,9 @@
 
 set -euo pipefail
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
 # Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -44,7 +47,7 @@ check() {
 echo -e "${YELLOW}1. Core Infrastructure${NC}"
 check "Docker installed" "command -v docker"
 check "Docker Compose v2" "docker compose version"
-check "Project directory" "[[ -d /home/joe/usenet ]]"
+check "Project directory" "[[ -d $SCRIPT_DIR ]]"
 
 echo -e "\n${YELLOW}2. Essential Files${NC}"
 check "docker-compose.yml" "[[ -f docker-compose.yml ]]"
