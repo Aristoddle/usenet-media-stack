@@ -184,6 +184,12 @@ MIT License - see [LICENSE](LICENSE) file
 
 Built with love by the Usenet community. Special thanks to all the developers of the included services.
 
+## 📖 Dedication
+
+This project is dedicated to **Stanley Eisenstat** (1943-2020), who taught generations at Yale that good code explains itself. See [DEDICATION.md](DEDICATION.md) for the full tribute.
+
+*"If you can't explain it to a freshman, you don't understand it yourself."* - Stan Eisenstat
+
 ---
 
 **Need help?** Open an issue on [GitHub](https://github.com/Aristoddle/usenet-media-stack/issues)
