@@ -162,25 +162,25 @@ As of 2025-05-24, this project has MAJOR issues:
 #=============================================================================
 
 ## Step 1.1: Create Clean Entry Point (1 hour)
-- [ ] Create new `usenet` script in zsh with proper header
-- [ ] Implement command routing (setup, manage, storage, etc.)
-- [ ] Add comprehensive --help system
+- [x] Create new `usenet` script in zsh with proper header
+- [x] Implement command routing (setup, manage, storage, etc.)
+- [x] Add comprehensive --help system
 - [ ] Test all command paths
 
 ## Step 1.2: Create lib/ Structure (2 hours)
-- [ ] mkdir -p lib/{commands,core,platform}
-- [ ] Create lib/core.zsh with shared functions
+- [x] mkdir -p lib/{commands,core,platform}
+- [x] Create lib/core.zsh with shared functions
 - [ ] Create lib/platform.zsh with OS detection
 - [ ] Create lib/ui.zsh with display functions
 - [ ] Create lib/help.zsh with help text
 
 ## Step 1.3: Move Core Logic (3 hours)
 Scripts to consolidate into lib/commands/:
-- [ ] one-click-setup.sh → lib/commands/setup.zsh
-- [ ] manage.sh → lib/commands/manage.zsh
-- [ ] setup-all.sh → merge into setup.zsh
-- [ ] configure-*.sh → lib/commands/configure.zsh
-- [ ] All test scripts → lib/commands/test.zsh
+- [x] one-click-setup.sh → lib/commands/setup.zsh
+- [x] manage.sh → lib/commands/manage.zsh
+- [x] setup-all.sh → merge into setup.zsh
+- [x] configure-*.sh → lib/commands/configure.zsh
+- [x] All test scripts → lib/commands/test.zsh
 
 ## Step 1.4: Delete Redundant Files (1 hour)
 Files to DELETE after moving logic:

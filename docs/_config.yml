@@ -1,0 +1,26 @@
+# GitHub Pages Configuration
+theme: minima
+title: Usenet Media Stack
+description: A modern, secure, and automated media management system
+author: Joseph Lanzone
+email: j3lanzone@gmail.com
+
+# Navigation
+header_pages:
+  - index.md
+  - guide.md
+  - storage.md
+  - security.md
+  - troubleshooting.md
+  - api.md
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Exclude files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
