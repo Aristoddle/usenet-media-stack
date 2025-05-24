@@ -198,13 +198,13 @@ get_service_api_key() {
   # In the future, we could scrape them from the config files
   case "$service" in
     prowlarr)
-      echo "$(grep -oP '(?<=<ApiKey>)[^<]+' /home/joe/usenet/config/prowlarr/config.xml 2>/dev/null || echo "")"
+      echo "$(grep -oP '(?<=<ApiKey>)[^<]+' $HOME/usenet/config/prowlarr/config.xml 2>/dev/null || echo "")"
       ;;
     sonarr)
-      echo "$(grep -oP '(?<=<ApiKey>)[^<]+' /home/joe/usenet/config/sonarr/config.xml 2>/dev/null || echo "")"
+      echo "$(grep -oP '(?<=<ApiKey>)[^<]+' $HOME/usenet/config/sonarr/config.xml 2>/dev/null || echo "")"
       ;;
     radarr)
-      echo "$(grep -oP '(?<=<ApiKey>)[^<]+' /home/joe/usenet/config/radarr/config.xml 2>/dev/null || echo "")"
+      echo "$(grep -oP '(?<=<ApiKey>)[^<]+' $HOME/usenet/config/radarr/config.xml 2>/dev/null || echo "")"
       ;;
     *)
       echo ""

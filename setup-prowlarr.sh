@@ -1,7 +1,7 @@
 #!/bin/bash
 # Extract Usenet indexer credentials for Prowlarr setup
 
-source /home/joe/usenet/op-helper.sh
+source $HOME/usenet/op-helper.sh
 
 echo "=== Usenet Indexer Credentials ==="
 echo

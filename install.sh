@@ -27,7 +27,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 USER_NAME="joe"
 USER_ID="1000"
 GROUP_ID="1000"
-INSTALL_DIR="/home/joe/usenet"
+INSTALL_DIR="$HOME/usenet"
 DOCKER_COMPOSE_VERSION="2.24.0"
 SWARM_SETUP=false
 SECURITY_HARDENING=true
@@ -255,11 +255,11 @@ configure_storage() {
     
     # Create base directories
     log_info "Creating directory structure..."
-    sudo mkdir -p /media/joe
+    sudo mkdir -p /media/$USER
     sudo mkdir -p $INSTALL_DIR/{config,downloads,backups}
     
     # Set permissions
-    sudo chown -R $USER_NAME:$USER_NAME /media/joe
+    sudo chown -R $USER_NAME:$USER_NAME /media/$USER
     sudo chown -R $USER_NAME:$USER_NAME $INSTALL_DIR
     
     # Detect available drives
@@ -278,7 +278,7 @@ configure_storage() {
                 read -p "Mount point (e.g., Fast_8TB_1): " mount_name
                 
                 if [[ -n "$mount_name" ]]; then
-                    mount_point="/media/joe/$mount_name"
+                    mount_point="/media/$USER/$mount_name"
                     
                     # Create filesystem if needed
                     if ! sudo blkid "$drive" &>/dev/null; then
@@ -482,12 +482,12 @@ post_installation() {
     cat >> ~/.bashrc << 'EOF'
 
 # Media Server Aliases
-alias media-start='cd /home/joe/usenet && ./manage.sh start'
-alias media-stop='cd /home/joe/usenet && ./manage.sh stop'
-alias media-status='cd /home/joe/usenet && ./manage.sh status'
-alias media-logs='cd /home/joe/usenet && ./manage.sh logs'
-alias media-health='cd /home/joe/usenet && ./manage.sh system-health'
-alias media-backup='cd /home/joe/usenet && ./manage.sh backup-configs'
+alias media-start='cd $HOME/usenet && ./manage.sh start'
+alias media-stop='cd $HOME/usenet && ./manage.sh stop'
+alias media-status='cd $HOME/usenet && ./manage.sh status'
+alias media-logs='cd $HOME/usenet && ./manage.sh logs'
+alias media-health='cd $HOME/usenet && ./manage.sh system-health'
+alias media-backup='cd $HOME/usenet && ./manage.sh backup-configs'
 EOF
     
     # Create desktop shortcuts (if GUI available)
@@ -515,10 +515,10 @@ EOF
     cat > $INSTALL_DIR/backup-cron.sh << 'EOF'
 #!/bin/bash
 # Automated backup script for media server
-cd /home/joe/usenet
+cd $HOME/usenet
 ./manage.sh backup-configs
 # Keep only last 7 days of backups
-find /home/joe/usenet/backups -name "*.tar.gz" -mtime +7 -delete
+find $HOME/usenet/backups -name "*.tar.gz" -mtime +7 -delete
 EOF
     
     chmod +x $INSTALL_DIR/backup-cron.sh
@@ -557,7 +557,7 @@ show_completion() {
 
 📁 FILE SHARING:
    • SMB/CIFS:          \\\\$hostname\\Media or smb://$ip/Media
-   • NFS:               mount -t nfs $ip:/media/joe /mnt/point
+   • NFS:               mount -t nfs $ip:/media/$USER /mnt/point
 
 🔐 SECURITY:
    • Firewall:          sudo ufw status
