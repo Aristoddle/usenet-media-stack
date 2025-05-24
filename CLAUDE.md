@@ -1,334 +1,515 @@
-# CLAUDE.md
+#!/usr/bin/env zsh
+##############################################################################
+# File: ./CLAUDE.md
+# Project: Usenet Media Stack
+# Description: Development guidelines and standards for AI-assisted coding
+# Created: 2025-05-24
+# Modified: 2025-05-24
+# Version: 2.0.0
+#
+# This file provides comprehensive guidance to Claude Code and other AI
+# assistants when working with this repository. It establishes coding
+# standards, architectural decisions, and development practices.
+##############################################################################
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+##############################################################################
+#                            PROJECT OVERVIEW                                #
+##############################################################################
 
-## Repository Overview
+This is a production-grade media automation stack using Docker Compose,
+designed for both single-device and multi-device deployments. The system
+manages Usenet downloads, media organization, and streaming with 20+
+integrated services.
 
-This is a comprehensive media automation stack using Docker Compose, designed for both single-device and multi-device deployments via Docker Swarm. The system manages media downloads, organization, and file sharing with 20+ integrated services.
+Target Audience: Power users and enthusiasts who want a professional-grade
+media server without the complexity of enterprise solutions.
 
-## Common Commands
+##############################################################################
+#                          CRITICAL STANDARDS                                #
+##############################################################################
 
-### Quick Start - One-Command Setup
+#=============================================================================
+# 1. FILE STRUCTURE AND HEADERS
+#=============================================================================
+
+EVERY file must begin with:
+
+```zsh
+#!/usr/bin/env zsh
+##############################################################################
+# File: <path relative to project root>
+# Project: Usenet Media Stack
+# Description: <one line description>
+# Author: Joseph Lanzone <j3lanzone@gmail.com>
+# Created: 2025-05-24
+# Modified: 2025-05-24
+# Version: X.Y.Z
+# License: MIT
+#
+# <Detailed description of what this file does, wrapped at 80 chars>
+##############################################################################
+```
+
+#=============================================================================
+# 2. CODE STYLE REQUIREMENTS
+#=============================================================================
+
+- Language: zsh (NOT bash, NOT sh)
+- Line width: 80 characters MAXIMUM
+- Indentation: 4 spaces (NO tabs)
+- Functions: MUST have docstring blocks
+- Sections: Delimited with 78 # characters
+- Variables: lowercase_with_underscores
+- Constants: UPPERCASE_WITH_UNDERSCORES
+- File paths: ALWAYS relative to project root
+
+#=============================================================================
+# 3. FUNCTION DOCUMENTATION
+#=============================================================================
+
+EVERY function must have:
+
+```zsh
+#=============================================================================
+# Function: function_name
+# Description: One-line summary
+#
+# Detailed description of what the function does, including any important
+# implementation details or limitations.
+#
+# Arguments:
+#   $1 - parameter_name (type, required/optional)
+#        Detailed description of parameter
+#   $2 - another_param (optional, default: value)
+#        Description of this parameter
+#
+# Returns:
+#   0 - Success condition
+#   1 - Error condition 1
+#   2 - Error condition 2
+#
+# Side Effects:
+#   - Creates files in /tmp
+#   - Modifies global variable X
+#   - Prints to stdout/stderr
+#
+# Example:
+#   if function_name "arg1" "arg2"; then
+#       echo "Success"
+#   fi
+#=============================================================================
+```
+
+#=============================================================================
+# 4. ERROR HANDLING
+#=============================================================================
+
+- ALWAYS check command success
+- NEVER use 'set -e' alone (use 'set -euo pipefail')
+- Provide meaningful error messages
+- Include recovery suggestions
+- Use proper exit codes
+
+#=============================================================================
+# 5. DIRECTORY STRUCTURE
+#=============================================================================
+
+IDEAL structure (NOT current state):
+
+```
+usenet-media-stack/
+├── usenet                  # Single entry point (zsh)
+├── README.md              # Beautiful with GIFs
+├── LICENSE                # MIT license
+├── docker-compose.yml     # Main compose file
+├── .env.example          # Example configuration
+├── .gitignore           # Proper ignores
+├── lib/                 # ALL implementation
+│   ├── core.zsh        # Core functions
+│   ├── platform.zsh    # OS compatibility
+│   ├── docker.zsh      # Docker management
+│   ├── storage.zsh     # JBOD/storage
+│   ├── ui.zsh          # User interface
+│   └── commands/       # Command implementations
+├── config/             # Service configurations
+├── docs/              # Minimal documentation
+│   ├── GUIDE.md       # Complete user guide
+│   ├── STORAGE.md     # JBOD setup guide
+│   └── DEVELOPMENT.md # For contributors
+└── tests/             # Automated tests
+```
+
+##############################################################################
+#                         CURRENT STATE ISSUES                               #
+##############################################################################
+
+As of 2025-05-24, this project has MAJOR issues:
+
+1. **File Sprawl**: 59 files in root (should be <10)
+2. **Entry Points**: 30+ scripts (should be 1)
+3. **Documentation**: 18 MD files (should be 3-4)
+4. **Style**: Mixed bash/sh instead of pure zsh
+5. **Organization**: No clear module structure
+6. **Storage Docs**: Missing JBOD documentation
+7. **Docstrings**: Most functions undocumented
+
+##############################################################################
+#                         REFACTORING PLAN                                   #
+##############################################################################
+
+#=============================================================================
+# PHASE 1: CONSOLIDATION (8 hours)
+#=============================================================================
+
+## Step 1.1: Create Clean Entry Point (1 hour)
+- [ ] Create new `usenet` script in zsh with proper header
+- [ ] Implement command routing (setup, manage, storage, etc.)
+- [ ] Add comprehensive --help system
+- [ ] Test all command paths
+
+## Step 1.2: Create lib/ Structure (2 hours)
+- [ ] mkdir -p lib/{commands,core,platform}
+- [ ] Create lib/core.zsh with shared functions
+- [ ] Create lib/platform.zsh with OS detection
+- [ ] Create lib/ui.zsh with display functions
+- [ ] Create lib/help.zsh with help text
+
+## Step 1.3: Move Core Logic (3 hours)
+Scripts to consolidate into lib/commands/:
+- [ ] one-click-setup.sh → lib/commands/setup.zsh
+- [ ] manage.sh → lib/commands/manage.zsh
+- [ ] setup-all.sh → merge into setup.zsh
+- [ ] configure-*.sh → lib/commands/configure.zsh
+- [ ] All test scripts → lib/commands/test.zsh
+
+## Step 1.4: Delete Redundant Files (1 hour)
+Files to DELETE after moving logic:
+- [ ] All *.sh files in root (except during transition)
+- [ ] All test-*.sh files
+- [ ] All setup-*.sh variants
+- [ ] quick-install.sh, auto-install-deps.sh (merge to setup)
+
+## Step 1.5: Documentation Consolidation (1 hour)
+Keep ONLY these docs:
+- [ ] README.md (rewrite with GIFs)
+- [ ] docs/GUIDE.md (merge all guides)
+- [ ] docs/STORAGE.md (NEW - JBOD guide)
+- [ ] docs/TROUBLESHOOTING.md
+
+DELETE these docs:
+- [ ] AUTOMATED_SETUP.md
+- [ ] COMPLETE_DOCUMENTATION.md
+- [ ] MEDIA_SERVICES_SETUP.md
+- [ ] MIGRATION_NOTES.md
+- [ ] PROJECT_STATUS.md
+- [ ] SETUP_GUIDE.md
+- [ ] STACK_RECOMMENDATIONS.md
+- [ ] TECHNICAL_REFERENCE.md
+- [ ] All *PLAN*.md, *REPORT*.md files
+
+#=============================================================================
+# PHASE 2: STANDARDIZATION (4 hours)
+#=============================================================================
+
+## Step 2.1: ZSH Conversion (1 hour)
+For EVERY file in lib/:
+- [ ] Change shebang to #!/usr/bin/env zsh
+- [ ] Add proper file header with location
+- [ ] Update bash-specific syntax to zsh
+- [ ] Test each file still works
+
+## Step 2.2: Add Headers (1 hour)
+EVERY file needs:
+```zsh
+#!/usr/bin/env zsh
+##############################################################################
+# File: ./lib/path/to/file.zsh
+# Project: Usenet Media Stack
+# Description: One-line description
+# Author: Joseph Lanzone <j3lanzone@gmail.com>
+# Created: 2025-05-24
+# Modified: 2025-05-24
+# Version: 1.0.0
+# License: MIT
+#
+# Detailed description wrapped at 80 characters explaining what this
+# file does and how it fits into the overall system.
+##############################################################################
+```
+
+## Step 2.3: Function Documentation (1.5 hours)
+For EVERY function add:
+```zsh
+#=============================================================================
+# Function: function_name
+# Description: One-line summary
+#
+# Detailed description...
+#
+# Arguments:
+#   $1 - name (type, required/optional)
+#        Description
+#
+# Returns:
+#   0 - Success
+#   1 - Error condition
+#
+# Example:
+#   function_name "arg1" "arg2"
+#=============================================================================
+```
+
+## Step 2.4: Code Formatting (0.5 hours)
+- [ ] Enforce 80-character line limit
+- [ ] Add section dividers (78 #'s)
+- [ ] Consistent 4-space indentation
+- [ ] Remove all tabs
+
+#=============================================================================
+# PHASE 3: DOCUMENTATION (4 hours)
+#=============================================================================
+
+## Step 3.1: README.md Rewrite (1.5 hours)
+Structure:
+```markdown
+<p align="center">
+  <img src="docs/assets/banner.png" width="600">
+</p>
+
+<p align="center">
+  [badges for version, platform, license]
+</p>
+
+# 🎬 Usenet Media Stack
+
+One line value prop.
+
+![Demo GIF](docs/assets/demo.gif)
+
+## ✨ Features
+- 🚀 One-command deployment
+- 💾 JBOD support
+- 🔒 Secure by default
+
+## 📦 What's Included
+[Table of services]
+
+## 🚀 Quick Start
 ```bash
-# Complete automated setup (starts stack, configures all services)
-./one-click-setup.sh
+git clone ...
+cd usenet-media-stack
+./usenet setup
 ```
 
-### Deployment and Management
-```bash
-# Service management
-./manage.sh start                    # Deploy entire stack
-./manage.sh stop                     # Stop all services
-./manage.sh restart                  # Restart all services
-./manage.sh status                   # Check service health
-./manage.sh logs [service_name]      # View service logs
-./manage.sh restart-service <name>   # Restart specific service
-./manage.sh backup-configs          # Backup configurations
-./manage.sh system-health           # Resource monitoring
+## 💾 Storage
+[Brief intro, link to full guide]
 
-# Automated configuration
-./setup-all.sh --fresh              # Complete setup (configure + test)
-./setup-all.sh --configure          # Configure all services
-./setup-all.sh --test               # Test all connections
-./setup-all.sh --health             # Health check all services
-./setup-all.sh --update             # Update credentials from 1Password
-./setup-all.sh --dry-run            # Preview what would be done
-./setup-all.sh --verbose            # Detailed output
-
-# Service readiness check
-./wait-for-services.sh              # Wait for all services to be ready
+## 📖 Documentation
+- [Complete Guide](docs/GUIDE.md)
+- [Storage Setup](docs/STORAGE.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
 ```
 
-### Docker Swarm Operations
-```bash
-./manage.sh init-swarm              # Initialize swarm manager
-./manage.sh join-swarm <token> <ip> # Add worker node
-./manage.sh label-nodes             # Configure node placement
-./manage.sh update                  # Update all services
-```
+## Step 3.2: STORAGE.md Creation (1.5 hours)
+Must include:
+- [ ] What is JBOD?
+- [ ] Benefits over RAID for media
+- [ ] Initial setup walkthrough
+- [ ] Adding drives step-by-step
+- [ ] Monitoring capacity
+- [ ] Handling drive failures
+- [ ] Performance optimization
+- [ ] Backup strategies
 
-### Troubleshooting
-```bash
-# View logs for specific service
-docker logs usenet_prowlarr_1 --tail 50 -f
-docker logs usenet_sonarr_1 --tail 50 -f
+## Step 3.3: Consolidate Guides (1 hour)
+Merge into docs/GUIDE.md:
+- [ ] Installation steps
+- [ ] Service descriptions
+- [ ] Configuration options
+- [ ] 1Password integration
+- [ ] Network setup
+- [ ] Security hardening
+- [ ] Update procedures
+- [ ] Common workflows
 
-# Access service shell
-docker exec -it usenet_prowlarr_1 /bin/bash
+#=============================================================================
+# PHASE 4: POLISH (4 hours)
+#=============================================================================
 
-# Check API keys
-grep -oP '(?<=<ApiKey>)[^<]+' /home/joe/usenet/config/prowlarr/config.xml
-grep -oP '(?<=api_key = )[^\s]+' /home/joe/usenet/config/sabnzbd/config.ini
+## Step 4.1: Visual Assets (1 hour)
+- [ ] Create banner image (docs/assets/banner.png)
+- [ ] Record demo GIF showing setup process
+- [ ] Add service logos/icons
+- [ ] Create architecture diagram
 
-# Force recreate a service
-docker-compose up -d --force-recreate prowlarr
-```
+## Step 4.2: GitHub Polish (1 hour)
+- [ ] Add badges: version, platform, license, docker
+- [ ] Create .github/ISSUE_TEMPLATE/
+- [ ] Add .github/PULL_REQUEST_TEMPLATE.md
+- [ ] Update .gitignore (remove test outputs)
+- [ ] Add GitHub Actions for testing
 
-## Architecture
+## Step 4.3: Final Cleanup (1 hour)
+DELETE these files:
+- [ ] All .md files with PLAN, STATUS, REPORT in name
+- [ ] All test output files
+- [ ] Any .bak or ~ files
+- [ ] Duplicate scripts
 
-### Service Categories
-1. **Media Management**: Sonarr, Radarr, Bazarr, Prowlarr, Lidarr, Readarr, Mylar3, Whisparr
-2. **Download Clients**: SABnzbd (Usenet), Transmission (BitTorrent)
-3. **File Sharing**: Samba (SMB/CIFS), NFS server
-4. **Monitoring**: Netdata (system metrics), Portainer (container management)
-5. **Media Servers**: Jellyfin, YacReader
+## Step 4.4: Testing Suite (1 hour)
+Create tests/:
+- [ ] tests/unit/ - Function tests
+- [ ] tests/integration/ - Full stack tests
+- [ ] tests/platform/ - OS-specific tests
+- [ ] Add GitHub Actions workflow
 
-### Service Communication Flow
-```
-User searches in Sonarr/Radarr
-    ↓
-Prowlarr queries indexers (NZBgeek, NZBFinder, etc.)
-    ↓
-Results returned to Sonarr/Radarr
-    ↓
-User selects download
-    ↓
-Sent to SABnzbd with category (tv/movies/etc.)
-    ↓
-SABnzbd downloads from Usenet providers
-    ↓
-Completed download moved to /media/[category]/
-    ↓
-Sonarr/Radarr imports and renames
-```
+#=============================================================================
+# PHASE 5: FINAL CHECKLIST
+#=============================================================================
 
-### Network Architecture
-- `media_network` (172.20.0.0/16): Internal communication between media services
-- `sharing_network` (172.21.0.0/16): File sharing services (Samba/NFS)
-- Bridge networks for single-device deployments
-- Overlay networks for Docker Swarm multi-device deployments
+Before declaring complete:
 
-### Storage Structure
-```
-/media/
-├── movies/
-├── tv/
-├── music/
-├── books/
-├── comics/
-└── watch/
+## Code Quality
+- [ ] All files use zsh shebang
+- [ ] All files have proper headers
+- [ ] All functions have docstrings
+- [ ] 80-char line limit enforced
+- [ ] No tabs, only spaces
 
-/config/
-├── [service_name]/    # Per-service configuration
-└── examples/          # Configuration templates
+## File Structure
+- [ ] Root has <10 files
+- [ ] All logic in lib/
+- [ ] Documentation in docs/
+- [ ] Tests in tests/
 
-/downloads/
-├── complete/
-└── incomplete/
-```
+## Documentation
+- [ ] README is beautiful with GIFs
+- [ ] STORAGE.md explains JBOD
+- [ ] Help text is comprehensive
+- [ ] Examples for every command
 
-## Key Configuration Files
+## Functionality
+- [ ] Single entry point works
+- [ ] All commands tested
+- [ ] Cross-platform verified
+- [ ] Error messages helpful
 
-- `docker-compose.yml`: Main service definitions with resource limits
-- `optimized_resources.yml`: Hardware-specific resource optimization
-- `manage.sh`: Central management script for all operations
-- `install.sh`: Automated installation and security setup
+## GitHub Ready
+- [ ] Professional appearance
+- [ ] Clear value proposition
+- [ ] Easy to understand
+- [ ] Impressive to engineers
 
-## Important Considerations
+##############################################################################
+#                    IMMEDIATE NEXT STEPS                                    #
+##############################################################################
 
-1. **Resource Management**: Services have CPU/memory limits based on priority tiers (critical/standard/low)
-2. **Security**: Automated firewall rules, Fail2Ban, and network isolation are configured
-3. **JBOD Architecture**: Supports multiple drives without RAID - each drive is mounted independently
-4. **Service Dependencies**: Media services depend on download clients; all services depend on network configuration
-5. **Persistent Storage**: All configuration and media directories use bind mounts for data persistence
+When context resumes, START HERE:
 
-## System Commands
+1. **Create lib/ structure**
+   ```bash
+   mkdir -p lib/{commands,core,platform}
+   ```
 
-When running system commands that require sudo:
-- Use `echo "fishing123" | sudo -S` where relevant and necessary
-- Pass `-y` and `-ya` flags where useful to speed up calls and avoid prompts
+2. **Create the perfect usenet entry point**
+   - Copy from usenet-clean example
+   - Add proper header
+   - Test it works
 
-## Action Plan for Stable Automated Setup
+3. **Move one-click-setup.sh logic to lib/commands/setup.zsh**
+   - Extract core functionality
+   - Add proper headers and docstrings
+   - Make it beautiful
 
-### Current Status
-- ✅ Created init-sabnzbd.sh script to bypass wizard mode
-- ✅ Updated credentials.sh to extract API keys from sabnzbd.ini
-- ✅ Added initialize_sabnzbd() function to setup-all.sh
-- ✅ SABnzbd wizard bypassed and accessible
-- ✅ All services configured for passwordless local access
-- ✅ SABnzbd providers added to config file
-- ✅ Created test-setup.sh for validation
-- ⚠️  Services need to be connected via web UI or API
+4. **Delete the mess**
+   - Remove all test-*.sh files
+   - Remove all PLAN/STATUS/REPORT.md files
+   - Keep ONLY essential files
 
-### Immediate Action Checklist
+5. **Create STORAGE.md**
+   - This is the biggest missing piece
+   - Users have NO idea how to add drives
 
-#### 1. Fix SABnzbd Setup (DONE)
-- [x] Complete SABnzbd wizard programmatically via config
-- [x] Verify API key is working and accessible
-- [x] Fix download directory permissions permanently
-- [x] Test services are accessible
+##############################################################################
+#                         CODING GUIDELINES                                  #
+##############################################################################
 
-#### 2. Update API Implementation (NEXT)
-- [ ] Fix sabnzbd_add_server() in modules/api.sh to use correct endpoint
-- [ ] Add proper error handling and response validation
-- [ ] Implement prowlarr_add_indexer() with correct schema
-- [ ] Add arr_add_download_client() for connecting services
+#=============================================================================
+# WHEN ADDING NEW FEATURES
+#=============================================================================
 
-#### 3. Service Configuration Flow (THEN)
-- [ ] Configure SABnzbd providers (Newshosting, UsenetExpress, Frugalusenet)
-- [ ] Configure SABnzbd categories (tv, movies, books, comics)
-- [ ] Add all indexers to Prowlarr (NZBgeek, NZBFinder, NZBsu, NZBPlanet)
-- [ ] Connect SABnzbd to all *arr apps
-- [ ] Connect Prowlarr to all *arr apps
+1. NEVER create new scripts in root
+2. ALWAYS add to lib/ structure
+3. MUST include proper headers
+4. MUST include docstrings
+5. MUST handle errors gracefully
+6. MUST update help system
 
-#### 4. Testing & Validation
-- [ ] Test SABnzbd server connections
-- [ ] Test Prowlarr indexer searches
-- [ ] Verify *arr apps can search via Prowlarr
-- [ ] Test download flow from search to completion
-- [ ] Verify media moves to correct folders
+#=============================================================================
+# WHEN FIXING BUGS
+#=============================================================================
 
-#### 5. Final Polish
-- [ ] Add comprehensive error handling
-- [ ] Create detailed logging system
-- [ ] Write troubleshooting guide
-- [ ] Prepare git commit with clear message
+1. Understand root cause first
+2. Add test to prevent regression
+3. Update documentation if needed
+4. Check for similar issues elsewhere
+5. Test on Linux AND macOS
 
-### Next Immediate Steps
-1. Complete SABnzbd wizard via curl POST
-2. Test API key works correctly
-3. Implement working API calls
-4. Run full configuration flow
+#=============================================================================
+# COMMIT STANDARDS
+#=============================================================================
 
-### Success Metrics
-- `curl http://localhost:8080/sabnzbd/api?mode=version&apikey=XXX` returns JSON
-- All providers show as configured in SABnzbd
-- All indexers show as configured in Prowlarr
-- Test NZB downloads successfully
-- Services persist configuration across restarts
+Format: <type>: <description>
 
-## Credentials and API Keys
+Types:
+- feat: New feature
+- fix: Bug fix
+- docs: Documentation only
+- style: Code style changes
+- refactor: Code restructuring
+- test: Test additions/changes
+- chore: Maintenance tasks
 
-### 1Password Integration
-Use the op-helper.sh script for persistent 1Password CLI access:
-```bash
-source /home/joe/usenet/op-helper.sh
-op_run item list --format json | jq -r '.[] | select(.urls) | "\(.title)||\(.urls[0].href)"' | grep -i "nzb\|usenet\|sab"
-```
+##############################################################################
+#                      INTERACTION GUIDELINES                                #
+##############################################################################
 
-### Usenet Indexers (Ready to Use)
-- **NZBgeek**: 
-  - URL: https://api.nzbgeek.info
-  - Username: Aristoddle
-  - Password: SsjwpN541AHYvbti4ZZXtsAH0l3wyc8a
-  - API Key: SsjwpN541AHYvbti4ZZXtsAH0l3wyc8a
+When Claude Code works on this project:
 
-- **NZB Finder**:
-  - URL: https://nzbfinder.ws
-  - Username: Aristoddle
-  - Password: OTYc6Dpr6oPXQce
-  - API Key: 14b3d53dbd98adc79fed0d336998536a
+1. **Prioritize Simplicity**: One way to do things
+2. **Document Everything**: No magic, explain it all
+3. **Think Cross-Platform**: Linux, macOS, WSL2
+4. **Assume Beginners**: Make it monkey-proof
+5. **Professional Polish**: Would a FAANG engineer approve?
 
-- **NZB.su**:
-  - URL: https://api.nzb.su
-  - Username: Aristoddle
-  - Password: fishing
-  - API Key: 25ba450623c248e2b58a3c0dc54aa019
+##############################################################################
+#                         QUALITY CHECKLIST                                  #
+##############################################################################
 
-- **NZBPlanet**:
-  - URL: https://api.nzbplanet.net
-  - Username: Aristoddle
-  - Password: fishing123
-  - API Key: 046863416d824143c79b6725982e293d
+Before ANY commit, ensure:
 
-### Usenet Providers
-- **Newshosting**:
-  - Server: news.newshosting.com
-  - Port: 563 (SSL)
-  - Username: j3lanzone@gmail.com
-  - Password: @Kirsten123
-  - Connections: 30
+□ Proper zsh shebang (#!/usr/bin/env zsh)
+□ File header with location
+□ 80-character line limit
+□ Function docstrings
+□ Error handling
+□ Cross-platform compatibility
+□ Updated help text
+□ No new files in root
+□ Tests pass
 
-- **UsenetExpress**:
-  - Server: usenetexpress.com
-  - Port: 563 (SSL)
-  - Username: une3226253
-  - Password: kKqzQXPeN
-  - Connections: 20
+##############################################################################
+#                            ULTIMATE GOAL                                   #
+##############################################################################
 
-- **Frugalusenet**:
-  - Server: newswest.frugalusenet.com
-  - Port: 563 (SSL)
-  - Username: aristoddle
-  - Password: fishing123
-  - Connections: 10
-  - Backup: bonus.frugalusenet.com
+Create a media automation system so clean, well-documented, and robust that:
 
-### Download Clients
-- **SABnzbd**:
-  - URL: http://localhost:8080
-  - Username: Aristoddle
-  - Password: fishing123
-  - API Key: 0b544ecf089649f0ba8905d869a88f22
+1. A beginner can deploy it successfully
+2. A senior engineer would be impressed by the code
+3. It works flawlessly on any Unix system
+4. It becomes the gold standard for Docker Compose projects
 
-### Search Patterns for 1Password
-When searching for Usenet-related credentials in 1Password, use these patterns:
-```bash
-# Indexer sites
-"nzbgeek|nzbfinder|nzb\.su|nzbplanet|nzbhydra|nzbndx|simplynzbs|oznzb|omgwtfnzbs|nzb\.cat|althubnzb|nzb\.is|nzbnoob|gingadaddy|fastnzb|nzbking|dognzb|tabula-rasa"
+Remember: We're not just writing code, we're crafting a masterpiece that
+would make Kernighan and Ritchie proud.
 
-# Provider sites  
-"usenetexpress|newshosting|frugalusenet|eweka|tweaknews|astraweb|usenetserver|thundernews|newsdemon|newsgroup\.ninja"
-
-# Download clients
-"sabnzbd|nzbget"
-```
-
-## Automated Setup System
-
-### Architecture
-The automated setup uses a modular design with specialized components:
-
-```
-setup-all.sh                 # Main orchestration script
-├── modules/api.sh          # API interaction functions
-├── modules/credentials.sh  # Credential management
-└── modules/services.sh     # Service orchestration
-
-Supporting scripts:
-- one-click-setup.sh        # Single command wrapper
-- wait-for-services.sh      # Service readiness checker
-- op-helper.sh             # 1Password CLI integration
-```
-
-### Module Functions
-
-**modules/api.sh**:
-- `sabnzbd_add_server()` - Add Usenet provider to SABnzbd
-- `sabnzbd_add_category()` - Configure download categories
-- `prowlarr_add_indexer()` - Add indexer with API key
-- `prowlarr_add_app()` - Connect *arr apps to Prowlarr
-- `arr_add_download_client()` - Connect SABnzbd to *arr apps
-- `arr_add_root_folder()` - Configure media directories
-
-**modules/credentials.sh**:
-- `load_credentials_from_1p()` - Extract from 1Password
-- `extract_api_key_from_config()` - Get API keys from service configs
-- `wait_for_api_key()` - Wait for service to generate API key
-- `save_credentials_to_env()` - Create .env file
-
-**modules/services.sh**:
-- `wait_for_services()` - Ensure all services are ready
-- `configure_sabnzbd_providers()` - Set up all Usenet providers
-- `configure_prowlarr_indexers()` - Add all indexers
-- `configure_arr_applications()` - Connect all apps
-- `test_all_connections()` - Verify everything works
-- `backup_configurations()` - Create config backups
-
-### API Key Management
-Services generate API keys on first run. The system automatically:
-1. Waits for key generation
-2. Extracts from config files
-3. Uses for inter-service communication
-
-### Environment Variables
-The .env file contains all credentials and is created automatically:
-```env
-# Generated by setup-all.sh
-NZBGEEK_API_KEY=SsjwpN541AHYvbti4ZZXtsAH0l3wyc8a
-NZBFINDER_API_KEY=14b3d53dbd98adc79fed0d336998536a
-NZBSU_API_KEY=25ba450623c248e2b58a3c0dc54aa019
-NZBPLANET_API_KEY=046863416d824143c79b6725982e293d
-SABNZBD_API_KEY=0b544ecf089649f0ba8905d869a88f22
-# ... plus provider credentials
-```
+# vim: set ts=4 sw=4 et tw=80:
