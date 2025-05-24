@@ -6,6 +6,9 @@
 
 set -euo pipefail
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
 # Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -52,14 +55,14 @@ test_service "Overseerr" "http://localhost:5055" "200"
 echo -e "\n${YELLOW}API Endpoints:${NC}"
 
 # SABnzbd API
-if sabnzbd_key=$(grep -oP 'api_key = \K.*' "$HOME/usenet/config/sabnzbd/sabnzbd.ini" 2>/dev/null); then
+if sabnzbd_key=$(grep -oP 'api_key = \K.*' "$SCRIPT_DIR/config/sabnzbd/sabnzbd.ini" 2>/dev/null); then
     test_service "SABnzbd API" "http://localhost:8080/sabnzbd/api?mode=version&apikey=$sabnzbd_key" "200"
 else
     echo -e "SABnzbd API... ${YELLOW}⚠ No API key found${NC}"
 fi
 
 # Prowlarr API
-if prowlarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$HOME/usenet/config/prowlarr/config.xml" 2>/dev/null); then
+if prowlarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$SCRIPT_DIR/config/prowlarr/config.xml" 2>/dev/null); then
     test_service "Prowlarr API" "http://localhost:9696/api/v1/health?apikey=$prowlarr_key" "200"
 else
     echo -e "Prowlarr API... ${YELLOW}⚠ No API key found${NC}"
