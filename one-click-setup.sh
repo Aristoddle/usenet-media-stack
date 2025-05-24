@@ -144,11 +144,40 @@ preflight_checks() {
     fi
     
     if ! docker ps &> /dev/null; then
-        error "Docker daemon is not running"
-        echo "Start with: sudo systemctl start docker"
-        exit 1
+        warning "Docker daemon is not running, attempting to start..."
+        
+        # Try to start Docker
+        if command -v systemctl &> /dev/null; then
+            if sudo systemctl start docker 2>/dev/null; then
+                sleep 2
+                if docker ps &> /dev/null; then
+                    success "Docker started successfully!"
+                else
+                    error "Failed to start Docker daemon"
+                    echo "Please start Docker manually and try again"
+                    exit 1
+                fi
+            else
+                error "Could not start Docker automatically"
+                echo "Try: sudo systemctl start docker"
+                echo "Or: sudo service docker start"
+                exit 1
+            fi
+        elif command -v service &> /dev/null; then
+            if sudo service docker start 2>/dev/null; then
+                sleep 2
+                success "Docker started successfully!"
+            else
+                error "Could not start Docker automatically"
+                exit 1
+            fi
+        else
+            error "Docker is not running and could not be started automatically"
+            exit 1
+        fi
+    else
+        success "Docker is running"
     fi
-    success "Docker is running"
     
     # Check required tools
     local missing_tools=()
@@ -159,11 +188,27 @@ preflight_checks() {
     done
     
     if [[ ${#missing_tools[@]} -gt 0 ]]; then
-        error "Missing required tools: ${missing_tools[*]}"
-        echo "Install with: sudo apt install ${missing_tools[*]}"
-        exit 1
+        warning "Missing required tools: ${missing_tools[*]}"
+        echo ""
+        echo "Would you like to auto-install missing dependencies? (y/n)"
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            info "Running auto-installer..."
+            if "$SCRIPT_DIR/auto-install-deps.sh"; then
+                success "Dependencies installed!"
+            else
+                error "Auto-installation failed"
+                echo "Try manually: sudo apt install ${missing_tools[*]}"
+                exit 1
+            fi
+        else
+            error "Cannot proceed without required tools"
+            echo "Install with: sudo apt install ${missing_tools[*]}"
+            exit 1
+        fi
+    else
+        success "All required tools installed"
     fi
-    success "All required tools installed"
     
     # Check disk space
     local disk_usage=$(df -h "$SCRIPT_DIR" | awk 'NR==2 {print $5}' | sed 's/%//')

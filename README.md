@@ -8,27 +8,38 @@
 
 ## 📋 Prerequisites
 
-Before you begin, ensure you have:
-- **Docker** & **Docker Compose v2** installed
-- **4GB+ RAM** (8GB+ recommended)
-- **50GB+ free disk space** 
-- **Ubuntu/Debian** or similar Linux distro
+**Don't worry if you don't have these - we'll help you install them!**
 
-Check dependencies:
+- **Docker** - Runs all the services (we'll install it for you)
+- **4GB+ RAM** - More is better (8GB+ recommended)
+- **50GB+ free disk space** - For downloads and media
+- **Linux** - Ubuntu, Debian, or similar (WSL2 works too!)
+
+**New to Docker?** No problem! Run this and we'll set everything up:
 ```bash
-./check-dependencies.sh
+curl -fsSL https://raw.githubusercontent.com/Aristoddle/usenet-media-stack/main/quick-install.sh | bash
 ```
 
 ## 🚀 One-Command Setup
 
+**For experienced users:**
 ```bash
 git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
-./check-dependencies.sh  # Verify prerequisites
-./usenet setup           # Deploy everything!
+./usenet setup           # Does everything!
+```
+
+**First time? Use our guided setup:**
+```bash
+git clone https://github.com/Aristoddle/usenet-media-stack.git
+cd usenet-media-stack
+./usenet deps            # Check what you need
+./usenet setup           # Deploy with auto-fixes!
 ```
 
 That's it! Your complete media automation system is now running.
+
+**Having issues?** See our [Troubleshooting Guide](TROUBLESHOOTING.md)
 
 ## 📚 Documentation
 
