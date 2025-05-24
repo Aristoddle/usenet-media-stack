@@ -84,7 +84,19 @@ File Sharing:
 
 ## 🚀 **Quick Start Guide**
 
-### **Single Node Deployment**
+### **Automated One-Click Setup**
+```bash
+cd /home/joe/usenet
+./one-click-setup.sh
+```
+
+This will:
+1. Start all Docker services
+2. Wait for services to be ready
+3. Configure all providers and indexers automatically
+4. Connect all services together
+
+### **Manual Single Node Deployment**
 
 1. **Clone and Setup**
    ```bash
@@ -93,9 +105,21 @@ File Sharing:
    ```
 
 2. **Access Services**
-   - Navigate to http://localhost:9000 (Portainer) for container management
-   - Configure indexers in Prowlarr: http://localhost:9696
-   - Setup download clients in Sonarr/Radarr
+   All services are configured for passwordless access from localhost/local network by default.
+   
+   **Service URLs and Default Access:**
+   - SABnzbd: http://localhost:8080 (No auth on local network)
+   - Prowlarr: http://localhost:9696 (No auth on local network)
+   - Sonarr: http://localhost:8989 (No auth on local network)
+   - Radarr: http://localhost:7878 (No auth on local network)
+   - Readarr: http://localhost:8787 (No auth on local network)
+   - Bazarr: http://localhost:6767 (No auth on local network)
+   - Mylar3: http://localhost:8090 (No auth on local network)
+   - Transmission: http://localhost:9092 (No auth on local network)
+   - Portainer: http://localhost:9000 (Admin account required on first access)
+   - Netdata: http://localhost:19999 (No auth required)
+
+   **Note**: Services are configured to allow passwordless access from the local network (192.168.x.x, 172.x.x.x, 10.x.x.x) for convenience. For remote access, authentication should be enabled.
 
 3. **File Sharing Access**
    ```bash
