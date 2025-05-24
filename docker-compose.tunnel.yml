@@ -1,0 +1,91 @@
+version: '3.8'
+
+##############################################################################
+# Cloudflare Tunnel Configuration for Usenet Media Stack
+# 
+# This provides secure external access without exposing your home IP
+# or opening any router ports. All traffic is encrypted end-to-end.
+#
+# Setup:
+# 1. Create a tunnel at https://one.dash.cloudflare.com/
+# 2. Add tunnel token to .env file
+# 3. Configure routes in Cloudflare dashboard
+##############################################################################
+
+services:
+  # Cloudflare Tunnel
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - media_network
+    environment:
+      - TZ=${TZ}
+    depends_on:
+      - sonarr
+      - radarr
+      - prowlarr
+      - sabnzbd
+      - jellyfin
+
+  # Optional: Authentik for SSO
+  authentik:
+    image: ghcr.io/goauthentik/server:latest
+    container_name: authentik
+    restart: unless-stopped
+    networks:
+      - media_network
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASS}
+    volumes:
+      - ./config/authentik/media:/media
+      - ./config/authentik/templates:/templates
+    depends_on:
+      - authentik-db
+
+  authentik-db:
+    image: postgres:16-alpine
+    container_name: authentik-db
+    restart: unless-stopped
+    networks:
+      - media_network
+    environment:
+      POSTGRES_DB: authentik
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${AUTHENTIK_DB_PASS}
+    volumes:
+      - authentik_db:/var/lib/postgresql/data
+
+  # Optional: Homepage Dashboard
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./config/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "homepage.group=Management"
+      - "homepage.name=Homepage"
+      - "homepage.icon=homepage"
+      - "homepage.href=https://dashboard.${DOMAIN}"
+      - "homepage.description=Media Stack Dashboard"
+
+volumes:
+  authentik_db:
+
+networks:
+  media_network:
+    external: true

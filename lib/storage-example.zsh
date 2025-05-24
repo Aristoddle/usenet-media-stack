@@ -3,7 +3,7 @@
 # File: ./lib/storage-example.zsh
 # Project: Usenet Media Stack
 # Description: JBOD storage management and drive pooling functions
-# Author: Joseph Lanzone <j3lanzone@gmail.com>
+# Author: Joseph Lanzone <mailto:j3lanzone@gmail.com>
 # Created: 2025-05-24
 # Modified: 2025-05-24
 # Version: 1.0.0
