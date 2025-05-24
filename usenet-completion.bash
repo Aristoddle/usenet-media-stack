@@ -8,7 +8,7 @@ _usenet_completions() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     
     # Main commands
-    commands="setup manage test validate creds backup restore update help"
+    commands="setup manage test validate deps creds backup restore update help"
     
     # Sub-commands for each main command
     local setup_opts="--test-only --skip-test --verbose --help"

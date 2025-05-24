@@ -6,12 +6,26 @@
 [![License](https://img.shields.io/badge/License-Private-red)]()
 [![Maintenance](https://img.shields.io/badge/Maintained-Yes-green)]()
 
+## 📋 Prerequisites
+
+Before you begin, ensure you have:
+- **Docker** & **Docker Compose v2** installed
+- **4GB+ RAM** (8GB+ recommended)
+- **50GB+ free disk space** 
+- **Ubuntu/Debian** or similar Linux distro
+
+Check dependencies:
+```bash
+./check-dependencies.sh
+```
+
 ## 🚀 One-Command Setup
 
 ```bash
 git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
-./one-click-setup.sh
+./check-dependencies.sh  # Verify prerequisites
+./usenet setup           # Deploy everything!
 ```
 
 That's it! Your complete media automation system is now running.
