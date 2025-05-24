@@ -3,16 +3,24 @@
 # File: ./usenet
 # Project: Usenet Media Stack
 # Description: Unified entry point for all media stack operations
-# Author: Joseph Lanzone <j3lanzone@gmail.com>
+# Author: Joseph Lanzone <mailto:j3lanzone@gmail.com>
 # Created: 2025-05-24
 # Modified: 2025-05-24
 # Version: 2.0.0
 # License: MIT
 #
+# Dedicated to Stan Eisenstat, who taught us that good code explains itself.
+#
 # This is the single entry point for the Usenet Media Stack. All operations
 # go through this script, which routes commands to appropriate handlers in
 # the lib/ directory. This design ensures consistency, maintainability, and
 # a clean user experience.
+#
+# Design principles (The Stan Way):
+# - One entry point, one responsibility
+# - Clear command routing, no magic
+# - Helpful error messages for humans
+# - No clever tricks, just clarity
 #
 # Usage: usenet <command> [options]
 # Try 'usenet help' for detailed information.
