@@ -1,0 +1,185 @@
+version: '3.8'
+
+# Additional Media Services for Usenet Stack
+# Run with: docker compose -f docker-compose.yml -f docker-compose.media.yml up -d
+
+services:
+  # ================================
+  # Jellyfin - Media Streaming Server
+  # Access at http://localhost:8096
+  # ================================
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    hostname: jellyfin
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+    volumes:
+      - jellyfin_config:/config
+      - jellyfin_cache:/cache
+      # Mount all media with organized structure
+      - /media/joe:/media/library:ro
+      - /home/joe/usenet/downloads:/media/downloads:ro
+    ports:
+      - "8096:8096"
+      - "8920:8920" # HTTPS port
+      - "7359:7359/udp" # Client discovery
+      - "1900:1900/udp" # DLNA discovery
+    # devices:
+      # Hardware acceleration (uncomment if you have Intel/AMD GPU)
+      # - /dev/dri:/dev/dri
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+  # ================================
+  # Overseerr - Media Request Management
+  # Access at http://localhost:5055
+  # ================================
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    hostname: overseerr
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - overseerr_config:/config
+    ports:
+      - "5055:5055"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # ================================
+  # Unpackerr - Automated Archive Extraction
+  # No web interface - works in background
+  # ================================
+  unpackerr:
+    image: golift/unpackerr:latest
+    container_name: unpackerr
+    hostname: unpackerr
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      # Global settings
+      - UN_DEBUG=false
+      - UN_INTERVAL=2m
+      - UN_START_DELAY=1m
+      - UN_RETRY_DELAY=5m
+      - UN_MAX_RETRIES=3
+      - UN_PARALLEL=1
+      - UN_FILE_MODE=0644
+      - UN_DIR_MODE=0755
+      # Sonarr configuration
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_SONARR_0_API_KEY=c0e746db6c604179ac34630df0f2c8fb
+      - UN_SONARR_0_PATHS_0=/downloads
+      - UN_SONARR_0_PROTOCOLS=torrent,usenet
+      - UN_SONARR_0_TIMEOUT=10s
+      - UN_SONARR_0_DELETE_DELAY=5m
+      - UN_SONARR_0_DELETE_ORIG=false
+      # Radarr configuration
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_RADARR_0_API_KEY=5685e1e402944f69ac4e0d01cf64b4a1
+      - UN_RADARR_0_PATHS_0=/downloads
+      - UN_RADARR_0_PROTOCOLS=torrent,usenet
+      - UN_RADARR_0_TIMEOUT=10s
+      - UN_RADARR_0_DELETE_DELAY=5m
+      - UN_RADARR_0_DELETE_ORIG=false
+      # Lidarr configuration
+      - UN_LIDARR_0_URL=http://lidarr:8686
+      - UN_LIDARR_0_API_KEY=da44de6e5e3543e499e8b5b7f44de532
+      - UN_LIDARR_0_PATHS_0=/downloads
+      - UN_LIDARR_0_PROTOCOLS=torrent,usenet
+      - UN_LIDARR_0_TIMEOUT=10s
+      - UN_LIDARR_0_DELETE_DELAY=5m
+      - UN_LIDARR_0_DELETE_ORIG=false
+      # Readarr configuration
+      - UN_READARR_0_URL=http://readarr:8787
+      - UN_READARR_0_API_KEY=0a40ec3436a14bfba4d668f10de96799
+      - UN_READARR_0_PATHS_0=/downloads
+      - UN_READARR_0_PROTOCOLS=torrent,usenet
+      - UN_READARR_0_TIMEOUT=10s
+      - UN_READARR_0_DELETE_DELAY=5m
+      - UN_READARR_0_DELETE_ORIG=false
+    volumes:
+      - /home/joe/usenet/downloads:/downloads
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # ================================
+  # Tautulli - Media Server Statistics
+  # Access at http://localhost:8181
+  # ================================
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    hostname: tautulli
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - tautulli_config:/config
+      # Mount Jellyfin logs for analysis (read-only)
+      - jellyfin_config:/jellyfin:ro
+    ports:
+      - "8181:8181"
+    restart: unless-stopped
+    depends_on:
+      - jellyfin
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+volumes:
+  jellyfin_config:
+    driver: local
+  jellyfin_cache:
+    driver: local
+  overseerr_config:
+    driver: local
+  tautulli_config:
+    driver: local
+
+networks:
+  media_network:
+    external: true

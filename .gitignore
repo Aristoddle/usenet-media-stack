@@ -1,5 +1,18 @@
+# Environment and credentials
+.env
+.env.*
+*.env
+credentials.txt
+usenet-credentials.txt
+
+# 1Password session
+.op_session_*
+/tmp/.op_session_*
+
 # Configuration directories with sensitive data
 config/*/
+# But include example configs
+!config/examples/
 
 # Download directories
 downloads/
