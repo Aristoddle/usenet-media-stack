@@ -77,7 +77,7 @@ if $all_ready; then
   echo "======================="
   
   for service in prowlarr sonarr radarr sabnzbd; do
-    config_path="/home/joe/usenet/config/$service"
+    config_path="$HOME/usenet/config/$service"
     
     if [[ -f "$config_path/config.xml" ]]; then
       api_key=$(grep -oP '(?<=<ApiKey>)[^<]+' "$config_path/config.xml" 2>/dev/null || echo "")

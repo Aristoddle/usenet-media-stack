@@ -112,7 +112,7 @@ echo -e "${BLUE}3. API Key Validation${NC}"
 echo "---------------------"
 
 # Check SABnzbd API
-SABNZBD_API=$(grep -oP '(?<=api_key = )[^\s]+' /home/joe/usenet/config/sabnzbd/sabnzbd.ini 2>/dev/null || echo "")
+SABNZBD_API=$(grep -oP '(?<=api_key = )[^\s]+' $HOME/usenet/config/sabnzbd/sabnzbd.ini 2>/dev/null || echo "")
 if [[ -n "$SABNZBD_API" ]]; then
     if curl -s "http://localhost:8080/sabnzbd/api?mode=version&apikey=$SABNZBD_API&output=json" | grep -q "version"; then
         test_pass "SABnzbd API key is valid"
@@ -124,7 +124,7 @@ else
 fi
 
 # Check Prowlarr API
-PROWLARR_API=$(grep -oP '(?<=<ApiKey>)[^<]+' /home/joe/usenet/config/prowlarr/config.xml 2>/dev/null || echo "")
+PROWLARR_API=$(grep -oP '(?<=<ApiKey>)[^<]+' $HOME/usenet/config/prowlarr/config.xml 2>/dev/null || echo "")
 if [[ -n "$PROWLARR_API" ]]; then
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "X-Api-Key: $PROWLARR_API" "http://localhost:9696/api/v1/system/status" 2>/dev/null)
     if [[ "$HTTP_CODE" == "200" ]]; then
@@ -138,7 +138,7 @@ fi
 
 # Check other *arr services
 for service in sonarr radarr readarr; do
-    API_KEY=$(grep -oP '(?<=<ApiKey>)[^<]+' /home/joe/usenet/config/$service/config.xml 2>/dev/null || echo "")
+    API_KEY=$(grep -oP '(?<=<ApiKey>)[^<]+' $HOME/usenet/config/$service/config.xml 2>/dev/null || echo "")
     if [[ -n "$API_KEY" ]]; then
         test_pass "$service API key found: ${API_KEY:0:8}..."
     else
@@ -153,7 +153,7 @@ echo -e "${BLUE}4. Storage and Permissions${NC}"
 echo "--------------------------"
 
 # Check download directories
-DOWNLOAD_DIRS=("/home/joe/usenet/downloads/complete" "/home/joe/usenet/downloads/incomplete")
+DOWNLOAD_DIRS=("$HOME/usenet/downloads/complete" "$HOME/usenet/downloads/incomplete")
 for dir in "${DOWNLOAD_DIRS[@]}"; do
     if [[ -d "$dir" ]]; then
         if [[ -w "$dir" ]]; then
@@ -167,11 +167,11 @@ for dir in "${DOWNLOAD_DIRS[@]}"; do
 done
 
 # Check media drives
-MEDIA_DRIVES=$(find /media/joe -maxdepth 1 -name "*TB*" -type d 2>/dev/null | wc -l)
+MEDIA_DRIVES=$(find /media/$USER -maxdepth 1 -name "*TB*" -type d 2>/dev/null | wc -l)
 if [[ $MEDIA_DRIVES -gt 0 ]]; then
     test_pass "Found $MEDIA_DRIVES media drives mounted"
 else
-    test_warn "No media drives found under /media/joe"
+    test_warn "No media drives found under /media/$USER"
 fi
 
 echo
@@ -181,7 +181,7 @@ echo -e "${BLUE}5. Service Integration Tests${NC}"
 echo "----------------------------"
 
 # Check if SABnzbd has servers configured
-if grep -q "\[\[Newshosting\]\]" /home/joe/usenet/config/sabnzbd/sabnzbd.ini 2>/dev/null; then
+if grep -q "\[\[Newshosting\]\]" $HOME/usenet/config/sabnzbd/sabnzbd.ini 2>/dev/null; then
     test_pass "SABnzbd has Usenet providers configured"
 else
     test_fail "SABnzbd providers not configured"
@@ -253,10 +253,10 @@ echo -e "${BLUE}8. Configuration Files Check${NC}"
 echo "----------------------------"
 
 CONFIG_FILES=(
-    "/home/joe/usenet/.env"
-    "/home/joe/usenet/docker-compose.yml"
-    "/home/joe/usenet/docker-compose.media.yml"
-    "/home/joe/usenet/one-click-setup.sh"
+    "$HOME/usenet/.env"
+    "$HOME/usenet/docker-compose.yml"
+    "$HOME/usenet/docker-compose.media.yml"
+    "$HOME/usenet/one-click-setup.sh"
 )
 
 for file in "${CONFIG_FILES[@]}"; do

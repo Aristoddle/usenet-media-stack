@@ -108,14 +108,14 @@ $(generate_volume_mounts "lidarr" "music")
   samba:
     volumes:
       - $MEDIA_BASE:/media/joe:rw
-      - /home/joe/usenet/downloads:/downloads:rw
-      - /home/joe/usenet/config:/config:rw
+      - $HOME/usenet/downloads:/downloads:rw
+      - $HOME/usenet/config:/config:rw
 
   nfs-server:
     volumes:
       - $MEDIA_BASE:/media/joe:rw
-      - /home/joe/usenet/downloads:/downloads:rw
-      - /home/joe/usenet/config:/config:rw
+      - $HOME/usenet/downloads:/downloads:rw
+      - $HOME/usenet/config:/config:rw
 EOF
 
 echo
@@ -123,7 +123,7 @@ echo "=== Generated docker-compose.override.yml ==="
 echo "This file will automatically mount all available drives"
 echo
 echo "To apply changes:"
-echo "  cd /home/joe/usenet"
+echo "  cd $HOME/usenet"
 echo "  docker compose down"
 echo "  docker compose up -d"
 echo

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Extract full Usenet credentials and check for API keys
 
-source /home/joe/usenet/op-helper.sh
+source $HOME/usenet/op-helper.sh
 
 echo "=== USENET CREDENTIALS EXTRACTION ==="
 echo "Generated: $(date)"

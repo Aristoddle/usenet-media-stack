@@ -338,7 +338,7 @@ show_sharing_info() {
    • Movies:    \\\\${hostname}\\Movies    or  smb://${ip}/Movies
 
 📁 NFS Exports (Linux/Unix):
-   • All Media: mount -t nfs ${ip}:/media/joe /mnt/point
+   • All Media: mount -t nfs ${ip}:/media/$USER /mnt/point
    • Downloads: mount -t nfs ${ip}:/downloads /mnt/point
    • Config:    mount -t nfs ${ip}:/config /mnt/point
 
@@ -385,7 +385,7 @@ check_storage_health() {
     
     # Check main storage drives
     echo "   📊 Disk Usage:"
-    df -h /media/joe/* 2>/dev/null | grep -E "(Fast_|Slow_)" | while read line; do
+    df -h /media/$USER/* 2>/dev/null | grep -E "(Fast_|Slow_)" | while read line; do
         usage=$(echo $line | awk '{print $5}' | tr -d '%')
         if [ $usage -gt 90 ]; then
             echo -e "   🔴 $line (${RED}Critical${NC})"
@@ -397,8 +397,8 @@ check_storage_health() {
     done
     
     # Check downloads directory
-    if [ -d "/home/joe/usenet/downloads" ]; then
-        downloads_usage=$(df -h /home/joe/usenet/downloads | tail -1 | awk '{print $5}' | tr -d '%')
+    if [ -d "$HOME/usenet/downloads" ]; then
+        downloads_usage=$(df -h $HOME/usenet/downloads | tail -1 | awk '{print $5}' | tr -d '%')
         if [ $downloads_usage -gt 80 ]; then
             echo -e "   🟡 Downloads: ${YELLOW}${downloads_usage}% used - Consider cleanup${NC}"
         else
@@ -457,7 +457,7 @@ create_samba_share() {
     
     if [ "$#" -ne 2 ]; then
         echo "Usage: $0 create-share <share_name> <path>"
-        echo "Example: $0 create-share NewMovies /media/joe/Fast_8TB_1/Movies4K"
+        echo "Example: $0 create-share NewMovies /media/$USER/Fast_8TB_1/Movies4K"
         exit 1
     fi
     
@@ -544,7 +544,7 @@ network_diagnostics() {
 
 # Backup configurations
 backup_configs() {
-    local backup_dir="/home/joe/usenet/backups/$(date +%Y%m%d_%H%M%S)"
+    local backup_dir="$HOME/usenet/backups/$(date +%Y%m%d_%H%M%S)"
     
     log_header "BACKING UP CONFIGURATIONS"
     log_info "Creating backup at $backup_dir"
@@ -555,8 +555,8 @@ backup_configs() {
     cp "$COMPOSE_FILE" "$backup_dir/"
     
     # Backup service configs
-    if [ -d "/home/joe/usenet/config" ]; then
-        tar czf "$backup_dir/config_backup.tar.gz" -C /home/joe/usenet config/
+    if [ -d "$HOME/usenet/config" ]; then
+        tar czf "$backup_dir/config_backup.tar.gz" -C $HOME/usenet config/
         log_success "Service configurations backed up"
     fi
     
@@ -609,7 +609,7 @@ EXAMPLES:
   $0 logs sonarr             # View Sonarr logs
   $0 restart-service radarr  # Restart only Radarr
   $0 init-swarm              # Initialize Docker Swarm
-  $0 create-share Movies4K /media/joe/Fast_8TB_1/Movies4K
+  $0 create-share Movies4K /media/$USER/Fast_8TB_1/Movies4K
   $0 system-health           # Check system resources
 
 ENVIRONMENT VARIABLES:

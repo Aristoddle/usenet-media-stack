@@ -176,7 +176,7 @@ main() {
     echo "=== Configuration Complete ==="
     echo "Services configured for passwordless access from local network."
     echo "Restart services to apply changes:"
-    echo "  cd /home/joe/usenet && ./manage.sh restart"
+    echo "  cd $HOME/usenet && ./manage.sh restart"
 }
 
 main "$@"

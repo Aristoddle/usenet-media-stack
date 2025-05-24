@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to retrieve API keys from Usenet sites and update 1Password
 
-source /home/joe/usenet/op-helper.sh
+source $HOME/usenet/op-helper.sh
 
 echo "=== API KEY RETRIEVAL HELPER ==="
 echo "This script will help you get API keys from sites that don't have them stored"
