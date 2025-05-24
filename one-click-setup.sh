@@ -356,7 +356,7 @@ show_summary() {
     echo "  View logs:    ./manage.sh logs [service]"
     echo "  Restart all:  ./manage.sh restart"
     echo "  Stop all:     ./manage.sh stop"
-    echo "  Run tests:    ./complete-test.sh"
+    echo "  Run tests:    ./usenet test all"
     
     echo -e "\n${YELLOW}Note: Complete Jellyfin/Overseerr setup via web UI${NC}"
 }

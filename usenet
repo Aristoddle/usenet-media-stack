@@ -1,0 +1,134 @@
+#!/bin/bash
+###############################################################################
+# usenet - Unified Usenet Media Stack Management Tool
+#
+# DESCRIPTION:
+#   Single entry point for all Usenet stack operations with rich subcommands
+#
+# USAGE:
+#   usenet <command> [options]
+#
+# COMMANDS:
+#   setup       Deploy and configure the entire stack
+#   manage      Service management (start/stop/status/logs)
+#   test        Run test suite
+#   validate    Pre-deployment validation
+#   creds       Extract credentials from 1Password
+#   backup      Backup configuration
+#   restore     Restore from backup
+#   update      Update containers to latest versions
+#   help        Show this help message
+#
+# EXAMPLES:
+#   usenet setup              # Full deployment
+#   usenet setup --test-only  # Test mode only
+#   usenet manage status      # Check service status
+#   usenet test quick         # Run quick tests
+#
+# AUTHOR: Usenet Media Stack
+# VERSION: 2.0
+###############################################################################
+
+set -euo pipefail
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Functions
+show_help() {
+    grep "^#" "$0" | grep -E "^# [A-Z]|^#   " | sed 's/^# //'
+}
+
+error() {
+    echo -e "${RED}Error: $1${NC}" >&2
+    exit 1
+}
+
+info() {
+    echo -e "${CYAN}$1${NC}"
+}
+
+success() {
+    echo -e "${GREEN}$1${NC}"
+}
+
+# Main command dispatcher
+main() {
+    if [[ $# -eq 0 ]]; then
+        show_help
+        exit 0
+    fi
+
+    local command="$1"
+    shift
+
+    case "$command" in
+        setup|deploy)
+            exec "$SCRIPT_DIR/one-click-setup.sh" "$@"
+            ;;
+        manage|mgmt)
+            exec "$SCRIPT_DIR/manage.sh" "$@"
+            ;;
+        test)
+            handle_test "$@"
+            ;;
+        validate|check)
+            exec "$SCRIPT_DIR/validate-deployment.sh" "$@"
+            ;;
+        creds|credentials)
+            exec "$SCRIPT_DIR/extract-usenet-creds.sh" "$@"
+            ;;
+        backup)
+            exec "$SCRIPT_DIR/manage.sh" backup "$@"
+            ;;
+        restore)
+            exec "$SCRIPT_DIR/manage.sh" restore "$@"
+            ;;
+        update|upgrade)
+            exec "$SCRIPT_DIR/manage.sh" update "$@"
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        *)
+            error "Unknown command: $command\nRun 'usenet help' for usage"
+            ;;
+    esac
+}
+
+# Test command handler
+handle_test() {
+    local test_type="${1:-all}"
+    
+    case "$test_type" in
+        quick)
+            exec "$SCRIPT_DIR/test-quick.sh"
+            ;;
+        essential)
+            exec "$SCRIPT_DIR/test-essential.sh"
+            ;;
+        full)
+            exec "$SCRIPT_DIR/test-full-stack.sh"
+            ;;
+        all)
+            info "Running all tests..."
+            "$SCRIPT_DIR/test-quick.sh" && \
+            "$SCRIPT_DIR/test-essential.sh" && \
+            "$SCRIPT_DIR/test-full-stack.sh"
+            ;;
+        *)
+            error "Unknown test type: $test_type\nAvailable: quick, essential, full, all"
+            ;;
+    esac
+}
+
+# Run main function
+main "$@"
