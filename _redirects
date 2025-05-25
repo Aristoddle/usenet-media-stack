@@ -1,0 +1,25 @@
+# Cloudflare Pages Redirects
+# Handle SPA routing and legacy redirects
+
+# SPA fallback for VitePress
+/* /index.html 200
+
+# Redirect legacy paths
+/docs/* /:splat 301
+/documentation/* /:splat 301
+
+# API redirects (if needed)
+/api/* https://api.beppesarrstack.net/:splat 200
+
+# Social media and external links
+/github https://github.com/Aristoddle/usenet-media-stack 302
+/discord https://discord.gg/yourdiscord 302
+/twitter https://twitter.com/j3lanzone 302
+
+# Legacy domain redirects (if you had old domains)
+# https://old-domain.com/* https://beppesarrstack.net/:splat 301
+
+# Force HTTPS
+http://beppesarrstack.net/* https://beppesarrstack.net/:splat 301
+http://www.beppesarrstack.net/* https://beppesarrstack.net/:splat 301
+https://www.beppesarrstack.net/* https://beppesarrstack.net/:splat 301
