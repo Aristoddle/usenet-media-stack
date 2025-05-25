@@ -1,184 +1,288 @@
 # 🎬 Usenet Media Stack
 
-**Version 2.0** - Professional-grade media automation with intelligent hardware optimization and modern CLI
+> Production-grade media automation with intelligent hardware optimization and professional CLI interface.
 
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20|%20macOS%20|%20WSL2-green)]()
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
-[![Shell](https://img.shields.io/badge/Shell-ZSH%20%7C%20Bash-orange)]()
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20WSL-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Shell](https://img.shields.io/badge/Shell-ZSH%20%7C%20Bash-orange.svg)]()
+[![Standards](https://img.shields.io/badge/Standards-Bell%20Labs-gold.svg)](#acknowledgments)
 
-## ✨ What's New in 2.0
+## Quick Start
 
-- 🎛️ **Modern CLI Interface**: Professional flag-based syntax (`--storage`, `--hardware`, `--backup`)
-- 🔍 **Intelligent Drive Discovery**: Automatic detection of ALL mounted storage (JBOD, ZFS, cloud mounts)
-- 🚀 **GPU Acceleration**: Automated optimization for NVIDIA RTX, AMD, Intel QuickSync, Raspberry Pi
-- 🎯 **Interactive TUI**: Beautiful drive selection and hardware configuration interfaces
-- 🔧 **Rich Autocompletion**: Professional zsh/bash completion with context-aware suggestions
-- 📦 **Universal Storage**: Selected drives automatically accessible to ALL services
-- ⚡ **Hardware Profiles**: Automatic resource allocation based on detected hardware
+```bash
+# Clone the repository
+git clone https://github.com/Aristoddle/usenet-media-stack.git
+cd usenet-media-stack
 
-## 🖥️ Platform Support
+# Complete deployment with hardware optimization
+./usenet setup
+```
 
-This stack runs anywhere Docker runs:
-- **Linux** (Ubuntu, Debian, Fedora, Arch, etc.)
-- **macOS** (Intel & Apple Silicon)
-- **Windows** (via WSL2)
-- **Raspberry Pi** (4/5 with GPU acceleration)
-- **Synology/QNAP** NAS systems
-- **Any Docker-capable system**
+**Result**: A complete media automation system configured in 5-10 minutes with automatic hardware optimization.
 
-## 📋 Prerequisites
+### What You Get
 
+After installation, you'll have:
+
+```bash
+# 17+ Services Running
+jellyfin     # → Media streaming (4K transcoding with GPU acceleration)
+overseerr    # → Beautiful request management interface
+sonarr       # → TV automation with TRaSH Guide optimization
+radarr       # → Movie automation with custom quality profiles
+prowlarr     # → Universal indexer management
+sabnzbd      # → High-speed Usenet downloading
+
+# Professional CLI Interface
+usenet --storage discover    # → List ALL mounted drives (ZFS, cloud, JBOD)
+usenet --hardware detect     # → GPU optimization (NVIDIA/AMD/Intel/RPi)
+usenet --backup create       # → Compressed configuration backups
+usenet status               # → Health check all services
+
+# Universal Storage Access
+/mnt/drive1     # → Accessible to ALL services automatically
+/home/dropbox   # → Cloud storage integrated seamlessly
+/media/nas      # → Network storage unified access
+```
+
+**Live Demo**: See [service screenshots](#service-urls) or check the [architecture overview](#architecture).
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [CLI Reference](#cli-reference)
+- [Architecture](#architecture)
+- [Hardware Optimization](#hardware-optimization)
+- [Storage Management](#storage-management)
+- [Network Configuration](#network-configuration)
+- [Service Configuration](#service-configuration)
+- [Troubleshooting](#troubleshooting)
+- [Development](#development)
+
+## Prerequisites
+
+### Required
 - **Docker** & **Docker Compose v2**
 - **4GB+ RAM** (8GB+ recommended for transcoding)
 - **50GB+ free disk space**
 - **Internet connection** for initial setup
 
-Don't have Docker? We'll help you install it!
+### Supported Platforms
+- **Linux** (Ubuntu, Debian, Fedora, Arch, etc.)
+- **macOS** (Intel & Apple Silicon)
+- **Windows** (via WSL2)
+- **Raspberry Pi** (4/5 with GPU acceleration)
+- **Synology/QNAP** NAS systems
 
-## 🚀 Quick Start
+### Optional (Auto-installed)
+- **zsh** (enhanced shell experience)
+- **GPU drivers** (NVIDIA/AMD/Intel - installed automatically)
+- **Modern CLI tools** (ripgrep, fd, etc.)
+
+Don't have Docker? We'll help you install it during setup!
+
+## Installation
+
+### Standard Installation
 
 ```bash
-# Clone and enter directory
+# Clone to your preferred location
 git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
 
-# One command deployment with hardware optimization
+# Complete automated setup
 ./usenet setup
 ```
 
-## 🎯 Complete Media Automation System
+**What `setup` does:**
+1. **Validates system requirements** (Docker, storage, network)
+2. **Detects hardware capabilities** (CPU, RAM, GPU acceleration)
+3. **Downloads optimized containers** (17+ services)
+4. **Configures quality profiles** (TRaSH Guide integration)
+5. **Sets up file sharing** (Samba/NFS)
+6. **Generates secure passwords** and API keys
+7. **Health checks all services** to verify everything works
 
-### 📺 Core Automation
-- **SABnzbd** (8080) - Usenet downloader with SSL/NZB support
-- **Prowlarr** (9696) - Universal indexer manager
-- **Sonarr** (8989) - TV show automation with quality profiles
-- **Radarr** (7878) - Movie automation with custom formats
-- **Readarr** (8787) - Book/audiobook automation
-- **Lidarr** (8686) - Music automation
+**Time required**: 5-10 minutes depending on internet speed.
 
-### 🎬 Media Services
-- **Jellyfin** (8096) - Open-source media server with hardware transcoding
-- **Overseerr** (5055) - Beautiful request management for users
-- **YACReader** (8082) - Comic/manga server and reader
-- **Tdarr** (8265) - Automated transcoding with GPU acceleration
+### Component Installation
 
-### 🔧 Quality & Optimization
-- **Bazarr** (6767) - Subtitle automation for 40+ languages
-- **Recyclarr** - Automatic TRaSH Guide optimization
-- **Whisparr** (6969) - Specialized content management
-- **Mylar3** (8090) - Comic book automation
-
-### 🌐 Network & Sharing
-- **Samba** (445) - Windows file sharing
-- **NFS** (2049) - Unix/Linux file sharing
-- **Cloudflare Tunnel** - Secure remote access
-
-### 📊 Monitoring & Management
-- **Netdata** (19999) - Real-time system monitoring
-- **Portainer** (9000) - Docker container management
-
-## 🎛️ Modern CLI Interface
-
-### Component-Based Commands
 ```bash
-# Storage Management - Intelligent JBOD Discovery
-usenet --storage discover          # List ALL mounted drives (ZFS, cloud, etc.)
-usenet --storage select            # Interactive drive selection TUI
-usenet --storage add /mnt/drive1   # Add specific drive to pool
-usenet --storage apply             # Apply changes and restart services
+# Hardware optimization only
+./usenet --hardware optimize --auto
 
-# Hardware Optimization - GPU Acceleration
-usenet --hardware detect           # Show detected GPU capabilities
-usenet --hardware optimize --auto  # Generate hardware-tuned configs
-usenet --hardware install-drivers  # Auto-install GPU drivers (NVIDIA/AMD/Intel)
+# Storage configuration only  
+./usenet --storage discover
+./usenet --storage select
 
-# Backup & Recovery
-usenet --backup create             # Create compressed configuration backup
-usenet --backup restore backup.tar # Restore from backup with verification
+# Network setup only
+./usenet --tunnel setup
 
-# Network & Security
-usenet --tunnel setup              # Configure Cloudflare secure tunnel
+# Run validation before full setup
+./usenet validate
 ```
+
+### Verification
+
+```bash
+# Comprehensive health check
+./usenet status
+
+# Test all functionality
+./usenet test
+
+# View all service URLs
+./usenet --help
+```
+
+## CLI Reference
+
+### Component Commands
+
+| Command | Purpose |
+|---------|---------|
+| `--storage discover` | List ALL mounted drives (ZFS, cloud, JBOD) |
+| `--storage select` | Interactive drive selection with TUI |
+| `--storage add <path>` | Add specific drive to media pool |
+| `--storage apply` | Apply changes and restart services |
+| `--hardware detect` | Show GPU capabilities and optimization |
+| `--hardware optimize --auto` | Generate hardware-tuned configs |
+| `--hardware install-drivers` | Auto-install GPU drivers (NVIDIA/AMD/Intel) |
+| `--backup create` | Create compressed configuration backup |
+| `--backup restore <file>` | Restore from backup with verification |
+| `--tunnel setup` | Configure Cloudflare secure tunnel |
 
 ### Service Management
-```bash
-# Core Operations
-usenet setup                       # Complete deployment with optimization
-usenet status                      # Health check all services
-usenet logs sonarr                 # View service logs
-usenet restart                     # Restart all services
 
-# Advanced Operations
-usenet test                        # Run comprehensive system tests
-usenet validate                    # Pre-deployment validation
-usenet update                      # Update all containers
+| Command | Purpose |
+|---------|---------|
+| `setup` | Complete deployment with optimization |
+| `status` | Health check all services |
+| `start [service]` | Start all services or specific service |
+| `stop [service]` | Stop all services or specific service |
+| `restart [service]` | Restart services |
+| `logs <service>` | View service logs |
+| `update` | Update all containers to latest versions |
+
+### Analysis & Maintenance
+
+| Command | Purpose |
+|---------|---------|
+| `test` | Run comprehensive system tests |
+| `validate` | Pre-deployment validation |
+| `--verbose <command>` | Enable detailed output |
+| `--quiet <command>` | Suppress non-essential output |
+| `--yes <command>` | Auto-confirm all prompts |
+
+### Interactive Mode
+
+Run any command without arguments for guided setup:
+
+```bash
+./usenet --storage    # Interactive storage management
+./usenet --hardware   # Interactive hardware configuration  
+./usenet             # Show complete help
 ```
 
-### Global Options
-```bash
-usenet --verbose --storage discover    # Detailed output
-usenet --quiet --hardware detect       # Suppress non-essential output
-usenet --yes --storage select          # Auto-confirm prompts
+## Architecture
+
+### System Overview
+
+```
+usenet-media-stack/
+├── usenet                  # Single entry point (unified CLI)
+├── lib/                    # Core libraries
+│   ├── commands/          # Command implementations
+│   ├── core/             # Utilities, logging, configuration
+│   └── test/             # Comprehensive test suite
+├── config/                # Service configurations
+├── completions/           # Rich zsh/bash completions
+├── docker-compose.yml     # Base service definitions
+├── docker-compose.*.yml   # Generated optimizations
+└── docs/                  # Comprehensive documentation
 ```
 
-## 🚀 GPU Acceleration Support
+### Service Architecture
 
-### Automatic Detection & Optimization
-- **NVIDIA RTX/GTX** - Full NVENC/NVDEC support with automatic driver installation
-- **AMD Radeon** - VAAPI hardware acceleration with AMF encoding
-- **Intel QuickSync** - Ultra-efficient iGPU transcoding (5-15W power usage)
-- **Raspberry Pi** - VideoCore GPU optimization for distributed clusters
+**17+ integrated services** organized by function:
+
+```
+📺 Media Automation
+├── Sonarr (8989)     → TV show automation
+├── Radarr (7878)     → Movie automation  
+├── Readarr (8787)    → Book automation
+├── Bazarr (6767)     → Subtitle automation
+└── Prowlarr (9696)   → Indexer management
+
+🎬 Media Services  
+├── Jellyfin (8096)   → Media server with GPU transcoding
+├── Overseerr (5055)  → Request management
+├── YACReader (8082)  → Comic server
+└── Tdarr (8265)      → Automated transcoding
+
+🔧 Quality & Processing
+├── Recyclarr         → TRaSH Guide automation
+├── SABnzbd (8080)    → Usenet downloader
+└── Transmission (9092) → BitTorrent client
+
+🌐 Network & Sharing
+├── Samba (445)       → Windows file sharing
+├── NFS (2049)        → Unix file sharing
+└── Cloudflare Tunnel → Secure remote access
+
+📊 Monitoring & Management
+├── Netdata (19999)   → System monitoring
+└── Portainer (9000)  → Container management
+```
+
+## Hardware Optimization
+
+### Automatic GPU Detection
+
+The system automatically detects and optimizes for:
+
+- **NVIDIA RTX/GTX** - Full NVENC/NVDEC support with Docker runtime
+- **AMD Radeon** - VAAPI hardware acceleration with AMF encoding  
+- **Intel QuickSync** - Ultra-efficient iGPU transcoding (5-15W)
+- **Raspberry Pi** - VideoCore GPU optimization for clusters
 
 ### Performance Benefits
-- **4K HEVC Transcoding**: 2-5 FPS (CPU) → 60+ FPS (GPU)
-- **Power Efficiency**: 200W CPU → 50W GPU transcoding
-- **Concurrent Streams**: 1-2 → 8+ simultaneous 4K streams
-- **Quality Preservation**: Hardware tone mapping and HDR passthrough
 
-## 🗄️ Universal Storage Management
+| Metric | CPU Only | GPU Accelerated | Improvement |
+|--------|----------|----------------|-------------|
+| **4K HEVC Transcoding** | 2-5 FPS | 60+ FPS | **12-30x faster** |
+| **Power Consumption** | 200W | 50W | **75% reduction** |
+| **Concurrent Streams** | 1-2 | 8+ | **4-8x more** |
+| **Quality** | Standard | Hardware tone mapping | **Enhanced** |
 
-### Intelligent Drive Discovery
-Automatically detects and manages:
-- **Traditional Filesystems** (ext4, xfs, NTFS, exFAT)
-- **Advanced Filesystems** (ZFS, Btrfs)
-- **Network Storage** (NFS, SMB/CIFS)
-- **Cloud Storage** (rclone mounts: Google Drive, Dropbox, OneDrive)
-- **JBOD Arrays** with hot-swap support
+### Hardware Profiles
 
-### Universal Service Access
-Once configured, ALL services can access selected storage:
-- **Sonarr/Radarr**: Organize media across multiple drives
-- **Jellyfin**: Stream from any selected storage location
-- **Tdarr**: Transcode across all configured drives
-- **SABnzbd**: Download to any selected destination
-- **Samba/NFS**: Share all selected drives over network
-
-## 📊 Hardware Profiles & Auto-Optimization
-
-### Deployment Profiles
-- **Dedicated Server** (100% resources) - Maximum performance
-- **High Performance** (75% resources) - Powerful desktop sharing
-- **Balanced** (50% resources) - Standard desktop/workstation
-- **Light** (25% resources) - Laptop or limited hardware
-- **Development** (10% resources) - Testing and development
-- **Custom** - User-defined resource limits
-
-### Automatic Resource Allocation
 ```bash
-# Auto-detect optimal configuration
+# Automatic profile selection based on detected hardware
 usenet --hardware optimize --auto
 
-# Interactive hardware configuration
-usenet --hardware configure
-
 # Manual profile selection
-usenet --hardware optimize --profile balanced
+usenet --hardware optimize --profile dedicated    # 100% resources
+usenet --hardware optimize --profile balanced     # 50% resources  
+usenet --hardware optimize --profile light        # 25% resources
 ```
 
-## 🎯 Rich Interactive Features
+## Storage Management
 
-### Drive Selection TUI
+### Universal Drive Discovery
+
+Automatically detects and manages:
+
+- **Traditional Filesystems** (ext4, xfs, NTFS, exFAT)
+- **Advanced Filesystems** (ZFS, Btrfs) 
+- **Network Storage** (NFS, SMB/CIFS)
+- **Cloud Storage** (rclone: Google Drive, Dropbox, OneDrive)
+- **JBOD Arrays** with hot-swap support
+
+### Interactive Drive Selection
+
 ```
 🗄️  USENET MEDIA STACK - DRIVE SELECTION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -194,199 +298,192 @@ All selected drives will be accessible to Sonarr, Radarr, Jellyfin, Tdarr, etc.
 Commands: 1-4 (toggle), a (all), n (none), s (save), q (quit)
 ```
 
-### Hardware Detection Output
-```
-🚀 PERFORMANCE OPTIMIZATION OPPORTUNITIES DETECTED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### Universal Service Access
 
-💎 NVIDIA RTX 4090 Detected! Your hardware is capable of:
-   • 4K HEVC transcoding at 60+ FPS (vs 2-5 FPS CPU-only)
-   • Simultaneous multi-stream encoding (up to 8 concurrent 4K streams)
-   • Real-time HDR tone mapping for optimal quality preservation
-   • AV1 encoding (50% smaller files than H.264)
+Once configured, **ALL services** can access selected storage:
+- **Sonarr/Radarr**: Organize media across multiple drives
+- **Jellyfin**: Stream from any selected storage location
+- **Tdarr**: Transcode across all configured drives
+- **SABnzbd**: Download to any selected destination
+- **Samba/NFS**: Share all selected drives over network
 
-🔧 OPTIMIZATION RECOMMENDATIONS:
-   ✅ NVIDIA drivers: ✓ Installed
-   🔧 Install NVIDIA Docker: sudo apt install nvidia-docker2
-
-💡 Want us to optimize your system?
-   Run: usenet --hardware install-drivers for automatic setup
-```
-
-## 🔧 Advanced Configuration
-
-### Custom Storage Layouts
-```yaml
-# Auto-generated docker-compose.storage.yml
-services:
-  sonarr:
-    volumes:
-      - /mnt/drive1:/tv/drive1:rw
-      - /mnt/drive2:/tv/drive2:rw
-      - /home/user/Dropbox:/tv/cloud:rw
-
-  jellyfin:
-    volumes:
-      - /mnt/drive1:/media/drive1:rw
-      - /mnt/drive2:/media/drive2:rw
-      - /home/user/Dropbox:/media/cloud:rw
-```
-
-### Hardware-Optimized Configurations
-```yaml
-# Auto-generated docker-compose.optimized.yml based on detected hardware
-services:
-  tdarr:
-    deploy:
-      resources:
-        limits:
-          cpus: '12.0'      # 75% of 16-core CPU
-          memory: 18G       # High-performance profile
-    devices:
-      - /dev/dri:/dev/dri   # AMD VAAPI acceleration
-    environment:
-      - VAAPI_DEVICE=/dev/dri/renderD128
-```
-
-## 🌐 Network Configuration
+## Network Configuration
 
 ### Secure Remote Access
+
 ```bash
 # Configure Cloudflare tunnel for secure remote access
-usenet --tunnel setup
+./usenet --tunnel setup
 
 # Traditional reverse proxy support
-# Traefik, Nginx Proxy Manager, etc. supported
+# Traefik, Nginx Proxy Manager, etc. supported via labels
 ```
 
 ### File Sharing
-- **Samba (SMB/CIFS)**: Windows-compatible file sharing
-- **NFS**: High-performance Unix/Linux file sharing  
+
+- **Samba (SMB/CIFS)**: Windows-compatible file sharing (port 445)
+- **NFS**: High-performance Unix/Linux file sharing (port 2049)
 - **Direct Access**: All configured drives accessible via network shares
 
-## 🧪 Testing & Validation
+### Port Management
 
-### Comprehensive Test Suite
-```bash
-# Run all tests
-usenet test
+The system automatically manages ports and detects conflicts:
 
-# Specific test categories  
-usenet test unit          # Unit tests for individual components
-usenet test integration   # Full-stack integration tests
-usenet test services      # Service health and connectivity tests
-```
+| Service | Port | Purpose |
+|---------|------|---------|
+| Jellyfin | 8096 | Media streaming |
+| Overseerr | 5055 | Request management |
+| Sonarr | 8989 | TV automation |
+| Radarr | 7878 | Movie automation |
+| Prowlarr | 9696 | Indexer management |
+| SABnzbd | 8080 | Downloads |
+| Netdata | 19999 | System monitoring |
+| Portainer | 9000 | Container management |
 
-### Pre-deployment Validation
-```bash
-# Validate system before deployment
-usenet validate
+## Service Configuration
 
-# Check specific requirements
-usenet validate docker    # Docker installation and permissions
-usenet validate storage   # Storage requirements and permissions
-usenet validate network   # Network connectivity and ports
-```
+### Post-Setup Access
 
-## 🚀 Performance Optimizations
+After running `./usenet setup`, configure your services:
 
-### TRaSH Guides Integration
-- **Automatic Quality Profiles**: Optimal settings for maximum quality
-- **Custom Formats**: Remux prioritization, HDR/DV support
-- **Release Profiles**: Preferred release groups and naming
-- **Regular Updates**: Automatic synchronization with TRaSH recommendations
+**Essential Configuration**:
+1. **Prowlarr** (9696) - Add your indexers and API keys
+2. **SABnzbd** (8080) - Configure your Usenet provider  
+3. **Sonarr** (8989) - Connect to Prowlarr and SABnzbd
+4. **Radarr** (7878) - Connect to Prowlarr and SABnzbd
+5. **Jellyfin** (8096) - Add media libraries and users
 
-### Transcoding Optimization
-- **Hardware Acceleration**: GPU-optimized encoding for all supported formats
-- **Quality Preservation**: Intelligent H.265 encoding with tone mapping
-- **Storage Efficiency**: 40-60% size reduction while maintaining quality
-- **Multi-stream Support**: Concurrent transcoding across multiple drives
+**Quality Optimization**:
+- **TRaSH Guides** integration automatically configures optimal quality profiles
+- **Custom Formats** prioritize remux releases and HDR content
+- **Hardware transcoding** enabled automatically based on detected GPU
 
-## 📚 Documentation & Support
+### Automated Configuration
 
-### Built-in Help System
-```bash
-usenet --help                    # Complete command reference
-usenet --storage --help          # Storage-specific help
-usenet --hardware --help         # Hardware optimization help
-```
+The setup process automatically:
+- Generates secure API keys for all services
+- Configures optimal quality profiles via Recyclarr
+- Sets up hardware transcoding based on detected GPU
+- Creates Samba/NFS shares for selected storage
+- Establishes service interconnections
 
-### Rich Autocompletion
-Enable zsh/bash completion:
-```bash
-# Add to ~/.zshrc or ~/.bashrc
-source /path/to/usenet/completions/_usenet
-```
-
-### Service URLs (Post-Setup)
-After running `./usenet setup`, access your services:
-
-| Service | URL | Purpose |
-|---------|-----|---------|
-| Jellyfin | http://localhost:8096 | Media streaming |
-| Overseerr | http://localhost:5055 | Request management |
-| Sonarr | http://localhost:8989 | TV automation |
-| Radarr | http://localhost:7878 | Movie automation |
-| Prowlarr | http://localhost:9696 | Indexer management |
-| SABnzbd | http://localhost:8080 | Downloads |
-| Portainer | http://localhost:9000 | Container management |
-| Netdata | http://localhost:19999 | System monitoring |
-
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
+
+**Services not starting**:
 ```bash
-# Check service health
-usenet status
+# Check Docker daemon
+./usenet validate
 
-# View logs for specific service
-usenet logs servicename
+# Check service health  
+./usenet status
 
-# Validate configuration
-usenet validate
+# View specific service logs
+./usenet logs servicename
+```
 
-# Reset to defaults
-usenet --hardware --reset
-usenet --storage remove --all
+**Storage not accessible**:
+```bash
+# Re-scan for drives
+./usenet --storage discover
+
+# Verify mount points
+./usenet --storage status
+
+# Re-apply storage configuration
+./usenet --storage apply
+```
+
+**Performance issues**:
+```bash
+# Check hardware optimization
+./usenet --hardware detect
+
+# Apply hardware-tuned configuration  
+./usenet --hardware optimize --auto
+
+# Monitor system resources
+./usenet logs netdata
 ```
 
 ### Debug Mode
+
 ```bash
 # Enable verbose output for troubleshooting
-usenet --verbose setup
-usenet --verbose --storage discover
+./usenet --verbose setup
+./usenet --verbose --storage discover
+./usenet --verbose --hardware detect
 ```
 
-## 🤝 Contributing
+### Support Resources
+
+1. **Built-in diagnostics**: `./usenet validate`
+2. **Service health**: `./usenet status`  
+3. **Comprehensive logs**: `./usenet logs <service>`
+4. **Issue tracking**: [GitHub Issues](https://github.com/Aristoddle/usenet-media-stack/issues)
+
+When reporting issues, include:
+- Output of `./usenet validate`
+- Platform information: `uname -a`
+- Docker version: `docker --version`
+
+## Development
+
+### Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
 
 # Run tests
-usenet test
+./usenet test
 
 # Enable completion for development
 source completions/_usenet
 ```
 
-## 📄 License
+### Code Quality Standards
+
+This project follows **Bell Labs standards** in honor of Stan Eisenstat:
+- **80-character lines** for VT100 compatibility
+- **Function contracts** for all major functions
+- **Comprehensive documentation** and error handling
+- **Modular architecture** with clean separation of concerns
+
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Dedicated to **Stan Eisenstat** and the Yale Computer Science tradition of clear, elegant code that explains itself.
 
-Special thanks to:
-- **TRaSH Guides** community for quality optimization
-- **LinuxServer.io** for excellent Docker containers
+### Special Thanks
+
+- **TRaSH Guides** community for quality optimization standards
+- **LinuxServer.io** for excellent Docker containers  
 - **Jellyfin**, **Sonarr**, **Radarr** teams for outstanding media automation tools
+- The **open-source media automation** community
+
+### Technical Foundations
+
+- [Docker](https://www.docker.com/) - Containerization platform
+- [Docker Compose](https://docs.docker.com/compose/) - Multi-container orchestration
+- [Jellyfin](https://jellyfin.org/) - Open-source media server
+- [TRaSH Guides](https://trash-guides.info/) - Quality optimization standards
 
 ---
 
-**Built with ❤️ for the media automation community**
+<div align="center">
+
+**Professional media automation for the modern self-hoster**
+
+[Installation](#installation) • [CLI Reference](#cli-reference) • [Contributing](#development) • [Issues](https://github.com/Aristoddle/usenet-media-stack/issues)
+
+</div>
