@@ -192,64 +192,95 @@ usenet backup restore backup.tar   # Restore from backup with verification
 
 </details>
 
+## ⚡ **Performance Results**
+
+**Real numbers from actual hardware**
+
+This isn't theoretical - here's what actually happens when you run it:
+
+### **Hardware Acceleration Results**
+- **4K Video**: 2-5 FPS (before) → 60+ FPS (after) = **1200% faster**
+- **Power Usage**: 200W (CPU) → 50W (GPU) = **75% less electricity**
+- **Multiple Streams**: 2 streams → 8+ streams = **4x more capacity**
+- **Video Quality**: Automatic HDR tone mapping, better compression
+
+### **Real System Example**
+- **29 drives detected** (including 8TB NVMe, cloud drives)
+- **19 services running** with 100% uptime
+- **TRaSH Guide optimization** automatically applied
+- **Zero manual networking** - everything just works
+
+<details>
+<summary>🎯 <strong>Interactive Components & Live Demos</strong></summary>
+
+The documentation includes interactive elements to show how everything works:
+
+## 🎯 **Interactive System Overview**
+<SystemArchitecture />
+
+## ⚡ **Performance Optimization Showcase**
+<PerformanceMetrics />
+
+## 🌐 **Service Network Topology**
+<ServiceTopology />
+
+## 💻 **Live CLI Demonstration**
+<CLISimulator />
+
+<GuidedTour tour-type="architecture" :auto-start="false" />
+
+</details>
+
 ---
 
-## 🎯 **Quality Engineering Standards**
+## 🛠️ **Under the Hood**
 
-### **Following Stan Eisenstat's Principles**
+**For developers who want to understand the technical implementation**
+
+<details>
+<summary>⚙️ <strong>Engineering Standards & Code Quality</strong></summary>
+
+### **Following Professional Standards**
 > *"Programs must be written for people to read, and only incidentally for machines to execute."*
 
-#### **Code Quality Metrics**
-- **80-character lines** for professional terminal compatibility
-- **Function contracts** documenting purpose, arguments, and returns  
-- **Comprehensive error handling** with helpful guidance
-- **Clear naming** that explains intent
-- **Zero magic strings** - environment-based configuration throughout
+**Code Quality**:
+- 80-character lines for terminal compatibility
+- Function contracts documenting purpose, arguments, and returns  
+- Comprehensive error handling with helpful guidance
+- Clear naming that explains intent
+- Zero magic strings - environment-based configuration
 
-#### **Professional Standards**
-- **Single responsibility** - each component has one clear job
-- **Proper abstractions** - configuration, storage, hardware management
-- **Professional CLI design** - follows industry standards (Git, Docker, Terraform)
-- **Comprehensive testing** - unit and integration coverage
+**Architecture Principles**:
+- Single responsibility - each component has one clear job
+- Proper abstractions - configuration, storage, hardware management
+- Professional CLI design - follows industry standards (Git, Docker, Terraform)
+- Comprehensive testing - unit and integration coverage
 
----
+</details>
 
-## 📊 **Real-World Performance Data**
+<details>
+<summary>🎓 <strong>Technical Showcase & Portfolio Value</strong></summary>
 
-### **Hardware Optimization Results**
-- **4K HEVC Transcoding**: 2-5 FPS (CPU) → 60+ FPS (GPU) = **1200% improvement**
-- **Power Consumption**: 200W (CPU) → 50W (GPU) = **75% reduction**
-- **Concurrent Streams**: 2 streams → 8+ streams = **4x capacity**
-- **Quality Enhancement**: Standard → HDR10+ with tone mapping
+**Demonstrates Technical Depth**:
+- Vue 3, D3.js, advanced visualizations
+- Docker orchestration with 19 services
+- Multi-platform hardware optimization
+- Professional CLI design patterns
 
-### **Storage Management Capabilities**
-- **29 drives detected** including 8TB NVMe (`/media/joe/Fast_8TB_31`)
-- **Multiple filesystem support**: ZFS, exFAT, cloud mounts, JBOD
-- **Hot-swap ready**: Plug drive → API update → no service restart
-- **Cross-platform compatibility**: exFAT drives for camping trips
+**Shows Product Sense**:
+- User-centered design over technical complexity
+- Community integration and resource sharing
+- Workflow optimization for real-world usage
+- Clear documentation and helpful interactions
 
-### **Service Reliability**
-- **19 services running** with 100% uptime
-- **Automatic API synchronization** across all media management services
-- **TRaSH Guide integration** for optimal quality profiles
-- **Zero-configuration networking** via Cloudflare Tunnel
+**Community Leadership**:
+- Comprehensive resource sharing
+- Expert guidance and support systems
+- Knowledge sharing with validated links
+- Professional presentation standards
 
----
-
-## 🎓 **Technical Leadership Demonstration**
-
-### **Product Excellence Indicators**
-- **Technical Depth**: Vue 3, D3.js, advanced visualizations, Docker orchestration
-- **Product Sense**: User-centered design, community integration, workflow optimization
-- **Leadership Evidence**: Resource sharing, expert guidance provision, community building
-- **Communication Skills**: Clear documentation, helpful interactions, technical writing
-
-### **Community Impact**
-- **Comprehensive Resource Hub**: Anna's Archive, Internet Archive, FMD2, EmuDeck integration
-- **Expert Support System**: Pre-populated contact forms for technical assistance
-- **Knowledge Sharing**: Deep research with validated links to major platforms
-- **Professional Presentation**: Industry-standard documentation and architecture
+</details>
 
 ---
 
-*This architecture represents the intersection of **technical excellence**, **product intuition**, and **community leadership** - built with Bell Labs standards and dedicated to the principles of clear, maintainable, and genuinely useful software.*
+*Built with Bell Labs standards for clear, maintainable, and genuinely useful software.*
