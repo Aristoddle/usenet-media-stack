@@ -117,7 +117,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
-import { DataSet, Network } from 'vis-network/standalone'
+import { DataSet, Network } from 'vis-network/standalone/esm/vis-network'
 
 // Reactive state
 const networkEl = ref(null)
