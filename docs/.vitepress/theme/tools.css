@@ -1,0 +1,176 @@
+/* Enhanced Design System for beppesarrstack.net */
+/* Senior Designer Optimizations by Claude Code */
+
+:root {
+  /* Enhanced Color Palette */
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --success-gradient: linear-gradient(135deg, #50fa7b 0%, #8be9fd 100%);
+  
+  /* Better Shadows & Glass Effects */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.20);
+  
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(16px);
+  
+  /* Enhanced Typography */
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+}
+
+/* Global Enhancement for All Cards */
+.vp-feature,
+.feature-card,
+.metric-card,
+[class*="card"] {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: var(--glass-blur);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vp-feature:hover,
+.feature-card:hover,
+.metric-card:hover,
+[class*="card"]:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(102, 126, 234, 0.5);
+}
+
+/* Enhanced shimmer effect */
+.vp-feature::before,
+.feature-card::before,
+.metric-card::before,
+[class*="card"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vp-feature:hover::before,
+.feature-card:hover::before,
+.metric-card:hover::before,
+[class*="card"]:hover::before {
+  left: 100%;
+}
+
+/* Enhanced Button Styles */
+.vp-button.brand {
+  background: var(--primary-gradient);
+  border: none;
+  box-shadow: var(--shadow-md);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vp-button.brand:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Enhanced Typography for Documentation */
+.VPDoc .vp-doc h1,
+.VPDoc .vp-doc h2,
+.VPDoc .vp-doc h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.VPDoc .vp-doc p {
+  line-height: 1.7;
+  font-family: var(--font-body);
+}
+
+.VPDoc .vp-doc code {
+  font-family: var(--font-mono);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 0.25em 0.5em;
+  backdrop-filter: var(--glass-blur);
+}
+
+/* Enhanced Code Blocks */
+.VPDoc .vp-doc div[class*="language-"] {
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: var(--glass-blur);
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+/* Enhanced Tables */
+.VPDoc .vp-doc table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: var(--glass-blur);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.VPDoc .vp-doc th {
+  background: var(--primary-gradient);
+  color: white;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  border: none;
+}
+
+.VPDoc .vp-doc td {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  border-left: none;
+  border-right: none;
+}
+
+.VPDoc .vp-doc tr:nth-child(even) {
+  background: var(--glass-bg);
+}
+
+.VPDoc .vp-doc tr:last-child td {
+  border-bottom: none;
+}
+
+/* Accessibility improvements */
+.vp-button:focus,
+.hero-btn:focus,
+button:focus,
+.suggestion-btn:focus {
+  outline: 2px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

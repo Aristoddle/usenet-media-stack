@@ -19,10 +19,10 @@ except ImportError:
 
 class UsenetImageGenerator:
     def __init__(self, api_key=None):
-        """Initialize with provided API key"""
+        """Initialize with API key from environment"""
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
         if not self.api_key:
-            raise ValueError("OpenAI API key required")
+            raise ValueError("OpenAI API key required. Set OPENAI_API_KEY environment variable.")
         
         self.client = OpenAI(api_key=self.api_key)
         
@@ -128,17 +128,12 @@ class UsenetImageGenerator:
 
 def main():
     """Main entry point"""
-    # Extract the API key from user's message format 
-    api_key = "ensk-proj-X66QlUjUWzWuG-EQdDQZsPv8G6WogtBmFc_PwdzQTHYkp-NHDrP7-eRFfLZW6VJW_nemJP7YCoT3BlbkFJlrmnNyDop2mkwtogG3SNTky-W69b5xrG1dIIeafcPGObovSJfh3o8Rm2A7HqiCIGac_ScsZAUA"
-    
-    # Remove any extra whitespace and formatting
-    api_key = api_key.strip().replace(" ", "")
-    
     try:
-        generator = UsenetImageGenerator(api_key=api_key)
+        generator = UsenetImageGenerator()
         generator.generate_usenet_stack_images()
     except Exception as e:
         print(f"❌ Error: {e}")
+        print("💡 Make sure to set OPENAI_API_KEY environment variable")
         sys.exit(1)
 
 if __name__ == "__main__":
