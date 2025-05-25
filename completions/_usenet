@@ -61,41 +61,52 @@ _usenet() {
 
 _usenet_commands() {
     local commands; commands=(
-        'setup:Deploy and configure the complete stack'
-        'start:Start all services or specific service'
-        'stop:Stop all services or specific service'
-        'restart:Restart services'
-        'status:Show health and status of all services'
-        'logs:View service logs'
-        'update:Update all containers to latest versions'
-        'test:Run system tests'
+        'deploy:Deploy and configure the complete stack'
+        'storage:JBOD storage pool management'
+        'hardware:Hardware optimization and GPU acceleration'
+        'services:Service management (start/stop/logs/status)'
+        'backup:Configuration backup and restore'
+        'tunnel:Cloudflare tunnel management'
         'validate:Pre-deployment validation'
+        'test:Run system tests'
         'help:Show help information'
         'version:Show version information'
+        # Legacy commands (deprecated)
+        'setup:Deploy stack (deprecated: use deploy)'
+        'start:Start services (deprecated: use services start)'
+        'stop:Stop services (deprecated: use services stop)'
+        'restart:Restart services (deprecated: use services restart)'
+        'status:Show status (deprecated: use services list)'
+        'logs:View logs (deprecated: use services logs)'
+        'update:Update containers (deprecated: use services update)'
     )
     _describe 'usenet commands' commands
 }
 
 _usenet_storage_actions() {
     local actions; actions=(
-        'discover:List all available mounted drives'
+        'list:List all available mounted drives'
         'select:Interactive drive selection TUI'
         'add:Add drive to storage pool'
         'remove:Remove drive from pool'
         'status:Show storage configuration'
         'apply:Apply changes and restart services'
         'health:Check drive health'
+        # Legacy support (deprecated)
+        'discover:List all available mounted drives (deprecated: use list)'
     )
     _describe 'storage actions' actions
 }
 
 _usenet_hardware_actions() {
     local actions; actions=(
-        'detect:Show detected hardware specifications'
+        'list:Show detected hardware specifications'
         'configure:Interactive resource allocation'
         'optimize:Generate optimized configurations'
         'install-drivers:Install GPU drivers and acceleration'
         'status:Show current hardware profile'
+        # Legacy support (deprecated)
+        'detect:Show detected hardware specifications (deprecated: use list)'
     )
     _describe 'hardware actions' actions
 }

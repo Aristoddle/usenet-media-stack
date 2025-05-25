@@ -1,0 +1,122 @@
+# Docker Compose Override for Single-Node Deployment
+# This file provides single-node compatibility overrides
+# Use: docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+#
+# DEPLOYMENT MODES:
+# 1. Single Node: docker-compose up (uses this override)
+# 2. Docker Swarm: docker stack deploy -c docker-compose.swarm.yml usenet
+
+# version field removed - deprecated in Docker Compose v2.x
+
+# Override networks for single-node deployment
+networks:
+  media_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+        
+  sharing_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+# Override volumes for single-node deployment (bind mounts)
+volumes:
+  sabnzbd_config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: ${PWD}/config/sabnzbd
+      
+  transmission_config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: ${PWD}/config/transmission
+      
+  sonarr_config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: ${PWD}/config/sonarr
+      
+  radarr_config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: ${PWD}/config/radarr
+      
+  bazarr_config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: ${PWD}/config/bazarr
+      
+  prowlarr_config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: ${PWD}/config/prowlarr
+      
+  downloads_volume:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: ${PWD}/downloads
+
+# Service overrides for single-node deployment
+services:
+  # Remove Swarm-specific deployment configurations
+  sabnzbd:
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # Use standard restart policy instead of Swarm deployment
+    restart: unless-stopped
+    
+  transmission:
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    restart: unless-stopped
+    
+  sonarr:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    restart: unless-stopped
+    
+  radarr:
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    restart: unless-stopped
