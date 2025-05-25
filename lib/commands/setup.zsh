@@ -663,23 +663,28 @@ show_summary() {
     print "${COLOR_GREEN}╚═══════════════════════════════════════════════════════════╝${COLOR_RESET}"
     
     print "\n${COLOR_BOLD}Core Services:${COLOR_RESET}"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} SABnzbd:   http://localhost:8080  - Download Manager"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Prowlarr:  http://localhost:9696  - Indexer Manager"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Sonarr:    http://localhost:8989  - TV Shows"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Radarr:    http://localhost:7878  - Movies"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Readarr:   http://localhost:8787  - Books"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Lidarr:    http://localhost:8686  - Music"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Bazarr:    http://localhost:6767  - Subtitles"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Mylar3:    http://localhost:8090  - Comics"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} SABnzbd:   ${SERVICE_URLS[sabnzbd]}  - Download Manager"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Prowlarr:  ${SERVICE_URLS[prowlarr]}  - Indexer Manager"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Sonarr:    ${SERVICE_URLS[sonarr]}  - TV Shows"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Radarr:    ${SERVICE_URLS[radarr]}  - Movies"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Readarr:   ${SERVICE_URLS[readarr]}  - Books"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Lidarr:    ${SERVICE_URLS[lidarr]}  - Music"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Bazarr:    ${SERVICE_URLS[bazarr]}  - Subtitles"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Mylar3:    ${SERVICE_URLS[mylar3]}  - Comics"
     
     print "\n${COLOR_BOLD}Media Services:${COLOR_RESET}"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Jellyfin:  http://localhost:8096  - Media Streaming"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Overseerr: http://localhost:5055  - Request Management"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Tautulli:  http://localhost:8181  - Statistics"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Jellyfin:  ${SERVICE_URLS[jellyfin]}  - Media Streaming"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Overseerr: ${SERVICE_URLS[overseerr]}  - Request Management"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} YACReader: ${SERVICE_URLS[yacreader]}  - Manga/Comic Server"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Tautulli:  ${SERVICE_URLS[tautulli]}  - Statistics"
+    
+    print "\n${COLOR_BOLD}Processing:${COLOR_RESET}"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Tdarr:     ${SERVICE_URLS[tdarr]}  - Automated Transcoding"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Recyclarr: TRaSH Guide Automation (background service)"
     
     print "\n${COLOR_BOLD}Management:${COLOR_RESET}"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Portainer: http://localhost:9000  - Docker Management"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Netdata:   http://localhost:19999 - System Monitoring"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Portainer: ${SERVICE_URLS[portainer]}  - Docker Management"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Netdata:   ${SERVICE_URLS[netdata]} - System Monitoring"
     
     print "\n${COLOR_BOLD}Configuration Status:${COLOR_RESET}"
     print "  ${COLOR_GREEN}✓${COLOR_RESET} Usenet providers configured"
@@ -695,6 +700,24 @@ show_summary() {
     print "  Run tests:    ./usenet test all"
     
     print "\n${COLOR_YELLOW}Note: Complete Jellyfin/Overseerr setup via web UI${COLOR_RESET}"
+    
+    # Proactive GPU optimization detection
+    if command -v "${PROJECT_ROOT}/usenet" >/dev/null 2>&1; then
+        # Run hardware detection to check for optimization opportunities
+        local gpu_check=$(cd "$PROJECT_ROOT" && ./usenet hardware detect 2>/dev/null | grep -E "(NVIDIA|AMD|Intel.*QuickSync|Raspberry Pi)" || true)
+        if [[ -n "$gpu_check" ]]; then
+            print ""
+            print "🚀 ${COLOR_BLUE}PERFORMANCE BOOST AVAILABLE!${COLOR_RESET}"
+            print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            print "${COLOR_YELLOW}We detected GPU hardware that can dramatically improve transcoding:${COLOR_RESET}"
+            print "$gpu_check" | head -1
+            print ""
+            print "💡 ${COLOR_GREEN}Want 10-50x faster transcoding?${COLOR_RESET}"
+            print "   Run: ${COLOR_BLUE}./usenet hardware install-drivers${COLOR_RESET}"
+            print "   This enables hardware acceleration for 4K HEVC encoding!"
+        fi
+    fi
+    
     print ""
 }
 

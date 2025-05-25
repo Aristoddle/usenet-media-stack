@@ -24,6 +24,138 @@ source "${SCRIPT_DIR:h}/core/common.zsh" || {
     print -u2 "ERROR: Cannot load common.zsh"
     exit 1
 }
+source "${SCRIPT_DIR:h}/core/init.zsh" || {
+    print -u2 "ERROR: Cannot load init.zsh"
+    exit 1
+}
+
+# Load configuration
+load_stack_config >/dev/null 2>&1 || true
+
+##############################################################################
+#                          DOCKER DAEMON MANAGEMENT                          #
+##############################################################################
+
+#=============================================================================
+# Function: start_docker_daemon
+# Description: Attempt to start Docker daemon based on platform
+#
+# Detects the platform and uses appropriate method to start Docker.
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Docker started or already running
+#   1 - Failed to start Docker
+#
+# Example:
+#   start_docker_daemon || die "Cannot start Docker"
+#=============================================================================
+start_docker_daemon() {
+    local platform=$(uname -s)
+    
+    case "$platform" in
+        Linux)
+            # Try systemd first
+            if command -v systemctl >/dev/null 2>&1; then
+                if sudo systemctl start docker 2>/dev/null; then
+                    sleep 3
+                    return 0
+                fi
+            fi
+            
+            # Try init.d
+            if command -v service >/dev/null 2>&1; then
+                if sudo service docker start 2>/dev/null; then
+                    sleep 3
+                    return 0
+                fi
+            fi
+            
+            return 1
+            ;;
+            
+        Darwin)
+            # macOS - try to open Docker Desktop
+            if command -v open >/dev/null 2>&1; then
+                open -a Docker 2>/dev/null
+                
+                # Wait up to 30 seconds for Docker to start
+                local attempts=0
+                while (( attempts < 30 )); do
+                    if docker info >/dev/null 2>&1; then
+                        return 0
+                    fi
+                    sleep 1
+                    ((attempts++))
+                done
+            fi
+            
+            return 1
+            ;;
+            
+        *)
+            # Unknown platform
+            return 1
+            ;;
+    esac
+}
+
+#=============================================================================
+# Function: check_docker_status
+# Description: Check Docker daemon status and provide helpful info
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Docker is running
+#   1 - Docker is not running
+#
+# Example:
+#   check_docker_status
+#=============================================================================
+check_docker_status() {
+    print "${COLOR_BOLD}Docker Status${COLOR_RESET}"
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    if docker info >/dev/null 2>&1; then
+        success "Docker daemon is running"
+        
+        # Show version info
+        local docker_version=$(docker --version | cut -d' ' -f3 | sed 's/,$//')
+        local compose_version=$(docker compose version 2>/dev/null | cut -d' ' -f4 || echo "not available")
+        
+        print "Docker: $docker_version"
+        print "Compose: $compose_version"
+        
+        # Show container count
+        local container_count=$(docker ps -q | wc -l)
+        print "Running containers: $container_count"
+        
+        return 0
+    else
+        warning "Docker daemon is not running"
+        
+        local platform=$(uname -s)
+        print "Platform: $platform"
+        
+        case "$platform" in
+            Linux)
+                print "To start: sudo systemctl start docker"
+                ;;
+            Darwin)
+                print "To start: Open Docker Desktop application"
+                ;;
+            *)
+                print "Please start Docker daemon manually"
+                ;;
+        esac
+        
+        return 1
+    fi
+}
 
 ##############################################################################
 #                            SERVICE OPERATIONS                              #
@@ -51,18 +183,18 @@ start_services() {
     local service="${1:-}"
     
     if [[ -n "$service" ]]; then
-        log_info "Starting $service..."
+        info "Starting $service..."
         if docker compose up -d "$service"; then
-            log_success "$service started"
+            success "$service started"
             return 0
         else
-            log_error "Failed to start $service"
+            error "Failed to start $service"
             return 1
         fi
     else
-        log_info "Starting all services..."
+        info "Starting all services..."
         if docker compose up -d; then
-            log_success "All services started"
+            success "All services started"
             
             # Show status
             print "\n${COLOR_BOLD}Service Status:${COLOR_RESET}"
@@ -70,7 +202,7 @@ start_services() {
             
             return 0
         else
-            log_error "Failed to start services"
+            error "Failed to start services"
             return 1
         fi
     fi
@@ -98,21 +230,21 @@ stop_services() {
     local service="${1:-}"
     
     if [[ -n "$service" ]]; then
-        log_info "Stopping $service..."
+        info "Stopping $service..."
         if docker compose stop "$service"; then
-            log_success "$service stopped"
+            success "$service stopped"
             return 0
         else
-            log_error "Failed to stop $service"
+            error "Failed to stop $service"
             return 1
         fi
     else
-        log_info "Stopping all services..."
+        info "Stopping all services..."
         if docker compose stop; then
-            log_success "All services stopped"
+            success "All services stopped"
             return 0
         else
-            log_error "Failed to stop services"
+            error "Failed to stop services"
             return 1
         fi
     fi
@@ -140,18 +272,18 @@ restart_services() {
     local service="${1:-}"
     
     if [[ -n "$service" ]]; then
-        log_info "Restarting $service..."
+        info "Restarting $service..."
         if docker compose restart "$service"; then
-            log_success "$service restarted"
+            success "$service restarted"
             return 0
         else
-            log_error "Failed to restart $service"
+            error "Failed to restart $service"
             return 1
         fi
     else
-        log_info "Restarting all services..."
+        info "Restarting all services..."
         if docker compose restart; then
-            log_success "All services restarted"
+            success "All services restarted"
             
             # Show status after restart
             sleep 5
@@ -160,7 +292,7 @@ restart_services() {
             
             return 0
         else
-            log_error "Failed to restart services"
+            error "Failed to restart services"
             return 1
         fi
     fi
@@ -195,10 +327,10 @@ show_logs() {
     fi
     
     if [[ -n "$service" ]]; then
-        log_info "Showing logs for $service..."
+        info "Showing logs for $service..."
         docker compose logs "${opts[@]}" "$service"
     else
-        log_info "Showing logs for all services..."
+        info "Showing logs for all services..."
         docker compose logs "${opts[@]}"
     fi
 }
@@ -223,6 +355,21 @@ show_status() {
     print "${COLOR_BOLD}Service Status Overview${COLOR_RESET}"
     print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
+    # Check Docker connectivity first
+    if ! docker info >/dev/null 2>&1; then
+        warning "Docker daemon not running - attempting to start..."
+        
+        if start_docker_daemon; then
+            success "Docker started successfully"
+        else
+            error "Failed to start Docker daemon"
+            info "Manual start required:"
+            info "  • macOS/Windows: Open Docker Desktop"
+            info "  • Linux: sudo systemctl start docker"
+            return 1
+        fi
+    fi
+    
     # Basic status table
     docker compose ps
     
@@ -235,24 +382,14 @@ show_status() {
     print "\n${COLOR_BOLD}Service URLs${COLOR_RESET}"
     print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
-    # Service URLs
-    local -A service_urls=(
-        [sabnzbd]="http://localhost:8080"
-        [prowlarr]="http://localhost:9696"
-        [sonarr]="http://localhost:8989"
-        [radarr]="http://localhost:7878"
-        [readarr]="http://localhost:8787"
-        [lidarr]="http://localhost:8686"
-        [bazarr]="http://localhost:6767"
-        [mylar3]="http://localhost:8090"
-        [jellyfin]="http://localhost:8096"
-        [overseerr]="http://localhost:5055"
-        [portainer]="http://localhost:9000"
-    )
+    # Use SERVICE_URLS from environment configuration
+    # (Already loaded by init.zsh)
     
-    for service url in ${(kv)service_urls}; do
+    for service url in ${(kv)SERVICE_URLS}; do
         if docker compose ps -q "$service" 2>/dev/null | grep -q .; then
             print "  ${COLOR_GREEN}●${COLOR_RESET} $service: $url"
+        else
+            print "  ${COLOR_RED}●${COLOR_RESET} $service: $url (not running)"
         fi
     done
 }
@@ -278,46 +415,46 @@ update_services() {
     local service="${1:-}"
     
     if [[ -n "$service" ]]; then
-        log_info "Updating $service..."
+        info "Updating $service..."
         
         # Pull latest image
         if docker compose pull "$service"; then
-            log_success "Downloaded latest $service image"
+            success "Downloaded latest $service image"
             
             # Recreate container
             if docker compose up -d "$service"; then
-                log_success "$service updated successfully"
+                success "$service updated successfully"
                 return 0
             else
-                log_error "Failed to recreate $service container"
+                error "Failed to recreate $service container"
                 return 1
             fi
         else
-            log_error "Failed to pull $service image"
+            error "Failed to pull $service image"
             return 1
         fi
     else
-        log_info "Updating all services..."
+        info "Updating all services..."
         
         # Pull all images
         if docker compose pull; then
-            log_success "Downloaded latest images"
+            success "Downloaded latest images"
             
             # Recreate containers
             if docker compose up -d; then
-                log_success "All services updated successfully"
+                success "All services updated successfully"
                 
                 # Clean up old images
-                log_info "Cleaning up old images..."
+                info "Cleaning up old images..."
                 docker image prune -f
                 
                 return 0
             else
-                log_error "Failed to recreate containers"
+                error "Failed to recreate containers"
                 return 1
             fi
         else
-            log_error "Failed to pull images"
+            error "Failed to pull images"
             return 1
         fi
     fi
@@ -348,7 +485,7 @@ backup_configs() {
     # Create backup directory
     mkdir -p "$dest"
     
-    log_info "Creating configuration backup..."
+    info "Creating configuration backup..."
     
     # Create backup
     if tar -czf "$backup_file" \
@@ -358,7 +495,7 @@ backup_configs() {
         docker-compose.yml \
         docker-compose.*.yml 2>/dev/null; then
         
-        log_success "Backup created: $backup_file"
+        success "Backup created: $backup_file"
         
         # Show backup size
         local size=$(du -h "$backup_file" | cut -f1)
@@ -366,7 +503,7 @@ backup_configs() {
         
         return 0
     else
-        log_error "Failed to create backup"
+        error "Failed to create backup"
         return 1
     fi
 }
@@ -426,8 +563,12 @@ main() {
             backup_configs "$@"
             ;;
             
+        docker)
+            check_docker_status
+            ;;
+            
         *)
-            log_error "Unknown command: $cmd"
+            error "Unknown command: $cmd"
             print "\nAvailable commands:"
             print "  start [service]    - Start services"
             print "  stop [service]     - Stop services"
@@ -436,6 +577,7 @@ main() {
             print "  status            - Show service status"
             print "  update [service]  - Update to latest images"
             print "  backup [path]     - Backup configurations"
+            print "  docker            - Check Docker daemon status"
             return 1
             ;;
     esac
