@@ -12,8 +12,12 @@
 # Services included:
 # DOWNLOADERS:  SABnzbd (8080), Transmission (9092)
 # AUTOMATION:   Sonarr (8989), Radarr (7878), Bazarr (6767), Prowlarr (9696)
-# SPECIALIZED:  Whisparr (6969), Readarr (8787), Mylar3 (8090), YacReader (8082)
+# SPECIALIZED:  Whisparr (6969), Readarr (8787), Mylar3 (8090), YACReader (8082)
 # INDEXERS:     Jackett (9117)
+# MEDIA:        Jellyfin (8096)
+# REQUESTS:     Overseerr (5055)
+# TRANSCODING:  Tdarr (8265)
+# OPTIMIZATION: Recyclarr (TRaSH Guide automation)
 # SHARING:      Samba (139,445), NFS (2049)
 # MONITORING:   Netdata (19999), Portainer (9000)
 #
@@ -36,7 +40,7 @@
 # MEDIUM: Sonarr, Radarr, Prowlarr, Readarr, Mylar3, Whisparr
 # HIGH:   SABnzbd, Transmission (during active downloads)
 
-version: '3.8'
+# Note: version field is deprecated in Compose v2.x and removed
 
 # Define networks for service isolation and Swarm compatibility
 networks:
@@ -708,4 +712,141 @@ services:
         limits:
           cpus: '0.25'
           memory: 256M
+
+  # ================================
+  # Jellyfin - Media Server
+  # Access at http://localhost:8096
+  # Medium Resource Usage
+  # ================================
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    hostname: jellyfin
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+    volumes:
+      - /home/joe/usenet/config/jellyfin:/config
+      - /home/joe/usenet/media:/media
+      - /home/joe/usenet/media/movies:/movies
+      - /home/joe/usenet/media/tv:/tv
+      - /home/joe/usenet/media/music:/music
+      - /home/joe/usenet/media/books:/books
+    ports:
+      - "8096:8096"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+
+  # ================================
+  # Overseerr - Request Management
+  # Access at http://localhost:5055
+  # Low Resource Usage
+  # ================================
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    hostname: overseerr
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/joe/usenet/config/overseerr:/config
+    ports:
+      - "5055:5055"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ================================
+  # Recyclarr - TRaSH Guide Automation
+  # Optimizes Sonarr/Radarr/Bazarr configurations
+  # Low Resource Usage (Cron-based)
+  # ================================
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:latest
+    container_name: recyclarr
+    hostname: recyclarr
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/joe/usenet/config/recyclarr:/config
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+  # ================================
+  # Tdarr - Automated Transcoding Engine
+  # Access at http://localhost:8265
+  # High Resource Usage (GPU/CPU intensive)
+  # ================================
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    hostname: tdarr
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - TDARR_INSTANCE_NAME=Main
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - nodeID=MainNode
+      # Hardware acceleration (uncomment for your GPU)
+      # - NVIDIA_VISIBLE_DEVICES=all
+      # - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+    volumes:
+      - /home/joe/usenet/config/tdarr/server:/app/server
+      - /home/joe/usenet/config/tdarr/configs:/app/configs
+      - /home/joe/usenet/config/tdarr/logs:/app/logs
+      - /home/joe/usenet/media:/media
+      - /home/joe/usenet/media/movies:/movies
+      - /home/joe/usenet/media/tv:/tv
+      - /home/joe/usenet/downloads/tdarr_transcode:/temp
+    ports:
+      - "8265:8265"  # Web UI
+      - "8266:8266"  # Server port
+    restart: unless-stopped
+    # Uncomment for GPU support
+    # runtime: nvidia
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '4.0'      # Allow high CPU usage for transcoding
+          memory: 4G       # Transcoding needs RAM for buffers
+        reservations:
+          cpus: '1.0'
+          memory: 1G
 
