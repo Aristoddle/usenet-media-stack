@@ -4,6 +4,8 @@
 
 This architecture showcases a production-ready system designed for **technical excellence**, **operational simplicity**, and **community leadership**.
 
+<GuidedTour tour-type="architecture" :auto-start="false" />
+
 ## 🎯 **Interactive System Overview**
 
 <SystemArchitecture />
