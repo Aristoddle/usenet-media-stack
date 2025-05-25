@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "created": "2025-05-25T05:00:32-04:00",
+  "created_unix": 1748163632,
+  "type": "config",
+  "description": "",
+  "filename": "usenet-stack-backup-test-fixed.tar.gz",
+  "size_human": "1.0K",
+  "size_bytes": 6267011,
+  "hostname": "JK-homeserver",
+  "git_commit": "317b8ca3f91e5f1b2bce0752092d22a1bc89baa2",
+  "git_branch": "feature/pure-subcommand-architecture",
+  "services": "",
+  "backup_type_description": "Configuration only (default) - excludes media, downloads, logs"
+}
