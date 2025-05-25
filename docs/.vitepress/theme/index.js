@@ -1,31 +1,32 @@
 import DefaultTheme from 'vitepress/theme'
-import SystemArchitecture from '../components/SystemArchitecture.vue'
-import PerformanceMetrics from '../components/PerformanceMetrics.vue'
-import ServiceTopology from '../components/ServiceTopology.vue'
-import CLISimulator from '../components/CLISimulator.vue'
-import GuidedTour from '../components/GuidedTour.vue'
+// Temporarily disabled for deployment fixes - will rebuild with proper ESM compatibility
+// import SystemArchitecture from '../components/SystemArchitecture.vue'
+// import PerformanceMetrics from '../components/PerformanceMetrics.vue'
+// import ServiceTopology from '../components/ServiceTopology.vue'
+// import CLISimulator from '../components/CLISimulator.vue'
+// import GuidedTour from '../components/GuidedTour.vue'
 import AnimatedHero from '../components/AnimatedHero.vue'
-import InteractiveCLIDemo from '../components/InteractiveCLIDemo.vue'
+// import InteractiveCLIDemo from '../components/InteractiveCLIDemo.vue'
 import PathSelector from '../components/PathSelector.vue'
-import PerformanceBenchmarks from '../components/PerformanceBenchmarks.vue'
-import ServiceNetworkTopology from '../components/ServiceNetworkTopology.vue'
-import StorageTreemap from '../components/StorageTreemap.vue'
+// import PerformanceBenchmarks from '../components/PerformanceBenchmarks.vue'
+// import ServiceNetworkTopology from '../components/ServiceNetworkTopology.vue'
+// import StorageTreemap from '../components/StorageTreemap.vue'
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    // Register global components
-    app.component('SystemArchitecture', SystemArchitecture)
-    app.component('PerformanceMetrics', PerformanceMetrics)
-    app.component('ServiceTopology', ServiceTopology)
-    app.component('CLISimulator', CLISimulator)
-    app.component('GuidedTour', GuidedTour)
+    // Register global components (temporarily reduced for deployment)
+    // app.component('SystemArchitecture', SystemArchitecture)
+    // app.component('PerformanceMetrics', PerformanceMetrics)
+    // app.component('ServiceTopology', ServiceTopology)
+    // app.component('CLISimulator', CLISimulator)
+    // app.component('GuidedTour', GuidedTour)
     app.component('AnimatedHero', AnimatedHero)
-    app.component('InteractiveCLIDemo', InteractiveCLIDemo)
+    // app.component('InteractiveCLIDemo', InteractiveCLIDemo)
     app.component('PathSelector', PathSelector)
-    app.component('PerformanceBenchmarks', PerformanceBenchmarks)
-    app.component('ServiceNetworkTopology', ServiceNetworkTopology)
-    app.component('StorageTreemap', StorageTreemap)
+    // app.component('PerformanceBenchmarks', PerformanceBenchmarks)
+    // app.component('ServiceNetworkTopology', ServiceNetworkTopology)
+    // app.component('StorageTreemap', StorageTreemap)
     
     // Enhanced responsive animations for mobile-first UX
     if (typeof window !== 'undefined') {
