@@ -6,6 +6,10 @@ import CLISimulator from '../components/CLISimulator.vue'
 import GuidedTour from '../components/GuidedTour.vue'
 import AnimatedHero from '../components/AnimatedHero.vue'
 import InteractiveCLIDemo from '../components/InteractiveCLIDemo.vue'
+import PathSelector from '../components/PathSelector.vue'
+import PerformanceBenchmarks from '../components/PerformanceBenchmarks.vue'
+import ServiceNetworkTopology from '../components/ServiceNetworkTopology.vue'
+import StorageTreemap from '../components/StorageTreemap.vue'
 
 export default {
   extends: DefaultTheme,
@@ -18,6 +22,10 @@ export default {
     app.component('GuidedTour', GuidedTour)
     app.component('AnimatedHero', AnimatedHero)
     app.component('InteractiveCLIDemo', InteractiveCLIDemo)
+    app.component('PathSelector', PathSelector)
+    app.component('PerformanceBenchmarks', PerformanceBenchmarks)
+    app.component('ServiceNetworkTopology', ServiceNetworkTopology)
+    app.component('StorageTreemap', StorageTreemap)
     
     // Enhanced responsive animations for mobile-first UX
     if (typeof window !== 'undefined') {
