@@ -536,6 +536,154 @@ export default {
 - **TroubleshootingFlow**: Interactive problem-solving
 - **ConfigGenerator**: Environment file builder
 
+## **🔄 CLI REFACTOR PLAN - MAJOR ARCHITECTURE IMPROVEMENT**
+
+### **Current State Analysis**
+**Git Restore Point**: `a12db31` - Pre-refactor checkpoint with shift errors fixed
+
+**Problems with Current CLI**:
+- ❌ No unified deployment workflow (`setup` buried in legacy commands)
+- ❌ Scattered pre-flight checks (hardware + storage + validation separate)
+- ❌ Component flags don't match capabilities (`--tunnel` vs `--cloudflare`)
+- ❌ Missing service API management (core capability not exposed)
+- ❌ Hot-swap workflow incomplete (detection exists, orchestration missing)
+
+### **New CLI Architecture Design**
+
+**Inspiration Sources**:
+- **Git**: Subcommand + flags perfection (`git commit -m "msg" --amend`)
+- **Docker**: Object + action model (`docker container run --rm -it`)
+- **Terraform**: Workflow-oriented (`terraform plan -var-file=prod.tfvars`)
+
+**Our Model**: **Pure Subcommand Workflow Tool** (following pyenv pattern)
+
+```bash
+# PRIMARY WORKFLOWS 
+usenet deploy                       # Interactive full deployment
+usenet deploy --auto                # Auto-detect everything  
+usenet deploy --profile balanced    # Specific performance profile
+usenet deploy --storage-only        # Just storage configuration
+usenet deploy --hardware-only       # Just hardware optimization
+
+# COMPONENT MANAGEMENT (consistent action verbs)
+usenet storage list                 # List available drives (was: discover)
+usenet storage add /path/to/drive   # Add to pool
+usenet storage remove /path         # Remove from pool
+usenet storage sync                 # Update service APIs
+usenet storage status               # Show current pool configuration
+
+usenet hardware list                # Show capabilities (was: detect)
+usenet hardware configure           # Interactive setup
+usenet hardware install-drivers     # Install GPU drivers
+usenet hardware optimize --auto     # Generate optimized configs
+
+usenet services list                # Show all service health (was: status)
+usenet services logs sonarr         # View specific logs
+usenet services restart radarr      # Restart service
+usenet services sync                # Update all API configs
+
+# SYSTEM OPERATIONS (consistent patterns)
+usenet backup list                  # List available backups
+usenet backup create [path]         # Create backup (default: stdout + file)
+usenet backup show <backup>         # Show backup contents
+usenet backup restore <backup>      # Restore from backup
+
+usenet tunnel setup --domain=x.y    # Cloudflare tunnel
+usenet tunnel status                # Show tunnel status
+
+usenet validate                     # Pre-flight checks
+usenet validate --fix               # Pre-flight checks with fixes
+
+# HELP SYSTEM (pyenv-style)
+usenet help                         # Main help
+usenet help storage                 # Component-specific help
+usenet storage --help               # Same as above
+```
+
+### **Implementation Phases**
+
+#### **✅ Phase 1: Core Parser Architecture** (COMPLETED)
+- [x] Create new argument parser with flag-based routing
+- [x] Implement `--storage`, `--hardware`, `--backup` flag routing  
+- [x] Add global flags (`--verbose`, `--dry-run`, `--profile`)
+- [x] Maintain backward compatibility with legacy syntax
+- [x] Test basic command dispatch and error handling
+
+#### **🔄 Phase 2A: Pure Subcommand Architecture Refactor** ⚡ HIGH PRIORITY
+- [x] **ARCHITECTURE DECISION**: Choose pyenv-style pure subcommand pattern
+- [ ] **MAIN PARSER REFACTOR**: Implement pure subcommand routing (no flag-based commands)
+- [ ] **BACKWARD COMPATIBILITY**: Maintain `--storage` syntax with deprecation warnings
+- [ ] **ACTION VERB CONSISTENCY**: Standardize `discover→list`, `detect→list`, `status→list`
+- [ ] **ERROR HANDLING**: Auto-show help when subcommand called without required args
+- [ ] **HELP SYSTEM**: Implement `usenet help <command>` and `usenet <command> --help`
+
+#### **🔄 Phase 2B: Enhanced Backup System** ⚡ HIGH PRIORITY  
+- [ ] **BACKUP REDESIGN**: 
+  - [ ] `usenet backup list` - List available backups with details
+  - [ ] `usenet backup create [path]` - Default stdout + file with content description
+  - [ ] `usenet backup show <backup>` - Inspect backup contents
+  - [ ] `usenet backup restore <backup>` - Restore from backup
+  - [ ] Clear documentation of what IS/ISN'T backed up
+- [ ] **QUALITY GATE**: Test full backup/restore workflow
+
+#### **Phase 3: Deploy Command (Primary Workflow)** ⚡ HIGH PRIORITY  
+- [ ] Create `usenet deploy` subcommand (pure subcommand, not flag)
+- [ ] Integrate pre-flight checks (hardware + storage + validation)
+- [ ] Add deployment profiles (`--auto`, `--profile`, `--storage-only`)
+- [ ] Implement complete deployment orchestration
+- [ ] **ADVERSARIAL REVIEW**: Test against user workflow expectations
+
+#### **Phase 4: Service API Integration** 🔧 MEDIUM PRIORITY
+- [ ] Create `--services` flag with consistent action verbs
+- [ ] Implement service API synchronization (`--storage sync`, `--services sync`)
+- [ ] Add hot-swap workflow orchestration
+- [ ] **QUALITY GATE**: Ensure zero-downtime drive addition works
+
+#### **Phase 5: Polish & Documentation** 📚 MEDIUM PRIORITY
+- [ ] Create comprehensive zsh completions for all flag combinations
+- [ ] Update all help text with consistent action verbs
+- [ ] Update README with new CLI patterns
+- [ ] Create CLI reference documentation
+- [ ] **ADVERSARIAL REVIEW**: Test docs against real user scenarios
+
+#### **Phase 6: Advanced Features** ✨ LOW PRIORITY
+- [ ] Add `--dry-run` support across all commands
+- [ ] Implement `--output json|yaml|table` formatting
+- [ ] Add progress bars for long operations
+- [ ] Create enhanced interactive modes
+
+### **Quality Assurance Framework**
+
+#### **Pre-Implementation Reviews**
+1. **Adversarial Design Review**: Challenge every design decision
+2. **User Workflow Analysis**: Map real-world usage patterns  
+3. **Consistency Check**: Ensure naming/behavior patterns align
+4. **Breaking Change Assessment**: Minimize user disruption
+
+#### **Implementation Quality Gates** 
+1. **Code Quality**: Apply Stan's Ten Commandments + `stanit` principles
+2. **Backward Compatibility**: All existing commands must work
+3. **Error Handling**: Clear, actionable error messages
+4. **Help System**: Comprehensive help at every level
+
+#### **Post-Implementation Validation**
+1. **End-to-End Testing**: Full workflow testing
+2. **Documentation Sync**: Ensure docs match implementation
+3. **Performance Check**: No regression in command speed
+4. **User Experience**: Intuitive, discoverable interface
+
+### **Critical Success Factors**
+1. **Backward Compatibility**: Support legacy `--storage` syntax during transition
+2. **Error Handling**: Clear error messages with suggested corrections
+3. **Help System**: Excellent `--help` at every level
+4. **Completions**: Rich zsh tab completion for all commands and flags
+
+### **Testing Strategy**
+- [ ] Test each command individually
+- [ ] Test command combinations and edge cases
+- [ ] Verify backward compatibility
+- [ ] Test on fresh system (no existing config)
+
 ### **💡 CONTENT STRATEGY**
 
 #### **Documentation Philosophy**

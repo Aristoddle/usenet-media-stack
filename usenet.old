@@ -1,0 +1,552 @@
+#!/usr/bin/env zsh
+##############################################################################
+# File: ./usenet
+# Project: Usenet Media Stack
+# Description: Unified entry point for all media stack operations
+# Author: Joseph Lanzone <mailto:j3lanzone@gmail.com>
+# Created: 2025-05-24
+# Modified: 2025-05-24
+# Version: 2.0.0
+# License: MIT
+#
+# Dedicated to Stan Eisenstat, who taught us that good code explains itself.
+#
+# This is the single entry point for the Usenet Media Stack. All operations
+# go through this script, which routes commands to appropriate handlers in
+# the lib/ directory. This design ensures consistency, maintainability, and
+# a clean user experience.
+#
+# Design principles (The Stan Way):
+# - One entry point, one responsibility
+# - Clear command routing, no magic
+# - Helpful error messages for humans
+# - No clever tricks, just clarity
+#
+# Usage: usenet <command> [options]
+# Try 'usenet help' for detailed information.
+##############################################################################
+
+##############################################################################
+#                              INITIALIZATION                                #
+##############################################################################
+
+# Enable strict error handling
+set -euo pipefail
+
+# Get absolute path to script directory (handles symlinks)
+SCRIPT_DIR="${0:A:h}"
+readonly SCRIPT_DIR
+
+# Ensure lib directory exists
+if [[ ! -d "${SCRIPT_DIR}/lib" ]]; then
+    print -u2 "ERROR: Cannot find lib/ directory"
+    print -u2 "Installation may be corrupted. Please reinstall."
+    exit 1
+fi
+
+# Load core functions and configuration
+source "${SCRIPT_DIR}/lib/core/common.zsh" || {
+    print -u2 "ERROR: Cannot load common.zsh"
+    exit 1
+}
+
+source "${SCRIPT_DIR}/lib/core/init.zsh" || {
+    print -u2 "ERROR: Cannot load init.zsh"
+    exit 1
+}
+
+# Initialize configuration
+if ! load_stack_config; then
+    print -u2 "ERROR: Configuration validation failed"
+    print -u2 "Please check your .env file"
+    exit 1
+fi
+
+##############################################################################
+#                                CONSTANTS                                   #
+##############################################################################
+
+# Version information
+readonly VERSION="2.0.0"
+readonly BUILD_DATE="2025-05-24"
+
+# Library paths
+readonly LIB_DIR="${SCRIPT_DIR}/lib"
+readonly COMMANDS_DIR="${LIB_DIR}/commands"
+readonly CORE_DIR="${LIB_DIR}/core"
+
+# Colors for output (if terminal supports it)
+if [[ -t 1 ]] && [[ "${TERM:-}" != "dumb" ]]; then
+    readonly COLOR_RED=$'\033[0;31m'
+    readonly COLOR_GREEN=$'\033[0;32m'
+    readonly COLOR_YELLOW=$'\033[0;33m'
+    readonly COLOR_BLUE=$'\033[0;34m'
+    readonly COLOR_RESET=$'\033[0m'
+else
+    readonly COLOR_RED=""
+    readonly COLOR_GREEN=""
+    readonly COLOR_YELLOW=""
+    readonly COLOR_BLUE=""
+    readonly COLOR_RESET=""
+fi
+
+##############################################################################
+#                              HELP SYSTEM                                   #
+##############################################################################
+
+#=============================================================================
+# Function: show_help
+# Description: Display main help or command-specific help
+#
+# Shows comprehensive help information for the usenet command or specific
+# subcommands. Uses beautiful formatting and provides examples.
+#
+# Arguments:
+#   $1 - topic (optional)
+#        Specific command to show help for. If omitted, shows main help.
+#
+# Returns:
+#   0 - Always succeeds
+#
+# Example:
+#   show_help
+#   show_help setup
+#=============================================================================
+show_help() {
+    local topic="${1:-main}"
+    
+    if [[ "$topic" == "main" ]]; then
+        cat <<'HELP'
+🎬 Usenet Media Stack v2.0
+
+USAGE
+    usenet [GLOBAL_OPTIONS] [COMMAND] [COMMAND_OPTIONS]
+    usenet --<component> [action] [options]
+
+COMPONENT FLAGS
+    --storage [action]     JBOD storage pool management
+        discover               List all available mounted drives
+        select                 Interactive drive selection TUI
+        add <path>             Add drive to storage pool
+        remove <path>          Remove drive from pool
+        status                 Show storage configuration
+        apply                  Apply changes and restart services
+        
+    --hardware [action]    Hardware optimization and GPU acceleration  
+        detect                 Show detected hardware specifications
+        configure              Interactive resource allocation
+        optimize               Generate optimized configurations
+        install-drivers        Install GPU drivers and acceleration
+        status                 Show current hardware profile
+        
+    --backup [action]      Configuration backup and restore
+        create                 Create new backup
+        restore <file>         Restore from backup
+        list                   List available backups
+        
+    --tunnel               Cloudflare tunnel management
+
+COMMANDS (Legacy Support)
+    setup                  Deploy and configure the complete stack
+    start [service]        Start all services or specific service  
+    stop [service]         Stop all services or specific service
+    restart [service]      Restart services
+    status                 Show health and status of all services
+    logs [service]         View service logs
+    update                 Update all containers to latest versions
+    test                   Run system tests
+    validate               Pre-deployment validation
+
+OPTIONS
+    --verbose, -v      Show detailed output
+    --quiet, -q        Suppress non-essential output
+    --yes, -y          Assume yes to all prompts
+
+EXAMPLES
+    Deploy everything:
+        $ usenet setup
+        
+    Check what's running:
+        $ usenet status
+        
+    Discover all available drives:
+        $ usenet --storage discover
+        
+    Interactive drive selection:
+        $ usenet --storage select
+        
+    Add a specific drive:
+        $ usenet --storage add /mnt/disk2
+        
+    Hardware optimization:
+        $ usenet --hardware optimize --auto
+        
+    Install GPU drivers:
+        $ usenet --hardware install-drivers
+        
+    View service logs:
+        $ usenet logs sonarr
+
+DOCUMENTATION
+    Complete guide: https://github.com/Aristoddle/usenet-media-stack
+    Storage setup: See 'usenet help storage'
+    
+HELP
+    else
+        # Command-specific help
+        local help_file="${LIB_DIR}/help/${topic}.txt"
+        if [[ -f "$help_file" ]]; then
+            cat "$help_file"
+        else
+            local msg="${COLOR_RED}No help available for: "
+            msg="${msg}${topic}${COLOR_RESET}"
+            print -u2 "$msg"
+            print -u2 "Try 'usenet help' for general help"
+            return 1
+        fi
+    fi
+}
+
+#=============================================================================
+# Function: show_version
+# Description: Display version and system information
+#
+# Shows version number, build date, and detected system information
+# to help with troubleshooting and compatibility checks.
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Always succeeds
+#
+# Example:
+#   show_version
+#=============================================================================
+show_version() {
+    print "Usenet Media Stack"
+    print "Version: ${VERSION}"
+    print "Build Date: ${BUILD_DATE}"
+    local platform_os platform_arch
+    platform_os=$(uname -s 2>/dev/null)
+    if [[ $? -eq 0 ]]; then
+        platform_arch=$(uname -m 2>/dev/null)
+        if [[ $? -eq 0 ]]; then
+            print "Platform: ${platform_os} ${platform_arch}"
+        else
+            print "Platform: ${platform_os} ${COLOR_RED}unknown${COLOR_RESET}"
+        fi
+    else
+        print "Platform: ${COLOR_RED}unknown${COLOR_RESET}"
+    fi
+    print ""
+    
+    # Check for dependencies
+    print "Components:"
+    if command -v docker &>/dev/null; then
+        local docker_version
+        docker_version=$(docker --version 2>/dev/null)
+        if [[ $? -eq 0 && -n "$docker_version" ]]; then
+            docker_version=$(echo "$docker_version" | cut -d' ' -f3 | \
+                            sed 's/,$//')
+            print "  Docker: ${docker_version}"
+        else
+            print "  Docker: ${COLOR_RED}error getting version${COLOR_RESET}"
+        fi
+    else
+        print "  Docker: ${COLOR_RED}not installed${COLOR_RESET}"
+    fi
+    
+    if docker compose version &>/dev/null 2>&1; then
+        local compose_version
+        compose_version=$(docker compose version 2>/dev/null)
+        if [[ $? -eq 0 && -n "$compose_version" ]]; then
+            compose_version=$(echo "$compose_version" | cut -d' ' -f4)
+            print "  Compose: ${compose_version}"
+        else
+            print "  Compose: ${COLOR_RED}error getting version${COLOR_RESET}"
+        fi
+    else
+        print "  Compose: ${COLOR_RED}not installed${COLOR_RESET}"
+    fi
+}
+
+##############################################################################
+#                            COMMAND ROUTING                                 #
+##############################################################################
+
+#=============================================================================
+# Function: route_component_flags
+# Description: Route modern component flags (--storage, --hardware, --backup)
+#
+# Arguments:
+#   $1 - Flag name
+#   $@ - Remaining arguments
+#=============================================================================
+route_component_flags() {
+    local flag="$1"
+    if [[ $# -gt 0 ]]; then
+        shift
+    fi
+    
+    case "$flag" in
+        --storage)
+            local storage_args=("$@")
+            if [[ -x "${COMMANDS_DIR}/storage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/storage.zsh" "${storage_args[@]}"
+            else
+                local err="${COLOR_RED}storage.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --storage=*)
+            local storage_cmd="${flag#*=}"
+            if [[ -x "${COMMANDS_DIR}/storage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/storage.zsh" "$storage_cmd" "$@"
+            else
+                local err="${COLOR_RED}storage.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --hardware)
+            local hardware_args=("$@")
+            if [[ -x "${COMMANDS_DIR}/hardware.zsh" ]]; then
+                exec "${COMMANDS_DIR}/hardware.zsh" "${hardware_args[@]}"
+            else
+                local err="${COLOR_RED}hardware.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --hardware=*)
+            local hardware_cmd="${flag#*=}"
+            if [[ -x "${COMMANDS_DIR}/hardware.zsh" ]]; then
+                exec "${COMMANDS_DIR}/hardware.zsh" "$hardware_cmd" "$@"
+            else
+                local err="${COLOR_RED}hardware.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --backup)
+            local backup_args=("$@")
+            if [[ -x "${COMMANDS_DIR}/backup.zsh" ]]; then
+                exec "${COMMANDS_DIR}/backup.zsh" "${backup_args[@]}"
+            else
+                local err="${COLOR_RED}backup.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --backup=*)
+            local backup_cmd="${flag#*=}"
+            if [[ -x "${COMMANDS_DIR}/backup.zsh" ]]; then
+                exec "${COMMANDS_DIR}/backup.zsh" "$backup_cmd" "$@"
+            else
+                local err="${COLOR_RED}backup.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        *)
+            return 1  # Unknown flag
+            ;;
+    esac
+}
+
+#=============================================================================
+# Function: route_legacy_commands
+# Description: Route legacy commands with deprecation warnings
+#
+# Arguments:
+#   $1 - Command name
+#   $@ - Remaining arguments
+#=============================================================================
+route_legacy_commands() {
+    local command="$1"
+    if [[ $# -gt 0 ]]; then
+        shift
+    fi
+    
+    case "$command" in
+        storage)
+            local warn="${COLOR_YELLOW}Warning: 'usenet storage' is "
+            warn="${warn}deprecated."
+            warn="${warn} Use 'usenet --storage' instead.${COLOR_RESET}"
+            print -u2 "$warn"
+            exec "${COMMANDS_DIR}/storage.zsh" "$@"
+            ;;
+        hardware)
+            local warn="${COLOR_YELLOW}Warning: 'usenet hardware' is "
+            warn="${warn}deprecated."
+            warn="${warn} Use 'usenet --hardware' instead.${COLOR_RESET}"
+            print -u2 "$warn"
+            exec "${COMMANDS_DIR}/hardware.zsh" "$@"
+            ;;
+        backup)
+            local warn="${COLOR_YELLOW}Warning: 'usenet backup' is "
+            warn="${warn}deprecated."
+            warn="${warn} Use 'usenet --backup' instead.${COLOR_RESET}"
+            print -u2 "$warn"
+            exec "${COMMANDS_DIR}/backup.zsh" "$@"
+            ;;
+        *)
+            return 1  # Unknown command
+            ;;
+    esac
+}
+
+#=============================================================================
+# Function: route_command
+# Description: Main command router (simplified for clarity)
+#
+# Arguments:
+#   $@ - All command line arguments
+#=============================================================================
+route_command() {
+    # Parse arguments using modern flag-based syntax
+    local action=""
+    local storage_args=()
+    local hardware_args=()
+    local backup_args=()
+    local verbose=false
+    local quiet=false
+    local yes=false
+    
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            # Help system
+            help|--help|-h)
+                show_help "${2:-main}"
+                return 0
+                ;;
+                
+            # Version
+            version|--version)
+                show_version
+                return 0
+                ;;
+                
+            # Global flags
+            --verbose|-v)
+                verbose=true
+                ;;
+            --quiet|-q)
+                quiet=true
+                ;;
+            --yes|-y)
+                yes=true
+                ;;
+                
+            # Component-specific flags
+            --storage|--storage=*|--hardware|--hardware=*|--backup|--backup=*)
+                route_component_flags "$1" "${@:2}"
+                return $?
+                ;;
+                
+            --tunnel|--cloudflare)
+                shift
+                exec "${COMMANDS_DIR}/cloudflare.zsh" "$@"
+                ;;
+                
+            # Legacy command support (for backward compatibility)
+            setup|install|deploy)
+                action="$1"
+                shift
+                exec "${COMMANDS_DIR}/setup.zsh" "$@"
+                ;;
+                
+            start|stop|restart|status|logs|update|upgrade)
+                action="$1"
+                shift
+                exec "${COMMANDS_DIR}/manage.zsh" "$action" "$@"
+                ;;
+                
+            test)
+                shift
+                exec "${COMMANDS_DIR}/test.zsh" "$@"
+                ;;
+                
+            validate|check)
+                shift
+                exec "${COMMANDS_DIR}/validate.zsh" "$@"
+                ;;
+                
+            # Legacy component commands (deprecated but supported)
+            storage|hardware|backup)
+                route_legacy_commands "$1" "${@:2}"
+                return $?
+                ;;
+                
+            # Unknown argument
+            -*)
+                local err="${COLOR_RED}Error: Unknown option "
+                err="${err}'${1}'${COLOR_RESET}"
+                print -u2 "$err"
+                print -u2 "Try 'usenet --help' for available options"
+                exit 1
+                ;;
+            *)
+                if [[ -z "$action" ]]; then
+                    action="$1"
+                    shift
+                    # Handle remaining args based on action
+                    case "$action" in
+                        setup|install|deploy)
+                            exec "${COMMANDS_DIR}/setup.zsh" "$@"
+                            ;;
+                        start|stop|restart|status|logs|update|upgrade)
+                            exec "${COMMANDS_DIR}/manage.zsh" "$action" "$@"
+                            ;;
+                        test)
+                            exec "${COMMANDS_DIR}/test.zsh" "$@"
+                            ;;
+                        validate|check)
+                            exec "${COMMANDS_DIR}/validate.zsh" "$@"
+                            ;;
+                        *)
+                            local err="${COLOR_RED}Error: Unknown command "
+                            err="${err}'${action}'${COLOR_RESET}"
+                            print -u2 "$err"
+                            print -u2 "Try 'usenet --help' for commands"
+                            exit 1
+                            ;;
+                    esac
+                else
+                    local err="${COLOR_RED}Error: Unexpected argument "
+                    err="${err}'${1}'${COLOR_RESET}"
+                    print -u2 "$err"
+                    print -u2 "Try 'usenet --help' for usage information"
+                    exit 1
+                fi
+                ;;
+        esac
+        if [[ $# -gt 0 ]]; then
+            shift
+        fi
+    done
+    
+    # If no arguments provided, show help
+    if [[ -z "$action" ]]; then
+        show_help
+    fi
+}
+
+##############################################################################
+#                              MAIN EXECUTION                                #
+##############################################################################
+
+# Ensure we're not running as root unless explicitly allowed
+if [[ $EUID -eq 0 ]] && [[ "${ALLOW_ROOT:-}" != "true" ]]; then
+    print -u2 "${COLOR_RED}Error: Do not run as root${COLOR_RESET}"
+    print -u2 "Docker will request sudo when needed"
+    exit 1
+fi
+
+# Route the command
+route_command "$@"
+
+# vim: set ts=4 sw=4 et tw=80:
