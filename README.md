@@ -10,6 +10,8 @@
 
 **Deploy once, add devices as needed. Hot-swap storage for portability. GPU acceleration where available.**
 
+📚 **[Complete Documentation](https://beppesarrstack.net)** | 🎯 **[Getting Started](https://docs.beppesarrstack.net/getting-started/)** | 🔧 **[CLI Reference](https://docs.beppesarrstack.net/cli/)**
+
 ---
 
 ## 🚀 **Quick Start**
