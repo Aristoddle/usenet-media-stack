@@ -213,21 +213,12 @@ This isn't theoretical - here's what actually happens when you run it:
 <details>
 <summary>🎯 <strong>Interactive Components & Live Demos</strong></summary>
 
-The documentation includes interactive elements to show how everything works:
+Interactive demonstrations are being rebuilt to align with the new user-centered design approach. Coming soon:
 
-## 🎯 **Interactive System Overview**
-<SystemArchitecture />
-
-## ⚡ **Performance Optimization Showcase**
-<PerformanceMetrics />
-
-## 🌐 **Service Network Topology**
-<ServiceTopology />
-
-## 💻 **Live CLI Demonstration**
-<CLISimulator />
-
-<GuidedTour tour-type="architecture" :auto-start="false" />
+- **System Architecture Diagram**: Visual overview of how services connect
+- **Performance Benchmarks**: Interactive charts showing optimization gains  
+- **CLI Simulator**: Live terminal demonstrations
+- **Storage Explorer**: Hot-swap workflow visualization
 
 </details>
 
