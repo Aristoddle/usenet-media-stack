@@ -551,7 +551,11 @@ main() {
             show_logs "$@"
             ;;
             
-        status)
+        list|status)
+            # Support both 'list' (preferred) and 'status' (legacy)
+            if [[ "$cmd" == "status" ]]; then
+                warning "Command 'status' is deprecated, use 'list' instead"
+            fi
             show_status
             ;;
             
@@ -574,7 +578,7 @@ main() {
             print "  stop [service]     - Stop services"
             print "  restart [service]  - Restart services"
             print "  logs [service]     - Show logs"
-            print "  status            - Show service status"
+            print "  list              - Show service status"
             print "  update [service]  - Update to latest images"
             print "  backup [path]     - Backup configurations"
             print "  docker            - Check Docker daemon status"

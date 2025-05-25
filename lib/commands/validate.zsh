@@ -28,6 +28,233 @@ source "${SCRIPT_DIR:h}/core/init.zsh"
 load_stack_config || die 1 "Failed to load configuration"
 
 ##############################################################################
+#                           DOCKER HELPER FUNCTIONS                          #
+##############################################################################
+
+#=============================================================================
+# Function: install_docker_automatically
+# Description: Attempt to install Docker based on the operating system
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Docker installed successfully
+#   1 - Docker installation failed
+#=============================================================================
+install_docker_automatically() {
+    local os_type=$(uname -s)
+    local arch=$(uname -m)
+    
+    case "$os_type" in
+        Linux)
+            info "Detected Linux system - attempting Docker installation..."
+            install_docker_linux
+            ;;
+        Darwin)
+            info "Detected macOS system - attempting Docker Desktop installation..."
+            install_docker_macos
+            ;;
+        CYGWIN*|MINGW*|MSYS*)
+            info "Detected Windows system - please install Docker Desktop manually"
+            info "Download from: https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+            return 1
+            ;;
+        *)
+            warning "Unknown operating system: $os_type"
+            return 1
+            ;;
+    esac
+}
+
+#=============================================================================
+# Function: install_docker_linux
+# Description: Install Docker on Linux systems
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Docker installed successfully
+#   1 - Docker installation failed
+#=============================================================================
+install_docker_linux() {
+    # Check if we have sudo access
+    if ! sudo -n true 2>/dev/null; then
+        error "Sudo access required for Docker installation"
+        return 1
+    fi
+    
+    # Detect Linux distribution
+    if [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        local distro=$ID
+    else
+        warning "Cannot detect Linux distribution"
+        return 1
+    fi
+    
+    case "$distro" in
+        ubuntu|debian)
+            info "Installing Docker via apt repository..."
+            curl -fsSL https://download.docker.com/linux/$distro/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/$distro $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt update
+            sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+            ;;
+        fedora|centos|rhel)
+            info "Installing Docker via dnf/yum..."
+            sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+            ;;
+        arch)
+            info "Installing Docker via pacman..."
+            sudo pacman -S --noconfirm docker docker-compose
+            ;;
+        *)
+            warning "Unsupported Linux distribution: $distro"
+            info "Please install Docker manually: https://docs.docker.com/engine/install/"
+            return 1
+            ;;
+    esac
+    
+    # Start and enable Docker service
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    
+    # Add current user to docker group
+    sudo usermod -aG docker $USER
+    
+    success "Docker installed and started"
+    warning "Please log out and back in for group changes to take effect"
+    
+    return 0
+}
+
+#=============================================================================
+# Function: install_docker_macos
+# Description: Install Docker Desktop on macOS
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Docker installed successfully
+#   1 - Docker installation failed
+#=============================================================================
+install_docker_macos() {
+    local arch=$(uname -m)
+    
+    # Check if Homebrew is available
+    if command -v brew >/dev/null 2>&1; then
+        info "Installing Docker Desktop via Homebrew..."
+        brew install --cask docker
+        return $?
+    else
+        # Direct download approach
+        info "Downloading Docker Desktop for macOS..."
+        local download_url
+        
+        if [[ "$arch" == "arm64" ]]; then
+            download_url="https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+        else
+            download_url="https://desktop.docker.com/mac/main/amd64/Docker.dmg"
+        fi
+        
+        local temp_dmg="/tmp/Docker.dmg"
+        
+        if curl -L "$download_url" -o "$temp_dmg"; then
+            info "Mounting Docker Desktop installer..."
+            hdiutil attach "$temp_dmg"
+            
+            info "Installing Docker Desktop..."
+            cp -R "/Volumes/Docker/Docker.app" "/Applications/"
+            
+            hdiutil detach "/Volumes/Docker"
+            rm "$temp_dmg"
+            
+            success "Docker Desktop installed to /Applications/Docker.app"
+            info "Please launch Docker Desktop to complete setup"
+            
+            return 0
+        else
+            error "Failed to download Docker Desktop"
+            return 1
+        fi
+    fi
+}
+
+#=============================================================================
+# Function: start_docker_daemon
+# Description: Attempt to start Docker daemon/Desktop
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Docker started successfully
+#   1 - Docker startup failed
+#=============================================================================
+start_docker_daemon() {
+    local os_type=$(uname -s)
+    
+    case "$os_type" in
+        Linux)
+            # Try systemctl first
+            if command -v systemctl >/dev/null 2>&1; then
+                info "Starting Docker service..."
+                if sudo systemctl start docker; then
+                    success "Docker service started"
+                    return 0
+                fi
+            fi
+            
+            # Try service command
+            if command -v service >/dev/null 2>&1; then
+                info "Starting Docker service (legacy)..."
+                if sudo service docker start; then
+                    success "Docker service started"
+                    return 0
+                fi
+            fi
+            
+            error "Failed to start Docker service"
+            return 1
+            ;;
+        Darwin)
+            # Try to start Docker Desktop
+            info "Starting Docker Desktop..."
+            
+            if [[ -f "/Applications/Docker.app/Contents/MacOS/Docker" ]]; then
+                open /Applications/Docker.app
+                info "Docker Desktop is starting... (this may take a minute)"
+                
+                # Wait for Docker to become available (up to 60 seconds)
+                local count=0
+                while [[ $count -lt 60 ]]; do
+                    if docker ps >/dev/null 2>&1; then
+                        success "Docker Desktop started successfully"
+                        return 0
+                    fi
+                    sleep 2
+                    ((count += 2))
+                done
+                
+                warning "Docker Desktop is starting but not ready yet"
+                return 1
+            else
+                error "Docker Desktop not found in /Applications/"
+                return 1
+            fi
+            ;;
+        *)
+            warning "Cannot auto-start Docker on this operating system"
+            return 1
+            ;;
+    esac
+}
+
+##############################################################################
 #                           VALIDATION FUNCTIONS                             #
 ##############################################################################
 
@@ -100,52 +327,85 @@ HELP
 #=============================================================================
 validate_docker() {
     local errors=0
+    local fix_issues=${FIX_ISSUES:-false}
     
     info "Validating Docker setup..."
     
     # Check if Docker is installed
     if ! command -v docker >/dev/null 2>&1; then
         error "Docker is not installed"
-        info "Install Docker from: https://docs.docker.com/get-docker/"
-        ((errors++))
+        if [[ "$fix_issues" == "true" ]]; then
+            warning "Attempting to install Docker automatically..."
+            install_docker_automatically
+            if [[ $? -eq 0 ]]; then
+                success "Docker installed successfully"
+            else
+                error "Failed to install Docker automatically"
+                info "Please install Docker from: https://docs.docker.com/get-docker/"
+                ((errors++))
+            fi
+        else
+            info "Run with --fix to attempt automatic installation"
+            info "Or install Docker from: https://docs.docker.com/get-docker/"
+            ((errors++))
+        fi
     else
         success "Docker is installed"
         
         # Check Docker version
         local docker_version=$(docker --version 2>/dev/null | cut -d' ' -f3 | sed 's/,$//')
         info "Docker version: $docker_version"
+    fi
+    
+    # Check if Docker daemon is accessible
+    local docker_running=false
+    local docker_context=""
+    
+    # Method 1: Try current Docker context
+    if docker ps >/dev/null 2>&1; then
+        docker_running=true
+        docker_context=$(docker context show 2>/dev/null || echo "default")
+        success "Docker daemon is accessible (context: $docker_context)"
+    else
+        warning "Docker daemon not accessible with current context"
         
-        # Check if Docker daemon is running
-        # Try multiple methods to detect Docker daemon status
-        local docker_running=false
+        # Method 2: Try different contexts if available
+        local contexts=($(docker context ls --format "{{.Name}}" 2>/dev/null || echo ""))
+        for context in "${contexts[@]}"; do
+            if [[ "$context" != "$(docker context show 2>/dev/null)" ]]; then
+                info "Trying Docker context: $context"
+                if docker context use "$context" >/dev/null 2>&1 && docker ps >/dev/null 2>&1; then
+                    docker_running=true
+                    docker_context="$context"
+                    success "Docker daemon accessible with context: $context"
+                    break
+                fi
+            fi
+        done
         
-        # Method 1: Check systemctl status (most reliable on Linux)
-        if command -v systemctl >/dev/null 2>&1; then
-            if systemctl is-active docker >/dev/null 2>&1; then
-                docker_running=true
+        # Method 3: Try to start Docker Desktop if it exists
+        if [[ "$docker_running" == "false" ]]; then
+            if [[ "$fix_issues" == "true" ]]; then
+                warning "Attempting to start Docker..."
+                start_docker_daemon
+                # Re-test after start attempt
+                if docker ps >/dev/null 2>&1; then
+                    docker_running=true
+                    success "Docker daemon started successfully"
+                fi
             fi
         fi
         
-        # Method 2: Try docker info (may fail due to permissions)
-        if [[ "$docker_running" == "false" ]] && docker info >/dev/null 2>&1; then
-            docker_running=true
-        fi
-        
-        # Method 3: Check if Docker socket exists and is accessible
-        if [[ "$docker_running" == "false" ]] && [[ -S /var/run/docker.sock ]]; then
-            # Docker socket exists, daemon likely running but may have permission issues
-            warning "Docker daemon is running but may require permission setup"
-            info "Add user to docker group: sudo usermod -aG docker \$USER && newgrp docker"
-            docker_running=true
-        fi
-        
-        if [[ "$docker_running" == "true" ]]; then
-            success "Docker daemon is running"
-        else
-            error "Docker daemon is not running"
-            info "Start Docker with: sudo systemctl start docker (Linux) or open Docker Desktop"
+        if [[ "$docker_running" == "false" ]]; then
+            error "Docker daemon is not accessible"
+            info "Try one of these solutions:"
+            info "  • Start Docker Desktop application"
+            info "  • Run: sudo systemctl start docker (Linux)"
+            info "  • Add user to docker group: sudo usermod -aG docker \$USER"
+            info "  • Use --fix flag to attempt automatic startup"
             ((errors++))
         fi
+    fi
         
         # Check Docker Compose (only if Docker daemon is accessible)
         if [[ "$docker_running" == "true" ]] && docker compose version >/dev/null 2>&1; then
@@ -158,7 +418,6 @@ validate_docker() {
         else
             info "Skipping Docker Compose check (daemon not accessible)"
         fi
-    fi
     
     return $errors
 }
@@ -505,7 +764,48 @@ run_all_validations() {
 #   Exit code from the executed validation
 #=============================================================================
 main() {
-    local check_type="${1:-all}"
+    local check_type="all"
+    local verbose=false
+    local quiet=false
+    export FIX_ISSUES=false
+    
+    # Parse command line options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --fix)
+                FIX_ISSUES=true
+                shift
+                ;;
+            --verbose|-v)
+                verbose=true
+                shift
+                ;;
+            --quiet|-q)
+                quiet=true
+                shift
+                ;;
+            --help|-h|help)
+                show_validate_help
+                return 0
+                ;;
+            all|docker|storage|network|config|dependencies)
+                check_type="$1"
+                shift
+                ;;
+            *)
+                error "Unknown option: $1"
+                show_validate_help
+                return 1
+                ;;
+        esac
+    done
+    
+    # Set verbosity
+    if [[ "$verbose" == "true" ]]; then
+        export VERBOSE=true
+    elif [[ "$quiet" == "true" ]]; then
+        export QUIET=true
+    fi
     
     case "$check_type" in
         all)
@@ -525,9 +825,6 @@ main() {
             ;;
         dependencies)
             validate_dependencies
-            ;;
-        help|--help|-h)
-            show_validate_help
             ;;
         *)
             error "Unknown validation check: $check_type"
