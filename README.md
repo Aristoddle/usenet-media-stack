@@ -10,7 +10,11 @@
 
 **Deploy once, add devices as needed. Hot-swap storage for portability. GPU acceleration where available.**
 
-📚 **[Complete Documentation](https://beppesarrstack.net)** | 🎯 **[Getting Started](https://docs.beppesarrstack.net/getting-started/)** | 🔧 **[CLI Reference](https://docs.beppesarrstack.net/cli/)**
+## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)**
+
+> **🚀 Professional VitePress documentation with interactive examples, architecture diagrams, and complete setup guides.**
+>
+> **[📚 Full Documentation](https://beppesarrstack.net)** • **[⚡ Quick Start](https://beppesarrstack.net/getting-started/)** • **[🔧 CLI Reference](https://beppesarrstack.net/cli/)** • **[🏗️ Architecture](https://beppesarrstack.net/architecture/)**
 
 ---
 
