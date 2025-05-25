@@ -74,6 +74,21 @@
           </button>
         </div>
         
+        <!-- Architecture Preview -->
+        <div class="architecture-preview" :class="{ animate: architectureVisible }">
+          <div class="preview-container">
+            <img 
+              src="/images/generated/hero-architecture.svg" 
+              alt="Usenet Media Stack Architecture" 
+              class="architecture-diagram"
+              @click="exploreArchitecture"
+            />
+            <div class="preview-overlay">
+              <span class="overlay-text">Click to explore interactive architecture</span>
+            </div>
+          </div>
+        </div>
+        
         <div class="hero-features" :class="{ animate: featuresVisible }">
           <div class="feature-item">
             <div class="feature-icon">⚡</div>
@@ -167,6 +182,7 @@ const titleVisible = ref(false)
 const subtitleVisible = ref(false)
 const statsVisible = ref(false)
 const actionsVisible = ref(false)
+const architectureVisible = ref(false)
 const featuresVisible = ref(false)
 const demoVisible = ref(false)
 const scrollVisible = ref(false)
@@ -183,9 +199,10 @@ const animationSequence = [
   { target: subtitleVisible, delay: 400 },
   { target: statsVisible, delay: 600 },
   { target: actionsVisible, delay: 800 },
-  { target: featuresVisible, delay: 1000 },
-  { target: demoVisible, delay: 1200 },
-  { target: scrollVisible, delay: 1400 }
+  { target: architectureVisible, delay: 1000 },
+  { target: featuresVisible, delay: 1200 },
+  { target: demoVisible, delay: 1400 },
+  { target: scrollVisible, delay: 1600 }
 ]
 
 // Particles for background animation
@@ -578,6 +595,71 @@ onMounted(() => {
 .btn-subtitle {
   font-size: 0.75rem;
   opacity: 0.8;
+}
+
+/* Architecture Preview Styles */
+.architecture-preview {
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease;
+}
+
+.architecture-preview.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.preview-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.preview-container:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+.architecture-diagram {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.preview-container:hover .architecture-diagram {
+  transform: scale(1.02);
+}
+
+.preview-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 1.5rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.preview-container:hover .preview-overlay {
+  transform: translateY(0);
+}
+
+.overlay-text {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  display: block;
 }
 
 .hero-features {
