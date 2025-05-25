@@ -12,7 +12,7 @@
 # Services included:
 # DOWNLOADERS:  SABnzbd (8080), Transmission (9092)
 # AUTOMATION:   Sonarr (8989), Radarr (7878), Bazarr (6767), Prowlarr (9696)
-# SPECIALIZED:  Whisparr (6969), Readarr (8787), Mylar3 (8090), YACReader (8082)
+# SPECIALIZED:  Whisparr (6969), Readarr (8787), Mylar3 (8090), YACReader (8082), Stash (9999)
 # (Legacy Jackett removed - Prowlarr handles all indexing)
 # MEDIA:        Jellyfin (8096)
 # REQUESTS:     Overseerr (5055)
@@ -97,6 +97,13 @@ volumes:
       type: bind
       o: bind
       device: /home/joe/usenet/config/prowlarr
+  
+  stash_config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: /home/joe/usenet/config/stash
   
   # Shared storage volumes
   downloads_volume:
@@ -820,4 +827,64 @@ services:
         reservations:
           cpus: '1.0'
           memory: 1G
+
+  # ================================
+  # Stash - Adult Media Library Manager
+  # Access at http://localhost:9999
+  # Medium Resource Usage
+  # ================================
+  stash:
+    image: stashapp/stash:latest
+    container_name: stash
+    hostname: stash
+    networks:
+      - media_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - STASH_STASH=/data/
+      - STASH_GENERATED=/generated/
+      - STASH_METADATA=/metadata/
+      - STASH_CACHE=/cache/
+      - STASH_PORT=9999
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/joe/usenet/config/stash:/root/.stash
+      - /home/joe/usenet/media/adult:/data
+      - /home/joe/usenet/config/stash/metadata:/metadata
+      - /home/joe/usenet/config/stash/cache:/cache
+      - /home/joe/usenet/config/stash/blobs:/blobs
+      - /home/joe/usenet/config/stash/generated:/generated
+      # Multi-drive adult storage mounts (same pattern as other services)
+      - /media/joe/Fast_8TB_1:/data/fast1:rw
+      - /media/joe/Fast_8TB_2:/data/fast2:rw
+      - /media/joe/Fast_8TB_3:/data/fast3:rw
+      - /media/joe/Fast_4TB_1:/data/fast4:rw
+      - /media/joe/Fast_4TB_2:/data/fast5:rw
+      - /media/joe/Slow_4TB_1:/data/slow1:rw
+      - /media/joe/Slow_4TB_2:/data/slow2:rw
+      - /media/joe/Slow_2TB_1:/data/slow3:rw
+      - /media/joe/Slow_2TB_2:/data/slow4:rw
+    ports:
+      - "9999:9999"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "2m"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
