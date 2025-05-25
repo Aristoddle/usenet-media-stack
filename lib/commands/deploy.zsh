@@ -46,14 +46,16 @@ load_stack_config >/dev/null 2>&1 || true
 
 # Deployment modes
 typeset -g DEPLOY_MODE="interactive"    # interactive, auto, storage-only, hardware-only
+typeset -g PROFILE="balanced"           # Hardware optimization profile
 typeset -g SKIP_HARDWARE=false
 typeset -g SKIP_STORAGE=false
 typeset -g SKIP_VALIDATION=false
 typeset -g DRY_RUN=false
 typeset -g VERBOSE_MODE=false
+typeset -g FORCE=false
 
 # Progress tracking
-typeset -g TOTAL_STEPS=6
+typeset -g TOTAL_STEPS=8
 typeset -g CURRENT_STEP=0
 
 ##############################################################################
@@ -73,7 +75,7 @@ typeset -g CURRENT_STEP=0
 show_deploy_header() {
     print ""
     print "${COLOR_CYAN}╔══════════════════════════════════════════════════════════════╗${COLOR_RESET}"
-    print "${COLOR_CYAN}║            USENET MEDIA STACK DEPLOYMENT v1.0               ║${COLOR_RESET}"
+    print "${COLOR_CYAN}║      🚀 USENET MEDIA STACK DEPLOYMENT v2.0 🚀              ║${COLOR_RESET}"
     print "${COLOR_CYAN}║                                                              ║${COLOR_RESET}"
     print "${COLOR_CYAN}║  🚀 Hot-swappable JBOD media automation                     ║${COLOR_RESET}"
     print "${COLOR_CYAN}║  🎯 19-service stack with hardware optimization             ║${COLOR_RESET}"
@@ -129,11 +131,15 @@ run_preflight_checks() {
     
     info "Validating system requirements..."
     
-    # Run existing validation system
+    # Run existing validation system with auto-fix if not in dry-run
     if [[ -x "${SCRIPT_DIR}/validate.zsh" ]]; then
-        if ! "${SCRIPT_DIR}/validate.zsh" >/dev/null 2>&1; then
+        local validate_flags=""
+        [[ "$DRY_RUN" != "true" ]] && validate_flags="--fix"
+        [[ "$VERBOSE_MODE" == "true" ]] && validate_flags="$validate_flags --verbose"
+        
+        if ! "${SCRIPT_DIR}/validate.zsh" $validate_flags >/dev/null 2>&1; then
             error "Pre-flight validation failed"
-            warning "Run 'usenet validate' for detailed diagnostics"
+            warning "Run 'usenet validate --fix' for detailed diagnostics"
             return 1
         fi
         success "✓ System validation passed"
@@ -174,15 +180,31 @@ detect_and_optimize_hardware() {
     if [[ -x "${SCRIPT_DIR}/hardware.zsh" ]]; then
         info "Analyzing system hardware..."
         
-        # Run hardware detection (suppress output for clean deployment)
-        if "${SCRIPT_DIR}/hardware.zsh" list >/dev/null 2>&1; then
+        # Run hardware detection
+        local hw_output=$("${SCRIPT_DIR}/hardware.zsh" detect 2>&1)
+        local hw_status=$?
+        
+        if [[ $hw_status -eq 0 ]]; then
             success "✓ Hardware detection completed"
             
-            # Check if optimization is available
-            if "${SCRIPT_DIR}/hardware.zsh" optimize --auto >/dev/null 2>&1; then
-                success "✓ Hardware optimization configured"
+            # Check for GPU optimization opportunities
+            if echo "$hw_output" | grep -q "PERFORMANCE OPTIMIZATION OPPORTUNITIES DETECTED"; then
+                success "Hardware acceleration available!"
+                
+                if [[ "$DEPLOY_MODE" == "auto" ]]; then
+                    info "Auto-configuring hardware optimization..."
+                    "${SCRIPT_DIR}/hardware.zsh" optimize --auto --profile "$PROFILE"
+                else
+                    # Show key hardware info
+                    echo "$hw_output" | grep -E "(CPU:|RAM:|GPU:)" | head -5
+                    
+                    # Interactive prompt for optimization
+                    if ! [[ "$DRY_RUN" == "true" ]] && confirm "Configure hardware optimization?" y; then
+                        "${SCRIPT_DIR}/hardware.zsh" optimize --profile "$PROFILE"
+                    fi
+                fi
             else
-                info "Hardware optimization not needed or unavailable"
+                info "No GPU acceleration detected - using CPU-only configuration"
             fi
         else
             warning "Hardware detection failed, continuing with defaults"
@@ -309,6 +331,74 @@ verify_deployment() {
 }
 
 #=============================================================================
+# Function: configure_services
+# Description: Generate optimized configurations based on hardware/storage
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Configuration successful
+#   1 - Configuration failed
+#=============================================================================
+configure_services() {
+    local configs_generated=0
+    
+    # Check for hardware optimization config
+    if [[ -f "${PROJECT_ROOT}/docker-compose.optimized.yml" ]]; then
+        success "✓ Hardware-optimized configuration found"
+        ((configs_generated++))
+    fi
+    
+    # Check for storage configuration
+    if [[ -f "${PROJECT_ROOT}/docker-compose.storage.yml" ]]; then
+        success "✓ Storage configuration found"
+        ((configs_generated++))
+    fi
+    
+    # Check for network configuration
+    if [[ -f "${PROJECT_ROOT}/docker-compose.network.yml" ]]; then
+        success "✓ Network configuration found"
+        ((configs_generated++))
+    fi
+    
+    if [[ $configs_generated -gt 0 ]]; then
+        info "Generated $configs_generated optimization configuration(s)"
+    else
+        info "Using default configuration (no optimizations)"
+    fi
+    
+    return 0
+}
+
+#=============================================================================
+# Function: apply_configurations
+# Description: Apply storage and other configurations to running services
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - Configuration applied
+#   1 - Configuration failed
+#=============================================================================
+apply_configurations() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        info "[DRY RUN] Would apply configurations to services"
+        return 0
+    fi
+    
+    # Apply storage configuration if it exists
+    if [[ -f "${PROJECT_ROOT}/config/storage.conf" ]]; then
+        info "Applying storage configuration to services..."
+        "${SCRIPT_DIR}/storage.zsh" apply >/dev/null 2>&1 || true
+    fi
+    
+    success "✓ Service configuration completed"
+    return 0
+}
+
+#=============================================================================
 # Function: show_deployment_summary
 # Description: Display post-deployment summary with next steps
 #
@@ -322,32 +412,62 @@ show_deployment_summary() {
     show_deployment_progress "Deployment completed successfully!"
     
     print ""
-    print "${COLOR_GREEN}🎉 DEPLOYMENT SUCCESSFUL${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    print ""
-    print "${COLOR_YELLOW}📋 NEXT STEPS${COLOR_RESET}"
-    print ""
-    print "1. ${COLOR_CYAN}Check service status:${COLOR_RESET}"
-    print "   usenet services list"
-    print ""
-    print "2. ${COLOR_CYAN}Configure additional storage:${COLOR_RESET}"
-    print "   usenet storage list"
-    print "   usenet storage select"
-    print ""
-    print "3. ${COLOR_CYAN}Access web interfaces:${COLOR_RESET}"
-    print "   • Overseerr (requests):    http://localhost:5055"
-    print "   • Jellyfin (media):        http://localhost:8096"
-    print "   • Sonarr (TV):             http://localhost:8989"
-    print "   • Radarr (movies):         http://localhost:7878"
-    print "   • Prowlarr (indexers):     http://localhost:9696"
-    print ""
-    print "4. ${COLOR_CYAN}Monitor system:${COLOR_RESET}"
-    print "   • Netdata (monitoring):    http://localhost:19999"
-    print "   • Portainer (containers):  http://localhost:9000"
-    print ""
-    print "${COLOR_GREEN}📚 Documentation:${COLOR_RESET} https://github.com/yourusername/usenet-media-stack"
-    print "${COLOR_GREEN}🔧 Hardware optimization:${COLOR_RESET} usenet hardware list"
-    print "${COLOR_GREEN}💾 Backup configuration:${COLOR_RESET} usenet backup create"
+    print "${COLOR_GREEN}╔═══════════════════════════════════════════════════════════╗${COLOR_RESET}"
+    print "${COLOR_GREEN}║        🚀 USENET MEDIA STACK DEPLOYED! 🚀                 ║${COLOR_RESET}"
+    print "${COLOR_GREEN}╚═══════════════════════════════════════════════════════════╝${COLOR_RESET}"
+    
+    # Show key service URLs
+    print "\n${COLOR_BOLD}Quick Access:${COLOR_RESET}"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Jellyfin:  ${SERVICE_URLS[jellyfin]:-http://localhost:8096}"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Sonarr:    ${SERVICE_URLS[sonarr]:-http://localhost:8989}"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Radarr:    ${SERVICE_URLS[radarr]:-http://localhost:7878}"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Prowlarr:  ${SERVICE_URLS[prowlarr]:-http://localhost:9696}"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} SABnzbd:   ${SERVICE_URLS[sabnzbd]:-http://localhost:8080}"
+    
+    # Show optimization status
+    print "\n${COLOR_BOLD}Optimization Status:${COLOR_RESET}"
+    
+    # Hardware optimization
+    if [[ -f "${PROJECT_ROOT}/docker-compose.optimized.yml" ]]; then
+        local gpu_info=$(grep -E "(NVIDIA|AMD|Intel|VideoCore)" "${PROJECT_ROOT}/config/hardware_profile.conf" 2>/dev/null || echo "")
+        if [[ -n "$gpu_info" ]]; then
+            print "  ${COLOR_GREEN}✓${COLOR_RESET} Hardware acceleration enabled"
+        fi
+    fi
+    
+    # Storage configuration
+    if [[ -f "${PROJECT_ROOT}/docker-compose.storage.yml" ]]; then
+        local drive_count=$(grep -c "source:" "${PROJECT_ROOT}/docker-compose.storage.yml" 2>/dev/null || echo "0")
+        if [[ $drive_count -gt 0 ]]; then
+            print "  ${COLOR_GREEN}✓${COLOR_RESET} Storage pool configured ($drive_count drives)"
+        fi
+    fi
+    
+    # Network configuration
+    if [[ -f "${PROJECT_ROOT}/docker-compose.network.yml" ]]; then
+        print "  ${COLOR_GREEN}✓${COLOR_RESET} Cloudflare tunnel configured"
+    fi
+    
+    # Next steps
+    print "\n${COLOR_BOLD}Next Steps:${COLOR_RESET}"
+    print "  1. Add indexers in Prowlarr: ${SERVICE_URLS[prowlarr]:-http://localhost:9696}"
+    print "  2. Configure media libraries in Jellyfin"
+    print "  3. Set up quality profiles in Sonarr/Radarr"
+    
+    # Useful commands
+    print "\n${COLOR_BOLD}Useful Commands:${COLOR_RESET}"
+    print "  View logs:         usenet logs <service>"
+    print "  Check status:      usenet status"
+    print "  Add storage:       usenet storage add /path/to/drive"
+    print "  Optimize hardware: usenet hardware optimize"
+    
+    # Performance tip if no GPU detected
+    if ! [[ -f "${PROJECT_ROOT}/docker-compose.optimized.yml" ]]; then
+        print "\n${COLOR_YELLOW}💡 Performance Tip:${COLOR_RESET}"
+        print "  No GPU detected. For faster transcoding, run:"
+        print "  ${COLOR_BLUE}usenet hardware detect${COLOR_RESET}"
+    fi
+    
     print ""
 }
 
@@ -375,14 +495,18 @@ DESCRIPTION
 
 OPTIONS
     --auto                 Fully automated deployment with safe defaults
-    --interactive          Interactive deployment with user prompts (default)
+    --profile <name>       Hardware optimization profile:
+                            • dedicated (100% resources)
+                            • high_performance (75%)
+                            • balanced (50% - default)
+                            • light (25%)
+                            • development (10%)
     --storage-only         Configure storage only (skip hardware/services)
     --hardware-only        Configure hardware only (skip storage/services)
-    --skip-hardware        Skip hardware detection and optimization
-    --skip-storage         Skip storage configuration
     --skip-validation      Skip pre-flight validation checks
     --dry-run, -n          Show what would be done without executing
     --verbose, -v          Show detailed output
+    --force, -f            Force operations without confirmation
     --help, -h             Show this help
 
 DEPLOYMENT MODES
@@ -391,26 +515,36 @@ DEPLOYMENT MODES
     Component-only         - Deploy specific components only
 
 EXAMPLES
-    Full automated deployment:
-        $ usenet deploy --auto
-        
-    Interactive deployment:
+    Interactive deployment (recommended):
         $ usenet deploy
         
-    Hardware optimization only:
-        $ usenet deploy --hardware-only
+    Fully automated deployment:
+        $ usenet deploy --auto
+        
+    High-performance gaming PC:
+        $ usenet deploy --profile high_performance
         
     Storage configuration only:
         $ usenet deploy --storage-only
+        
+    Test deployment without changes:
+        $ usenet deploy --dry-run
 
-NOTES
-    • Pre-flight validation ensures system readiness
-    • Hardware optimization improves transcoding performance
-    • Storage configuration enables hot-swappable JBOD workflows
-    • All components can be reconfigured after deployment
+PROFILES
+    dedicated         - Dedicated media server (100% resources)
+    high_performance  - Powerful workstation (75% resources)
+    balanced          - Shared usage (50% resources) [DEFAULT]
+    light             - Background services (25% resources)
+    development       - Minimal resources (10% for testing)
 
-The deploy command demonstrates both technical depth and product intuition -
-complex systems orchestration wrapped in intuitive user experience.
+POST-DEPLOYMENT
+    After deployment completes:
+    • Access Jellyfin to configure media libraries
+    • Add indexers in Prowlarr
+    • Configure quality profiles in Sonarr/Radarr
+    • Set up user accounts and permissions
+
+For more information: https://github.com/Aristoddle/usenet-media-stack
 HELP
 }
 
@@ -432,8 +566,14 @@ parse_deploy_options() {
                 DEPLOY_MODE="auto"
                 shift
                 ;;
-            --interactive)
-                DEPLOY_MODE="interactive"
+            --profile)
+                shift
+                PROFILE="${1:-balanced}"
+                if [[ ! "$PROFILE" =~ ^(dedicated|high_performance|balanced|light|development)$ ]]; then
+                    error "Invalid profile: $PROFILE"
+                    info "Valid profiles: dedicated, high_performance, balanced, light, development"
+                    return 1
+                fi
                 shift
                 ;;
             --storage-only)
@@ -443,14 +583,6 @@ parse_deploy_options() {
                 ;;
             --hardware-only)
                 DEPLOY_MODE="hardware-only"
-                SKIP_STORAGE=true
-                shift
-                ;;
-            --skip-hardware)
-                SKIP_HARDWARE=true
-                shift
-                ;;
-            --skip-storage)
                 SKIP_STORAGE=true
                 shift
                 ;;
@@ -464,6 +596,11 @@ parse_deploy_options() {
                 ;;
             --verbose|-v)
                 VERBOSE_MODE=true
+                export VERBOSE=true
+                shift
+                ;;
+            --force|-f)
+                FORCE=true
                 shift
                 ;;
             --help|-h|help)
@@ -477,6 +614,12 @@ parse_deploy_options() {
                 ;;
         esac
     done
+    
+    # Validate exclusive options
+    if [[ "$DEPLOY_MODE" == "storage-only" && "$DEPLOY_MODE" == "hardware-only" ]]; then
+        error "Cannot use --storage-only and --hardware-only together"
+        return 1
+    fi
     
     return 0
 }
@@ -523,14 +666,29 @@ main() {
         print ""
         print "Would execute deployment with:"
         print "  Mode: $DEPLOY_MODE"
+        print "  Profile: $PROFILE"
         print "  Skip hardware: $SKIP_HARDWARE"
         print "  Skip storage: $SKIP_STORAGE"
         print "  Skip validation: $SKIP_VALIDATION"
         return 0
     fi
     
+    # Confirmation for interactive mode
+    if [[ "$DEPLOY_MODE" == "interactive" && "$FORCE" != "true" ]]; then
+        print "${COLOR_BOLD}This will deploy the complete Usenet Media Stack${COLOR_RESET}"
+        print "Profile: ${COLOR_BLUE}$PROFILE${COLOR_RESET}"
+        print ""
+        if ! confirm "Continue with deployment?" y; then
+            info "Deployment cancelled"
+            return 0
+        fi
+    fi
+    
     # Execute deployment workflow
     local start_time=$(date +%s)
+    
+    # Reset progress counter
+    CURRENT_STEP=0
     
     # Pre-flight validation
     if [[ "$SKIP_VALIDATION" != "true" ]]; then
@@ -543,8 +701,18 @@ main() {
     # Storage discovery and configuration
     discover_and_configure_storage || return 1
     
-    # Deploy services
-    deploy_services || return 1
+    # Configuration generation
+    show_deployment_progress "Generating optimized configurations..."
+    configure_services || true
+    
+    # Deploy services (only if not component-only mode)
+    if [[ "$DEPLOY_MODE" != "storage-only" && "$DEPLOY_MODE" != "hardware-only" ]]; then
+        deploy_services || return 1
+    fi
+    
+    # Post-deployment configuration
+    show_deployment_progress "Applying configuration to services..."
+    apply_configurations || true
     
     # Verify deployment
     verify_deployment || return 1

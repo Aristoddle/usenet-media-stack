@@ -91,12 +91,15 @@ show_main_help() {
     print "    usenet <command> [<args>]"
     print ""
     print "${COLOR_YELLOW}PRIMARY WORKFLOWS${COLOR_RESET}"
-    print "    ${COLOR_GREEN}deploy${COLOR_RESET}                 Interactive full deployment"
+    print "    ${COLOR_GREEN}deploy${COLOR_RESET}                 Complete stack deployment"
+    print "    ${COLOR_GREEN}deploy --auto${COLOR_RESET}          Automated deployment"
     print "    ${COLOR_GREEN}validate${COLOR_RESET}               Pre-flight system checks"
     print ""
     print "${COLOR_YELLOW}COMPONENT MANAGEMENT${COLOR_RESET}"
-    print "    ${COLOR_GREEN}storage${COLOR_RESET}                JBOD storage pool management"
-    print "    ${COLOR_GREEN}hardware${COLOR_RESET}               Hardware optimization and GPU acceleration"
+    print "    ${COLOR_GREEN}storage list${COLOR_RESET}           Discover all available drives"
+    print "    ${COLOR_GREEN}storage add${COLOR_RESET}            Add drive to media pool"
+    print "    ${COLOR_GREEN}hardware list${COLOR_RESET}          Show hardware capabilities"
+    print "    ${COLOR_GREEN}hardware optimize${COLOR_RESET}      Configure GPU acceleration"
     print "    ${COLOR_GREEN}services${COLOR_RESET}               Service management (start/stop/logs/status)"
     print "    ${COLOR_GREEN}backup${COLOR_RESET}                 Configuration backup and restore"
     print "    ${COLOR_GREEN}tunnel${COLOR_RESET}                 Cloudflare tunnel management"
@@ -142,6 +145,30 @@ show_command_help() {
     local command="$1"
     
     case "$command" in
+        deploy)
+            print "${COLOR_GREEN}usenet deploy${COLOR_RESET} - Primary deployment workflow"
+            print ""
+            print "${COLOR_YELLOW}USAGE${COLOR_RESET}"
+            print "    usenet deploy [options]"
+            print ""
+            print "${COLOR_YELLOW}OPTIONS${COLOR_RESET}"
+            print "    ${COLOR_GREEN}--auto${COLOR_RESET}                 Fully automated deployment"
+            print "    ${COLOR_GREEN}--profile${COLOR_RESET} <name>       Hardware optimization profile"
+            print "    ${COLOR_GREEN}--storage-only${COLOR_RESET}         Configure storage only"
+            print "    ${COLOR_GREEN}--hardware-only${COLOR_RESET}        Configure hardware only"
+            print "    ${COLOR_GREEN}--skip-validation${COLOR_RESET}      Skip pre-flight checks"
+            print "    ${COLOR_GREEN}--dry-run${COLOR_RESET}              Show what would be done"
+            print ""
+            print "${COLOR_YELLOW}EXAMPLES${COLOR_RESET}"
+            print "    Interactive deployment:"
+            print "        ${COLOR_CYAN}usenet deploy${COLOR_RESET}"
+            print ""
+            print "    Automated deployment:"
+            print "        ${COLOR_CYAN}usenet deploy --auto${COLOR_RESET}"
+            print ""
+            print "    High-performance profile:"
+            print "        ${COLOR_CYAN}usenet deploy --profile high_performance${COLOR_RESET}"
+            ;;
         storage)
             print "${COLOR_GREEN}usenet storage${COLOR_RESET} - JBOD storage pool management"
             print ""
@@ -249,11 +276,7 @@ route_command() {
             if [[ -x "${COMMANDS_DIR}/deploy.zsh" ]]; then
                 exec "${COMMANDS_DIR}/deploy.zsh" "$@"
             else
-                error "Deploy command not implemented yet"
-                error "Use 'usenet setup' for now (legacy fallback)"
-                if [[ -x "${COMMANDS_DIR}/setup.zsh" ]]; then
-                    exec "${COMMANDS_DIR}/setup.zsh" "$@"
-                fi
+                error "Deploy command not found"
                 exit 1
             fi
             ;;
