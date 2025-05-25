@@ -23,11 +23,13 @@ export default defineConfig({
       { text: 'CLI Reference', link: '/cli/' },
       { text: 'Architecture', link: '/architecture/' },
       { text: 'Advanced', link: '/advanced/' },
+      { text: '📚 Free Media', link: '/free-media' },
       { 
         text: 'Links',
         items: [
           { text: 'GitHub', link: 'https://github.com/Aristoddle/usenet-media-stack' },
           { text: 'Issues', link: 'https://github.com/Aristoddle/usenet-media-stack/issues' },
+          { text: 'Request Credentials', link: 'mailto:j3lanzone@gmail.com?subject=Credentials%20Access%20Request&body=Hi%20Joe,%0A%0AI%20need%20access%20to:%0A%0A-%20Specific%20services:%0A-%20My%20background:%0A-%20How%20we%20know%20each%20other:%0A%0AThanks!' },
           { text: 'Roadmap', link: '/roadmap' }
         ]
       }
@@ -122,6 +124,14 @@ export default defineConfig({
     lineNumbers: true,
     config: (md) => {
       // Add any markdown-it plugins here
+    }
+  },
+
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag.includes('-')
+      }
     }
   },
 
