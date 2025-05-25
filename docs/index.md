@@ -109,47 +109,72 @@ usenet backup restore backup.tar.gz     # → Atomic restore with rollback
 
 ## 🌍 **Community & Resource Integration**
 
-### **Comprehensive Media Resource Hub**
-Direct integration with the world's largest content libraries:
-- **[Anna's Archive](https://annas-archive.org/)** - 70M+ books, papers, comics
-- **[Internet Archive](https://archive.org/)** - Digital preservation of everything
-- **[Academic Resources](mailto:j3lanzone@gmail.com?subject=Academic%20Resource%20Help)** - MIT OpenCourseWare, arXiv, JSTOR access
-- **[Gaming & ROMs](mailto:j3lanzone@gmail.com?subject=Gaming%20%26%20Emulation%20Help)** - EmuDeck, RetroArch, BIOS assistance
+<div class="feature-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
 
-### **Expert Personal Support**
-Not just documentation - **direct access to expertise**:
-- **Technical setup assistance** for complex deployments
-- **Hardware optimization consulting** for specific configurations  
-- **Content discovery help** for academic and research needs
-- **BIOS and system file location** for legitimate emulation
+<div class="feature-card clickable-element" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('https://annas-archive.org/', '_blank')">
+  <h3 style="margin-top: 0; color: white;">📚 Free & Open Media Access</h3>
+  <p style="margin-bottom: 0;">Anna's Archive: 70M+ books, papers, comics. Internet Archive digital preservation. MIT OpenCourseWare and academic resources.</p>
+</div>
+
+<div class="feature-card clickable-element" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('/free-media/', '_self')">
+  <h3 style="margin-top: 0; color: white;">🎮 Gaming & Emulation Hub</h3>
+  <p style="margin-bottom: 0;">EmuDeck integration, RetroArch setup, legitimate BIOS assistance, and ROM organization for comprehensive gaming libraries.</p>
+</div>
+
+<div class="feature-card clickable-element" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('mailto:j3lanzone@gmail.com?subject=Academic%20Resource%20Help', '_self')">
+  <h3 style="margin-top: 0; color: white;">🎓 Bell Labs Standards</h3>
+  <p style="margin-bottom: 0;">Code following legendary Bell Labs principles. Dedicated to Stan Eisenstat, Dana Angluin, and Avi Silberschatz.</p>
+</div>
+
+<div class="feature-card clickable-element" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('mailto:j3lanzone@gmail.com?subject=Technical%20Support%20Request', '_self')">
+  <h3 style="margin-top: 0;">🤝 Expert Personal Support</h3>
+  <p style="margin-bottom: 0;">Direct technical assistance, hardware optimization consulting, and specialized deployment help from experienced engineers.</p>
+</div>
+
+</div>
 
 ---
 
 ## 🚀 **Deploy Your Production Stack**
 
-### **Guided Quick Start**
-```bash
-# 1. Clone the repository
-git clone https://github.com/Aristoddle/usenet-media-stack.git
-cd usenet-media-stack
+<div class="deployment-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
 
-# 2. Run comprehensive validation
-./usenet validate
+<div class="service-card clickable-element" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('/getting-started/', '_self')">
+  <h3 style="margin-top: 0; color: white;">🚀 Quick Start Guide</h3>
+  <p>One-command deployment with automatic hardware optimization and storage discovery.</p>
+  <code style="background: rgba(255,255,255,0.2); padding: 0.5rem; border-radius: 4px; display: block; margin-top: 1rem;">./usenet deploy --auto</code>
+</div>
 
-# 3. Deploy with automatic optimization
-./usenet deploy --auto
+<div class="service-card clickable-element" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('/architecture/', '_self')">
+  <h3 style="margin-top: 0; color: white;">🏗️ Architecture Deep Dive</h3>
+  <p>Interactive system diagrams, service topology, and performance visualization.</p>
+</div>
 
-# 4. Access your stack
-open https://your-domain.com  # or localhost ports
-```
+<div class="service-card clickable-element" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('/cli-reference/', '_self')">
+  <h3 style="margin-top: 0;">💻 CLI Reference</h3>
+  <p>Complete command documentation with examples and interactive simulator.</p>
+</div>
 
-### **What Happens During Deploy**
-1. **Hardware Detection**: GPU capabilities, driver requirements, optimization opportunities
-2. **Storage Discovery**: All mounted drives (ZFS, exFAT, cloud, JBOD, network)
-3. **Service Orchestration**: 19 services with optimized resource allocation
-4. **Network Configuration**: Cloudflare Tunnel with automatic SSL/TLS
-5. **Quality Optimization**: TRaSH Guide profiles for maximum quality
-6. **Validation & Testing**: Comprehensive health checks and performance verification
+<div class="service-card clickable-element" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="window.open('/troubleshooting/', '_self')">
+  <h3 style="margin-top: 0; color: white;">🔧 Expert Support</h3>
+  <p>Comprehensive troubleshooting guides and direct expert assistance.</p>
+</div>
+
+</div>
+
+### **Automated Deployment Process**
+<div style="background: rgba(102, 126, 234, 0.05); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #667eea;">
+
+**What happens during `./usenet deploy --auto`:**
+
+1. **🔍 Hardware Detection** - GPU capabilities, driver requirements, optimization opportunities
+2. **💾 Storage Discovery** - All mounted drives (ZFS, exFAT, cloud, JBOD, network) 
+3. **🎛️ Service Orchestration** - 19 services with optimized resource allocation
+4. **🌐 Network Configuration** - Cloudflare Tunnel with automatic SSL/TLS
+5. **⚡ Quality Optimization** - TRaSH Guide profiles for maximum quality
+6. **✅ Validation & Testing** - Comprehensive health checks and performance verification
+
+</div>
 
 ---
 
