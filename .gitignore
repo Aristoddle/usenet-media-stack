@@ -31,6 +31,10 @@ logs/
 # Backup files
 *.bak
 *.backup
+backups/*.tar
+backups/*.tar.gz
+backups/*.tar.bz2
+backups/*.tar.info
 
 # OS specific files
 .DS_Store
