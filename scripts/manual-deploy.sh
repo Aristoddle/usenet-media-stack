@@ -16,9 +16,16 @@ NC='\033[0m'
 echo -e "${BLUE}🚀 Building beppesarrstack.net for deployment${NC}"
 echo "================================================="
 
-# Navigate to docs directory and build
+# Navigate to project root then docs directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+DOCS_DIR="$PROJECT_ROOT/docs"
+
 echo -e "${BLUE}📦 Building VitePress site...${NC}"
-cd docs
+echo "Project root: $PROJECT_ROOT"
+echo "Docs directory: $DOCS_DIR"
+
+cd "$DOCS_DIR"
 npm run docs:build
 
 # Check if build succeeded
