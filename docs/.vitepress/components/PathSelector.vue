@@ -3,8 +3,8 @@
     <!-- Initial Path Selection -->
     <div v-if="!selectedPath" class="path-selection">
       <div class="selector-header">
-        <h2>👋 Choose Your Journey</h2>
-        <p>Let's find the best path for your experience level and goals</p>
+        <h2>🎯 Choose Your Setup Path</h2>
+        <p>Professional Usenet automation for your experience level</p>
       </div>
       
       <div class="path-cards">
@@ -13,12 +13,12 @@
           @click="selectPath('beginner')"
         >
           <div class="card-icon">🚀</div>
-          <h3>New to Media Automation</h3>
+          <h3>New to Usenet & Automation</h3>
           <p>Visual guide with explanations</p>
           <ul class="path-features">
-            <li>Step-by-step walkthrough</li>
-            <li>What each service does</li>
-            <li>Safe default settings</li>
+            <li>What is Usenet and why use it</li>
+            <li>How automated downloading works</li>
+            <li>Safe, tested configurations</li>
           </ul>
           <div class="path-cta">Get Started Simply</div>
         </div>
@@ -71,8 +71,8 @@
       <!-- Beginner Path -->
       <div v-if="selectedPath === 'beginner'" class="beginner-content">
         <div class="simple-explainer">
-          <h4>🎬 What This Actually Does</h4>
-          <p>Think of this as your personal Netflix that automatically finds and downloads the shows/movies you want. Plus it works on any device, anywhere.</p>
+          <h4>🎬 Usenet Media Automation Explained</h4>
+          <p>Think of this as your personal Netflix that automatically finds and downloads shows/movies from Usenet newsgroups. Plus free access to books, comics, and academic papers from curated sources.</p>
           
           <div class="visual-flow">
             <div class="flow-step">
@@ -86,8 +86,8 @@
             <div class="flow-step">
               <div class="step-icon">🤖</div>
               <div class="step-text">
-                <strong>2. Automation</strong><br>
-                Finds and downloads automatically
+                <strong>2. Usenet Search</strong><br>
+                Finds and downloads from newsgroups
               </div>
             </div>
             <div class="flow-arrow">→</div>

@@ -1,126 +1,196 @@
-# 🏗️ System Architecture
+# How It Actually Works
 
-> **A comprehensive view of the hot-swappable JBOD media automation stack with intelligent hardware optimization and professional-grade orchestration.**
+**The technical story behind "it just works everywhere"**
 
-This architecture showcases a production-ready system designed for **technical excellence**, **operational simplicity**, and **community leadership**.
+Three core principles make this system work reliably across any hardware setup:
 
-<GuidedTour tour-type="architecture" :auto-start="false" />
+## 📦 **What You Get**
 
-## 🎯 **Interactive System Overview**
+**19 integrated services** that work together automatically:
+- **Media Management**: Sonarr, Radarr, Prowlarr (finds and organizes everything)
+- **Media Server**: Jellyfin with hardware acceleration (streams anywhere)
+- **Downloads**: SABnzbd + Transmission (gets your content fast)
+- **Quality**: Bazarr subtitles, Tdarr transcoding, TRaSH optimization
+- **Access**: Secure Cloudflare tunnel (no ports, no VPN needed)
 
-<SystemArchitecture />
+<details>
+<summary>📋 <strong>Complete Service List</strong></summary>
 
-## ⚡ **Performance Optimization Showcase**
-
-<PerformanceMetrics />
-
-## 🌐 **Service Network Topology**
-
-<ServiceTopology />
-
-## 💻 **Live CLI Demonstration**
-
-<CLISimulator />
-
----
-
-## 🔧 **Core Architecture Principles**
-
-### **🎮 Hardware-First Design**
-Our architecture prioritizes **hardware optimization** as a first-class concern:
-
-- **GPU Acceleration**: NVIDIA RTX, AMD VAAPI, Intel QuickSync, Raspberry Pi VideoCore
-- **Automatic Driver Installation**: One-command setup with hardware-specific optimizations
-- **Performance Profiles**: Dedicated (100%), High Performance (75%), Balanced (50%), Light (25%), Development (10%)
-- **Real Performance Gains**: 4K HEVC transcoding 2-5 FPS → 60+ FPS, 200W CPU → 50W GPU
-
-### **🗄️ Universal Storage Philosophy**
-**Hot-swappable JBOD excellence** that works with any storage configuration:
-
-- **Comprehensive Drive Discovery**: ZFS, Btrfs, cloud mounts (Dropbox, OneDrive, Google Drive), JBOD arrays
-- **Interactive Drive Selection**: Professional TUI for selecting drives to expose to all services
-- **Universal Service Access**: Selected storage automatically accessible to ALL services (Sonarr, Radarr, Jellyfin, Tdarr, etc.)
-- **Dynamic Mount Generation**: Auto-generates docker-compose.storage.yml with proper mount configurations
-- **Hot-Swap Support**: JBOD arrays with automated drive management
-
-### **🐳 Container Orchestration Excellence**
-**19 integrated services** working in perfect harmony:
-
-#### **📺 Media Automation (6 Services)**
-- **Sonarr** (8989) - TV show automation with TRaSH Guide optimization
-- **Radarr** (7878) - Movie automation with custom quality profiles  
+### **📺 Media Automation (6 Services)**
+- **Sonarr** (8989) - TV show automation
+- **Radarr** (7878) - Movie automation  
 - **Readarr** (8787) - Book/audiobook automation
 - **Bazarr** (6767) - Subtitle automation for 40+ languages
 - **Prowlarr** (9696) - Universal indexer management
-- **Recyclarr** - Automatic TRaSH Guide optimization
+- **Recyclarr** - Automatic quality optimization
 
-#### **🎬 Media Services (4 Services)**
-- **Jellyfin** (8096) - Open-source media server with hardware transcoding
-- **Overseerr** (5055) - Beautiful request management interface
-- **YACReader** (8082) - Comic/manga server and reader
-- **Tdarr** (8265) - Automated transcoding with GPU acceleration
+### **🎬 Media Services (4 Services)**
+- **Jellyfin** (8096) - Media server with hardware transcoding
+- **Overseerr** (5055) - Request management interface
+- **YACReader** (8082) - Comic/manga server
+- **Tdarr** (8265) - Automated transcoding
 
-#### **⬇️ Download & Processing (2 Services)**
+### **⬇️ Download & Processing (2 Services)**
 - **SABnzbd** (8080) - High-speed Usenet downloader
 - **Transmission** (9092) - BitTorrent client
 
-#### **🌐 Network & Sharing (3 Services)**
+### **🌐 Network & Sharing (3 Services)**
 - **Samba** (445) - Windows file sharing
 - **NFS** (2049) - Unix/Linux file sharing
 - **Cloudflare Tunnel** - Secure remote access
 
-#### **📊 Monitoring & Management (2 Services)**
+### **📊 Monitoring & Management (4 Services)**
 - **Netdata** (19999) - Real-time system monitoring
 - **Portainer** (9000) - Docker container management
-
-#### **🔍 Indexing & Adult Content (2 Services)**
 - **Jackett** (9117) - Torrent tracker proxy
-- **Whisparr** (6969) - Adult content automation
-- **Mylar3** (8090) - Comic book automation
+- **Whisparr** + **Mylar3** - Specialized content automation
 
-### **🌐 Network & Security Architecture**
-**Zero exposed ports** with enterprise-grade security:
+</details>
 
-- **Domain**: beppesarrstack.net configured ✅
-- **Cloudflare**: API token integrated, DNS records created ✅
-- **Tunnel Config**: Generated for all services ✅
-- **Zero Exposed Ports**: Cloudflare Tunnel architecture ✅
-- **SSL/TLS**: Automatic via Cloudflare ✅
+## 🔧 **Core Architecture Principles**
 
----
+### **🚀 Principle #1: Works With Your Hardware**
+**Auto-detects and optimizes for whatever you have**
 
-## 🚀 **Professional CLI Design**
+The system finds your GPU and configures hardware acceleration automatically:
+- **Common GPUs**: NVIDIA RTX → 60+ FPS 4K transcoding (vs 2-5 FPS CPU-only)
+- **Any GPU**: AMD, Intel, even Raspberry Pi → all get optimized configs
+- **No GPU**: Works fine, just uses CPU (still faster than most setups)
 
-### **Modern Command Architecture**
-Following **pyenv-style patterns** for intuitive professional use:
+<details>
+<summary>⚡ <strong>Performance Gains & Technical Details</strong></summary>
 
+**Real Performance Results**:
+- **4K HEVC Transcoding**: 2-5 FPS (CPU) → 60+ FPS (GPU) = 1200% improvement
+- **Power Consumption**: 200W (CPU) → 50W (GPU) = 75% reduction  
+- **Concurrent Streams**: 2 streams → 8+ streams = 4x capacity
+- **Quality**: Standard → HDR10+ with tone mapping
+
+**Supported Hardware**:
+- **NVIDIA RTX**: NVENC/NVDEC acceleration
+- **AMD GPUs**: VAAPI/AMF acceleration  
+- **Intel**: QuickSync acceleration
+- **Raspberry Pi**: VideoCore optimization
+- **Performance Profiles**: Dedicated (100%), High (75%), Balanced (50%), Light (25%), Dev (10%)
+
+</details>
+
+### **💾 Principle #2: Works With Your Storage** 
+**Use any drives, anywhere, anytime**
+
+Detects all your storage and lets you pick what to use:
+- **Any filesystem**: ZFS, exFAT, cloud drives, whatever
+- **Portable drives**: Take exFAT drives camping, plug them back in later
+- **Cloud storage**: Dropbox, OneDrive, Google Drive all work
+- **Hot-swap**: Add/remove drives without breaking anything
+
+<details>
+<summary>🗄️ <strong>Storage Discovery & Management Details</strong></summary>
+
+**What Gets Detected**:
+- **Local drives**: ZFS, Btrfs, ext4, exFAT, NTFS
+- **Cloud mounts**: Dropbox, OneDrive, Google Drive, rclone mounts
+- **Network storage**: NFS, SMB/CIFS shares
+- **JBOD arrays**: Multiple drives working independently
+
+**How Hot-Swap Works**:
+1. **Plug in drive** → System detects it automatically
+2. **Add to pool** → `usenet storage add /media/your-drive`  
+3. **Services update** → All apps can immediately use the new storage
+4. **No restart needed** → Everything keeps running
+
+**Real Example**: 29 drives detected including 8TB NVMe, multiple cloud drives totaling 10+ TB
+
+</details>
+
+### **🌐 Principle #3: Secure & Simple Access**
+**Access everything from anywhere, safely**
+
+No complicated networking or VPN setup needed:
+- **One domain**: Everything at `*.beppesarrstack.net` with automatic SSL
+- **Zero open ports**: Cloudflare tunnel handles all access securely  
+- **Works anywhere**: Home, work, mobile, friend's house
+- **No configuration**: DNS and certificates handled automatically
+
+<details>
+<summary>🔒 <strong>Security & Network Technical Details</strong></summary>
+
+**How Security Works**:
+- **Cloudflare Tunnel**: Outbound-only connections, no ports exposed
+- **Automatic SSL/TLS**: Certificates managed automatically
+- **Domain**: beppesarrstack.net configured with DNS
+- **Access Control**: Can add authentication layers if needed
+
+**Network Architecture**:
+- **Zero Trust**: No direct internet exposure
+- **High Availability**: Cloudflare's global network
+- **Fast Access**: CDN acceleration for static content
+- **Mobile Optimized**: Works perfectly on phones/tablets
+
+</details>
+
+## 🛠️ **How to Use It**
+
+**Simple commands that do complex things**
+
+The whole system is controlled through one command: `usenet`
+
+### **Main Commands**
 ```bash
-# Component-Based Commands (Modern)
+# Get everything running
+usenet deploy                      # Interactive setup (recommended first time)
+usenet deploy --auto               # Auto-detect everything and go
+
+# Manage storage  
+usenet storage list                # See all your drives
+usenet storage add /media/drive    # Add a drive to the pool
+
+# Check hardware
+usenet hardware list               # See what optimization is possible
+usenet hardware optimize           # Apply optimizations
+
+# Monitor and control
+usenet services list               # See what's running
+usenet backup create               # Save your configuration
+```
+
+<details>
+<summary>💻 <strong>Complete CLI Reference</strong></summary>
+
+**Storage Management**:
+```bash
 usenet storage list                 # List ALL mounted drives (ZFS, cloud, JBOD)
 usenet storage add /mnt/drive1      # Add specific drive to pool
 usenet storage sync                 # Apply changes and restart services
+```
 
+**Hardware Optimization**:
+```bash
 usenet hardware list               # Show GPU capabilities and optimization opportunities
 usenet hardware optimize --auto    # Generate hardware-tuned configurations
 usenet hardware install-drivers    # Auto-install GPU drivers (NVIDIA/AMD/Intel/RPi)
-
-usenet services list               # Show all service health (was: status)
-usenet services logs sonarr        # View specific logs
-usenet services restart radarr     # Restart service
-
-usenet backup create               # Create compressed configuration backup
-usenet backup restore backup.tar   # Restore from backup with verification
-
-# Primary Workflow
-usenet deploy                      # Interactive full deployment
-usenet deploy --auto               # Auto-detect everything and deploy
 ```
 
-### **Intelligent Defaults & Safety**
-- **Safe defaults prevent user footguns** (config-only backups)
-- **Rich metadata system** provides excellent UX
-- **Comprehensive validation** with helpful error messages
-- **Professional help system** at every level
+**Service Management**:
+```bash
+usenet services list               # Show all service health
+usenet services logs sonarr        # View specific logs
+usenet services restart radarr     # Restart service
+```
+
+**Backup & Recovery**:
+```bash
+usenet backup create               # Create compressed configuration backup
+usenet backup restore backup.tar   # Restore from backup with verification
+```
+
+**Built-in Safety**:
+- Safe defaults prevent breaking things
+- Helpful error messages with suggestions  
+- Comprehensive validation before making changes
+- Professional help system: `usenet help` or `usenet <command> --help`
+
+</details>
 
 ---
 

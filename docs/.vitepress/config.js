@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'Usenet Media Stack',
-  description: 'Professional-grade hot-swappable JBOD media automation with intelligent deployment and "just fucking works" usability.',
+  description: 'Professional Usenet-powered media automation with hot-swappable storage, GPU acceleration, and intelligent deployment. Plus curated free content resources.',
   
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],

@@ -2,19 +2,13 @@
 layout: page
 ---
 
-# Media Stack That Actually Works Everywhere
+# Usenet Media Stack
 
-**One command. All your devices. Any storage.**
+**Professional automated media acquisition and streaming. One command deployment.**
 
-Your media should work everywhere you do - whether you're at home with your main setup, on a laptop, or taking drives camping. Most media stacks break when you change anything. This one adapts.
+Built for people who need their media setup to work reliably across multiple devices and changing storage configurations. Usenet-powered with curated free content resources.
 
-<div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.1) 100%); padding: 2rem; border-radius: 12px; margin: 2rem 0; text-align: center;">
-
-**Real example**: Plug in your camping drive → All services immediately see it → Download and watch offline → Plug back into home setup → Everything syncs automatically
-
-[📊 **See Live System Data** →](/visualizations)
-
-</div>
+<PathSelector />
 
 <div style="text-align: center; margin: 3rem 0;">
   <a href="/getting-started/" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">🚀 Get Started (5 minutes)</a>
