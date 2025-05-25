@@ -1,0 +1,133 @@
+import { defineConfig } from 'vitepress'
+
+export default defineConfig({
+  title: 'Usenet Media Stack',
+  description: 'Professional-grade hot-swappable JBOD media automation with intelligent deployment and "just fucking works" usability.',
+  
+  head: [
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['meta', { name: 'theme-color', content: '#3eaf7c' }],
+    ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
+    ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'Usenet Media Stack' }],
+    ['meta', { property: 'og:description', content: 'Professional-grade hot-swappable JBOD media automation' }],
+    ['meta', { name: 'keywords', content: 'media automation, docker, jellyfin, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
+  ],
+
+  themeConfig: {
+    logo: '/logo.svg',
+    
+    nav: [
+      { text: 'Guide', link: '/getting-started/' },
+      { text: 'CLI Reference', link: '/cli/' },
+      { text: 'Architecture', link: '/architecture/' },
+      { text: 'Advanced', link: '/advanced/' },
+      { 
+        text: 'Links',
+        items: [
+          { text: 'GitHub', link: 'https://github.com/Aristoddle/usenet-media-stack' },
+          { text: 'Issues', link: 'https://github.com/Aristoddle/usenet-media-stack/issues' },
+          { text: 'Roadmap', link: '/roadmap' }
+        ]
+      }
+    ],
+
+    sidebar: {
+      '/getting-started/': [
+        {
+          text: '🚀 Getting Started',
+          items: [
+            { text: 'Quick Start', link: '/getting-started/' },
+            { text: 'Prerequisites', link: '/getting-started/prerequisites' },
+            { text: 'Installation', link: '/getting-started/installation' },
+            { text: 'First Deployment', link: '/getting-started/first-deployment' }
+          ]
+        }
+      ],
+      
+      '/cli/': [
+        {
+          text: '📋 CLI Reference',
+          items: [
+            { text: 'Overview', link: '/cli/' },
+            { text: 'Deploy Command', link: '/cli/deploy' },
+            { text: 'Storage Management', link: '/cli/storage' },
+            { text: 'Hardware Optimization', link: '/cli/hardware' },
+            { text: 'Backup & Restore', link: '/cli/backup' },
+            { text: 'Service Management', link: '/cli/services' },
+            { text: 'Validation', link: '/cli/validate' }
+          ]
+        }
+      ],
+      
+      '/architecture/': [
+        {
+          text: '🏗️ Architecture',
+          items: [
+            { text: 'System Overview', link: '/architecture/' },
+            { text: 'CLI Design', link: '/architecture/cli-design' },
+            { text: 'Service Architecture', link: '/architecture/services' },
+            { text: 'Storage System', link: '/architecture/storage' },
+            { text: 'Hardware Integration', link: '/architecture/hardware' },
+            { text: 'Network & Security', link: '/architecture/network' }
+          ]
+        }
+      ],
+      
+      '/advanced/': [
+        {
+          text: '🔧 Advanced Topics',
+          items: [
+            { text: 'Overview', link: '/advanced/' },
+            { text: 'Custom Configurations', link: '/advanced/custom-configs' },
+            { text: 'Performance Tuning', link: '/advanced/performance' },
+            { text: 'Backup Strategies', link: '/advanced/backup-strategies' },
+            { text: 'Hot-Swap Workflows', link: '/advanced/hot-swap' },
+            { text: 'API Integration', link: '/advanced/api-integration' },
+            { text: 'Troubleshooting', link: '/advanced/troubleshooting' }
+          ]
+        }
+      ]
+    },
+
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/Aristoddle/usenet-media-stack' }
+    ],
+
+    footer: {
+      message: 'Built with ❤️ following Bell Labs standards. Dedicated to Stan Eisenstat.',
+      copyright: 'Copyright © 2025 Joseph Lanzone. MIT Licensed.'
+    },
+
+    search: {
+      provider: 'local'
+    },
+
+    editLink: {
+      pattern: 'https://github.com/Aristoddle/usenet-media-stack/edit/main/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
+
+    lastUpdated: {
+      text: 'Updated at',
+      formatOptions: {
+        dateStyle: 'full',
+        timeStyle: 'medium'
+      }
+    }
+  },
+
+  markdown: {
+    lineNumbers: true,
+    config: (md) => {
+      // Add any markdown-it plugins here
+    }
+  },
+
+  vite: {
+    define: {
+      __VUE_OPTIONS_API__: false
+    }
+  }
+})
