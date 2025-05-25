@@ -56,7 +56,8 @@ setup_cloudflare_tunnel() {
     fi
     
     # Deploy tunnel container
-    if docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up -d cloudflared; then
+    local compose_files="-f docker-compose.yml -f docker-compose.tunnel.yml"
+    if docker compose $compose_files up -d cloudflared; then
         log_success "Cloudflare Tunnel deployed"
         log_info "Configure routes at: https://one.dash.cloudflare.com/"
         return 0
@@ -105,7 +106,7 @@ setup_authentik() {
     fi
     
     # Deploy Authentik
-    if docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up -d authentik authentik-db; then
+    if docker compose $compose_files up -d authentik authentik-db; then
         log_success "Authentik deployed"
         log_info "Access at: https://auth.${DOMAIN}"
         log_info "Default user: akadmin"
