@@ -11,7 +11,15 @@ export default defineConfig({
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Usenet Media Stack' }],
-    ['meta', { property: 'og:description', content: 'Professional-grade hot-swappable JBOD media automation' }],
+    ['meta', { property: 'og:description', content: 'Professional-grade hot-swappable JBOD media automation with Monty as your guide' }],
+    ['meta', { property: 'og:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { property: 'og:url', content: 'https://beppesarrstack.net' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'Usenet Media Stack' }],
+    ['meta', { name: 'twitter:description', content: 'Professional media automation with hot-swappable storage. Guided by Monty.' }],
+    ['meta', { name: 'twitter:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
     ['meta', { name: 'keywords', content: 'media automation, docker, jellyfin, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
   ],
 
