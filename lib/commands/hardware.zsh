@@ -686,6 +686,9 @@ ACTIONS
     status             Show current hardware profile and resource usage
     install-drivers    Install GPU drivers and acceleration libraries
 
+LEGACY ACTIONS (deprecated - use new verbs above)
+    detect             Use 'list' instead
+
 OPTIONS
     --profile <name>   Use specific profile (dedicated/balanced/light)
     --auto             Auto-detect optimal configuration

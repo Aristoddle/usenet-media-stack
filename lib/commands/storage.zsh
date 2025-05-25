@@ -57,6 +57,9 @@ ACTIONS
     health             Check health status of all drives
     apply              Apply storage changes and restart services
 
+LEGACY ACTIONS (deprecated - use new verbs above)
+    discover           Use 'list' instead
+
 PLANNED FEATURES (not yet implemented)
     balance            Rebalance data across available drives
     mount              Mount all configured drives
