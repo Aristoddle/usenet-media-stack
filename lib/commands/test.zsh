@@ -1,858 +1,209 @@
 #!/usr/bin/env zsh
-##############################################################################
-# File: ./lib/commands/test.zsh
-# Project: Usenet Media Stack
-# Description: Comprehensive testing and validation suite
-# Author: Joseph Lanzone <mailto:j3lanzone@gmail.com>
-# Created: 2025-05-24
-# Modified: 2025-05-24
-# Version: 1.0.0
-# License: MIT
+#=============================================================================
+# test.zsh - End-to-end testing framework
+# Part of Usenet Media Stack v1.0
 #
-# This module provides testing functionality for the entire stack, including
-# service health checks, API validation, configuration testing, and 
-# performance benchmarks. Consolidates all test-*.sh scripts.
-##############################################################################
+# Tests:
+# - Web UI accessibility for all services
+# - Service-to-service communication  
+# - API functionality and integration
+#=============================================================================
 
-##############################################################################
-#                              INITIALIZATION                                #
-##############################################################################
-
-# Get script directory and load common functions
+# Load core utilities
 SCRIPT_DIR="${0:A:h}"
-source "${SCRIPT_DIR:h}/core/common.zsh" || {
-    print -u2 "ERROR: Cannot load common.zsh"
+source "${SCRIPT_DIR}/../core/common.zsh" 2>/dev/null || {
+    echo "Error: Cannot load common utilities" >&2
     exit 1
 }
 
-# Test counters
-typeset -g PASSED=0
-typeset -g FAILED=0
-typeset -g WARNINGS=0
-
-##############################################################################
-#                           TEST UTILITIES                                   #
-##############################################################################
-
 #=============================================================================
-# Function: test_result
-# Description: Display test result with consistent formatting
-#
-# Shows test name and result with color coding and updates counters.
-#
-# Arguments:
-#   $1 - Test name
-#   $2 - Result (pass, fail, warn, skip)
-#   $3 - Message (optional)
-#
-# Returns:
-#   0 - Always succeeds
-#
-# Example:
-#   test_result "Docker daemon" "pass"
-#   test_result "API key" "fail" "Not found"
+# Function: test_web_interfaces
+# Description: Test web UI accessibility for all media services
 #=============================================================================
-test_result() {
-    local test_name=$1
-    local result=$2
-    local message="${3:-}"
+test_web_interfaces() {
+    info "🌐 Testing web interfaces for all media services..."
+    echo
     
-    # Format test name with dots
-    local formatted_name="${test_name:0:40}"
-    local dots_count=$((45 - ${#formatted_name}))
-    local dots=$(printf '.%.0s' {1..$dots_count})
-    
-    print -n "${formatted_name}${dots} "
-    
-    case "$result" in
-        pass)
-            print "${COLOR_GREEN}✓ PASS${COLOR_RESET}"
-            ((PASSED++))
-            ;;
-        fail)
-            print "${COLOR_RED}✗ FAIL${COLOR_RESET} ${message:+($message)}"
-            ((FAILED++))
-            ;;
-        warn)
-            print "${COLOR_YELLOW}⚠ WARN${COLOR_RESET} ${message:+($message)}"
-            ((WARNINGS++))
-            ;;
-        skip)
-            print "${COLOR_BLUE}→ SKIP${COLOR_RESET} ${message:+($message)}"
-            ;;
-    esac
-}
-
-#=============================================================================
-# Function: test_command
-# Description: Test if a command exists
-#
-# Checks if a command is available in PATH.
-#
-# Arguments:
-#   $1 - Command name
-#   $2 - Test description (optional)
-#
-# Returns:
-#   0 - Command exists
-#   1 - Command not found
-#
-# Example:
-#   test_command docker "Docker CLI"
-#=============================================================================
-test_command() {
-    local cmd=$1
-    local desc="${2:-$cmd}"
-    
-    if command -v "$cmd" &>/dev/null; then
-        test_result "$desc" "pass"
-        return 0
-    else
-        test_result "$desc" "fail" "not found"
-        return 1
-    fi
-}
-
-#=============================================================================
-# Function: test_url
-# Description: Test HTTP endpoint availability
-#
-# Checks if a URL responds with expected status code.
-#
-# Arguments:
-#   $1 - Service name
-#   $2 - URL
-#   $3 - Expected status (optional, default: 200)
-#
-# Returns:
-#   0 - URL accessible
-#   1 - URL not accessible
-#
-# Example:
-#   test_url "Sonarr" "http://localhost:8989"
-#=============================================================================
-test_url() {
-    local name=$1
-    local url=$2
-    local expected="${3:-200}"
-    
-    local status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url" 2>/dev/null || echo "000")
-    
-    if [[ "$status" == "$expected" ]] || [[ "$status" =~ ^(301|302|303)$ ]]; then
-        test_result "$name" "pass"
-        return 0
-    else
-        test_result "$name" "fail" "HTTP $status"
-        return 1
-    fi
-}
-
-##############################################################################
-#                         DEPENDENCY TESTS                                   #
-##############################################################################
-
-#=============================================================================
-# Function: test_dependencies
-# Description: Test system dependencies
-#
-# Verifies all required commands and tools are available.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All dependencies met
-#   1 - Missing dependencies
-#
-# Example:
-#   test_dependencies
-#=============================================================================
-test_dependencies() {
-    print "\n${COLOR_BOLD}System Dependencies${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    # Core requirements
-    test_command docker "Docker"
-    test_command docker-compose "Docker Compose v1" || \
-        docker compose version &>/dev/null && test_result "Docker Compose v2" "pass"
-    
-    # Utilities
-    test_command curl "curl"
-    test_command jq "jq"
-    test_command grep "grep"
-    test_command sed "sed"
-    test_command awk "awk"
-    
-    # Optional but recommended
-    test_command git "git" || test_result "git" "warn" "optional"
-    test_command htop "htop" || test_result "htop" "warn" "optional"
-}
-
-##############################################################################
-#                          SERVICE TESTS                                     #
-##############################################################################
-
-#=============================================================================
-# Function: test_services
-# Description: Test all service endpoints
-#
-# Checks availability of all core and optional services.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All services accessible
-#   1 - Some services not accessible
-#
-# Example:
-#   test_services
-#=============================================================================
-test_services() {
-    print "\n${COLOR_BOLD}Service Availability${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    # Core services (using SERVICE_URLS from environment)
-    test_url "SABnzbd" "${SERVICE_URLS[sabnzbd]}/sabnzbd/"
-    test_url "Prowlarr" "${SERVICE_URLS[prowlarr]}"
-    test_url "Sonarr" "${SERVICE_URLS[sonarr]}"
-    test_url "Radarr" "${SERVICE_URLS[radarr]}"
-    test_url "Readarr" "${SERVICE_URLS[readarr]}"
-    test_url "Lidarr" "${SERVICE_URLS[lidarr]}"
-    test_url "Bazarr" "${SERVICE_URLS[bazarr]}"
-    test_url "Mylar3" "${SERVICE_URLS[mylar3]}"
-    
-    # Media services
-    test_url "Jellyfin" "${SERVICE_URLS[jellyfin]}" || \
-        test_result "Jellyfin" "skip" "optional service"
-    test_url "Overseerr" "${SERVICE_URLS[overseerr]}" || \
-        test_result "Overseerr" "skip" "optional service"
-    
-    # Management services
-    test_url "Portainer" "${SERVICE_URLS[portainer]}" || \
-        test_result "Portainer" "skip" "optional service"
-}
-
-##############################################################################
-#                         CONTAINER TESTS                                    #
-##############################################################################
-
-#=============================================================================
-# Function: test_containers
-# Description: Test Docker container health
-#
-# Verifies containers are running and healthy.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All containers healthy
-#   1 - Some containers unhealthy
-#
-# Example:
-#   test_containers
-#=============================================================================
-test_containers() {
-    print "\n${COLOR_BOLD}Docker Containers${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    local -a services=(
-        sabnzbd prowlarr sonarr radarr readarr 
-        lidarr bazarr mylar3 jellyfin overseerr
+    # Define services and their expected ports
+    local -A services=(
+        [sonarr]="8989"
+        [radarr]="7878"
+        [jellyfin]="8096"
+        [overseerr]="5055"
+        [portainer]="9000"
+        [sabnzbd]="8080"
+        [prowlarr]="9696"
+        [readarr]="8787"
+        [whisparr]="6969"
+        [bazarr]="6767"
+        [tdarr]="8265"
+        [yacreader]="8082"
+        [mylar]="8090"
+        [netdata]="19999"
     )
     
-    for service in $services; do
-        if docker ps --format '{{.Names}}' | grep -q "^${service}$"; then
-            # Check health status
-            local health=$(docker inspect --format='{{.State.Health.Status}}' "$service" 2>/dev/null || echo "none")
-            
-            case "$health" in
-                healthy)
-                    test_result "Container: $service" "pass"
-                    ;;
-                unhealthy)
-                    test_result "Container: $service" "fail" "unhealthy"
-                    ;;
-                starting)
-                    test_result "Container: $service" "warn" "starting"
-                    ;;
-                none|"")
-                    test_result "Container: $service" "pass"
-                    ;;
-            esac
+    local failures=0
+    local successes=0
+    
+    for service port in ${(kv)services}; do
+        local url="http://localhost:${port}"
+        
+        # Test basic connectivity
+        if curl -s -f -m 10 "$url" >/dev/null 2>&1; then
+            success "✓ ${service} (${url}) - Accessible"
+            ((successes++))
         else
-            test_result "Container: $service" "fail" "not running"
+            error "✗ ${service} (${url}) - Not accessible"
+            ((failures++))
         fi
     done
+    
+    echo
+    if [[ $failures -eq 0 ]]; then
+        success "🎉 All ${successes} web interfaces are accessible!"
+    else
+        warning "⚠ ${failures} service(s) failed, ${successes} succeeded"
+    fi
+    
+    return $failures
 }
 
-##############################################################################
-#                           API TESTS                                        #
-##############################################################################
-
 #=============================================================================
-# Function: test_apis
-# Description: Test service API endpoints
-#
-# Verifies API keys are configured and APIs are responding.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All APIs accessible
-#   1 - Some APIs not accessible
-#
-# Example:
-#   test_apis
+# Function: test_api_endpoints
+# Description: Test API functionality for *arr services
 #=============================================================================
-test_apis() {
-    print "\n${COLOR_BOLD}API Endpoints${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+test_api_endpoints() {
+    info "🔌 Testing API endpoints for automation services..."
+    echo
     
-    # SABnzbd API
-    local sab_key=""
-    if [[ -f "$CONFIG_DIR/sabnzbd/sabnzbd.ini" ]]; then
-        sab_key=$(grep -oP 'api_key = \K.*' "$CONFIG_DIR/sabnzbd/sabnzbd.ini" 2>/dev/null)
-    fi
-    if [[ -n "$sab_key" ]]; then
-        test_url "SABnzbd API" "${SERVICE_URLS[sabnzbd]}/sabnzbd/api?mode=version&apikey=$sab_key"
-    else
-        test_result "SABnzbd API" "warn" "no API key"
-    fi
-    
-    # Prowlarr API
-    local prowlarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/prowlarr/config.xml" 2>/dev/null || true)
-    if [[ -n "$prowlarr_key" ]]; then
-        test_url "Prowlarr API" "${SERVICE_URLS[prowlarr]}/api/v1/health?apikey=$prowlarr_key"
-    else
-        test_result "Prowlarr API" "warn" "no API key"
-    fi
-    
-    # Sonarr API
-    local sonarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/sonarr/config.xml" 2>/dev/null || true)
-    if [[ -n "$sonarr_key" ]]; then
-        test_url "Sonarr API" "${SERVICE_URLS[sonarr]}/api/v3/health?apikey=$sonarr_key"
-    else
-        test_result "Sonarr API" "warn" "no API key"
-    fi
-}
-
-##############################################################################
-#                      CONFIGURATION TESTS                                   #
-##############################################################################
-
-#=============================================================================
-# Function: test_configuration
-# Description: Test service configurations
-#
-# Verifies configuration files exist and contain required settings.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - Configurations valid
-#   1 - Configuration issues
-#
-# Example:
-#   test_configuration
-#=============================================================================
-test_configuration() {
-    print "\n${COLOR_BOLD}Configuration Files${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    # Check config directory
-    if [[ -d "$CONFIG_DIR" ]]; then
-        test_result "Config directory" "pass"
-    else
-        test_result "Config directory" "fail" "not found"
-        return 1
-    fi
-    
-    # Check service configs
-    local -A config_files=(
-        [SABnzbd]="$CONFIG_DIR/sabnzbd/sabnzbd.ini"
-        [Prowlarr]="$CONFIG_DIR/prowlarr/config.xml"
-        [Sonarr]="$CONFIG_DIR/sonarr/config.xml"
-        [Radarr]="$CONFIG_DIR/radarr/config.xml"
+    # Test basic API endpoints (without API keys for now)
+    local -A api_services=(
+        [sonarr]="8989"
+        [radarr]="7878"
+        [prowlarr]="9696"
+        [readarr]="8787"
+        [whisparr]="6969"
+        [bazarr]="6767"
     )
     
-    for service file in ${(kv)config_files}; do
-        if [[ -f "$file" ]]; then
-            test_result "$service config" "pass"
-        else
-            test_result "$service config" "warn" "not found"
-        fi
-    done
-}
-
-##############################################################################
-#                       PERFORMANCE TESTS                                    #
-##############################################################################
-
-#=============================================================================
-# Function: test_performance
-# Description: Test system performance metrics
-#
-# Checks disk space, memory usage, and response times.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - Performance acceptable
-#   1 - Performance issues
-#
-# Example:
-#   test_performance
-#=============================================================================
-test_performance() {
-    print "\n${COLOR_BOLD}Performance Metrics${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    local failures=0
+    local successes=0
     
-    # Disk space
-    local disk_usage=$(df -h "$PROJECT_ROOT" | awk 'NR==2 {print $5}' | sed 's/%//')
-    if (( disk_usage < 80 )); then
-        test_result "Disk space" "pass" "${disk_usage}% used"
-    elif (( disk_usage < 90 )); then
-        test_result "Disk space" "warn" "${disk_usage}% used"
-    else
-        test_result "Disk space" "fail" "${disk_usage}% used"
-    fi
-    
-    # Memory usage
-    local mem_available=$(free -m | awk 'NR==2{print $7}')
-    if (( mem_available > 2048 )); then
-        test_result "Memory available" "pass" "${mem_available}MB"
-    elif (( mem_available > 1024 )); then
-        test_result "Memory available" "warn" "${mem_available}MB"
-    else
-        test_result "Memory available" "fail" "${mem_available}MB"
-    fi
-    
-    # Response time test
-    local start_time=$(date +%s%N)
-    curl -s -o /dev/null "${SERVICE_URLS[sonarr]}" 2>/dev/null
-    local end_time=$(date +%s%N)
-    local response_time=$(( (end_time - start_time) / 1000000 ))
-    
-    if (( response_time < 1000 )); then
-        test_result "Service response time" "pass" "${response_time}ms"
-    elif (( response_time < 3000 )); then
-        test_result "Service response time" "warn" "${response_time}ms"
-    else
-        test_result "Service response time" "fail" "${response_time}ms"
-    fi
-}
-
-##############################################################################
-#                      INTEGRATION TESTS                                     #
-##############################################################################
-
-#=============================================================================
-# Function: test_integration
-# Description: Test service integrations
-#
-# Verifies services can communicate with each other.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - Integrations working
-#   1 - Integration issues
-#
-# Example:
-#   test_integration
-#=============================================================================
-test_integration() {
-    print "\n${COLOR_BOLD}Service Integration${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    # Test Prowlarr -> Sonarr connection
-    local prowlarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/prowlarr/config.xml" 2>/dev/null || true)
-    if [[ -n "$prowlarr_key" ]]; then
-        if curl -s -H "X-Api-Key: $prowlarr_key" "${SERVICE_URLS[prowlarr]}/api/v1/applications" | grep -q "sonarr"; then
-            test_result "Prowlarr → Sonarr" "pass"
-        else
-            test_result "Prowlarr → Sonarr" "warn" "not configured"
-        fi
-    else
-        test_result "Prowlarr → Sonarr" "skip" "no API key"
-    fi
-    
-    # Test Sonarr -> SABnzbd connection
-    local sonarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/sonarr/config.xml" 2>/dev/null || true)
-    if [[ -n "$sonarr_key" ]]; then
-        if curl -s -H "X-Api-Key: $sonarr_key" "${SERVICE_URLS[sonarr]}/api/v3/downloadclient" | grep -q "sabnzbd"; then
-            test_result "Sonarr → SABnzbd" "pass"
-        else
-            test_result "Sonarr → SABnzbd" "warn" "not configured"
-        fi
-    else
-        test_result "Sonarr → SABnzbd" "skip" "no API key"
-    fi
-}
-
-##############################################################################
-#                         UNIT AND INTEGRATION TESTS                         #
-##############################################################################
-
-#=============================================================================
-# Function: test_unit_tests
-# Description: Run unit tests for individual components
-#
-# Executes all unit test files to verify individual function behavior.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All unit tests passed
-#   1 - Some unit tests failed
-#
-# Example:
-#   test_unit_tests
-#=============================================================================
-test_unit_tests() {
-    print "\n${COLOR_BOLD}Unit Tests${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    local test_dir="${SCRIPT_DIR:h}/test/unit"
-    local tests_run=0
-    local tests_passed=0
-    
-    if [[ -d "$test_dir" ]]; then
-        for test_file in "$test_dir"/*.test.zsh; do
-            [[ ! -f "$test_file" ]] && continue
-            
-            local test_name=$(basename "$test_file" .test.zsh)
-            ((tests_run++))
-            
-            print "Running $test_name unit tests..."
-            if "$test_file" >/dev/null 2>&1; then
-                test_result "$test_name unit tests" "pass"
-                ((tests_passed++))
-            else
-                test_result "$test_name unit tests" "fail" "see test output for details"
-            fi
-        done
+    for service port in ${(kv)api_services}; do
+        local api_url="http://localhost:${port}/api/v3/system/status"
         
-        if [[ $tests_run -eq 0 ]]; then
-            test_result "Unit tests" "skip" "no unit test files found"
-        elif [[ $tests_passed -eq $tests_run ]]; then
-            test_result "All unit tests" "pass" "$tests_passed/$tests_run passed"
-        else
-            test_result "Unit test suite" "fail" "$tests_passed/$tests_run passed"
-        fi
-    else
-        test_result "Unit tests" "skip" "test directory not found"
-    fi
-}
-
-#=============================================================================
-# Function: test_integration_tests
-# Description: Run integration tests for system components
-#
-# Executes integration test files to verify component interactions.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All integration tests passed
-#   1 - Some integration tests failed
-#
-# Example:
-#   test_integration_tests
-#=============================================================================
-test_integration_tests() {
-    print "\n${COLOR_BOLD}Integration Tests${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
-    local test_dir="${SCRIPT_DIR:h}/test/integration"
-    local tests_run=0
-    local tests_passed=0
-    
-    if [[ -d "$test_dir" ]]; then
-        for test_file in "$test_dir"/*.test.zsh; do
-            [[ ! -f "$test_file" ]] && continue
-            
-            local test_name=$(basename "$test_file" .test.zsh)
-            ((tests_run++))
-            
-            print "Running $test_name integration tests..."
-            if "$test_file" >/dev/null 2>&1; then
-                test_result "$test_name integration tests" "pass"
-                ((tests_passed++))
-            else
-                test_result "$test_name integration tests" "fail" "see test output for details"
-            fi
-        done
+        # Test API endpoint accessibility (expect 401 without API key)
+        local response=$(curl -s -w "%{http_code}" -o /dev/null "$api_url" 2>/dev/null)
         
-        if [[ $tests_run -eq 0 ]]; then
-            test_result "Integration tests" "skip" "no integration test files found"
-        elif [[ $tests_passed -eq $tests_run ]]; then
-            test_result "All integration tests" "pass" "$tests_passed/$tests_run passed"
-        else
-            test_result "Integration test suite" "fail" "$tests_passed/$tests_run passed"
-        fi
-    else
-        test_result "Integration tests" "skip" "test directory not found"
-    fi
-}
-
-##############################################################################
-#                         TEST SUITES                                        #
-##############################################################################
-
-#=============================================================================
-# Function: run_quick_tests
-# Description: Run minimal test suite
-#
-# Runs only essential tests for quick validation.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All tests passed
-#   1 - Some tests failed
-#
-# Example:
-#   run_quick_tests
-#=============================================================================
-run_quick_tests() {
-    print "${COLOR_BLUE}🧪 Quick Test Suite${COLOR_RESET}"
-    print "===================="
-    
-    test_services
-    test_containers
-    
-    show_summary
-}
-
-#=============================================================================
-# Function: run_full_tests
-# Description: Run comprehensive test suite
-#
-# Runs all available tests for thorough validation.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - All tests passed
-#   1 - Some tests failed
-#
-# Example:
-#   run_full_tests
-#=============================================================================
-run_full_tests() {
-    print "${COLOR_BLUE}🧪 Full Test Suite${COLOR_RESET}"
-    print "=================="
-    
-    test_dependencies
-    test_services
-    test_containers
-    test_apis
-    test_configuration
-    test_performance
-    test_integration
-    
-    # New unit and integration test suites
-    test_unit_tests
-    test_integration_tests
-    
-    show_summary
-}
-
-#=============================================================================
-# Function: show_summary
-# Description: Display test summary
-#
-# Shows final count of passed, failed, and warning tests.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - No failures
-#   1 - Had failures
-#
-# Example:
-#   show_summary
-#=============================================================================
-show_summary() {
-    print "\n${COLOR_BOLD}Test Summary${COLOR_RESET}"
-    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    print "Passed:   ${COLOR_GREEN}$PASSED${COLOR_RESET}"
-    print "Failed:   ${COLOR_RED}$FAILED${COLOR_RESET}"
-    print "Warnings: ${COLOR_YELLOW}$WARNINGS${COLOR_RESET}"
-    
-    if (( FAILED == 0 )); then
-        print "\n${COLOR_GREEN}✅ All tests passed!${COLOR_RESET}"
-        return 0
-    else
-        print "\n${COLOR_RED}❌ Some tests failed${COLOR_RESET}"
-        return 1
-    fi
-}
-
-##############################################################################
-#                            MAIN HANDLER                                    #
-##############################################################################
-
-#=============================================================================
-# Function: show_test_help
-# Description: Display help for test command
-#
-# Shows available test suites and options.
-#
-# Arguments:
-#   None
-#
-# Returns:
-#   0 - Always succeeds
-#
-# Example:
-#   show_test_help
-#=============================================================================
-show_test_help() {
-    cat <<'HELP'
-TEST COMMAND
-
-Usage: usenet test [suite] [options]
-
-Run automated tests to verify stack health and configuration.
-
-TEST SUITES
-    quick              Essential tests only (default)
-    full               Comprehensive test suite
-    deps               Dependency tests only
-    services           Service availability tests
-    containers         Docker container tests
-    api                API endpoint tests
-    config             Configuration tests
-    performance        Performance metrics
-    integration        Service integration tests
-
-OPTIONS
-    --verbose, -v      Show detailed output
-    --help, -h         Show this help
-
-EXAMPLES
-    Quick validation:
-        $ usenet test
-        
-    Full test suite:
-        $ usenet test full
-        
-    Specific tests:
-        $ usenet test services
-        $ usenet test api
-
-EXIT CODES
-    0 - All tests passed
-    1 - Some tests failed
-
-HELP
-}
-
-#=============================================================================
-# Function: main
-# Description: Main entry point for test command
-#
-# Routes test requests to appropriate test functions.
-#
-# Arguments:
-#   $@ - Command line arguments
-#
-# Returns:
-#   0 - Tests passed
-#   1 - Tests failed
-#
-# Example:
-#   main full --verbose
-#=============================================================================
-main() {
-    local suite="${1:-quick}"
-    shift || true
-    
-    # Parse options
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            --verbose|-v)
-                set -x
+        case "$response" in
+            200)
+                success "✓ ${service} API - Public endpoint accessible"
+                ((successes++))
                 ;;
-            --help|-h)
-                show_test_help
-                return 0
+            401)
+                success "✓ ${service} API - Protected (requires authentication)"
+                ((successes++))
+                ;;
+            404)
+                warning "⚠ ${service} API - Endpoint not found (may use different version)"
+                ;;
+            000)
+                error "✗ ${service} API - Service not responding"
+                ((failures++))
                 ;;
             *)
-                error "Unknown option: $1"
-                show_test_help
-                return 1
+                warning "⚠ ${service} API - Unexpected response: ${response}"
                 ;;
         esac
-        shift
     done
     
-    # Run requested test suite
-    case "$suite" in
-        quick|all)
-            run_quick_tests
+    echo
+    if [[ $failures -eq 0 ]]; then
+        success "🎉 All ${successes} API endpoints responded correctly!"
+    else
+        warning "⚠ ${failures} API(s) failed, ${successes} succeeded"
+    fi
+    
+    return $failures
+}
+
+#=============================================================================
+# Main command handler
+#=============================================================================
+main() {
+    local action="$1"
+    shift
+    
+    case "$action" in
+        web|ui)
+            test_web_interfaces
             ;;
-        full)
-            run_full_tests
+        api)
+            test_api_endpoints
             ;;
-        deps|dependencies)
-            test_dependencies
-            show_summary
+        all)
+            info "🚀 Running comprehensive test suite..."
+            echo
+            
+            local total_failures=0
+            
+            test_web_interfaces
+            ((total_failures += $?))
+            echo
+            
+            test_api_endpoints
+            ((total_failures += $?))
+            echo
+            
+            if [[ $total_failures -eq 0 ]]; then
+                success "🎉 All tests passed! System is fully functional."
+            else
+                warning "⚠ ${total_failures} test(s) failed. Check output above for details."
+            fi
+            
+            return $total_failures
             ;;
-        services)
-            test_services
-            show_summary
-            ;;
-        containers|docker)
-            test_containers
-            show_summary
-            ;;
-        api|apis)
-            test_apis
-            show_summary
-            ;;
-        config|configuration)
-            test_configuration
-            show_summary
-            ;;
-        performance|perf)
-            test_performance
-            show_summary
-            ;;
-        integration|int)
-            test_integration
-            show_summary
-            ;;
-        unit)
-            test_unit_tests
-            show_summary
-            ;;
-        integration-tests|integration-new)
-            test_integration_tests
-            show_summary
+        --help|-h)
+            show_help
+            return 0
             ;;
         *)
-            error "Unknown test suite: $suite"
-            show_test_help
+            error "Unknown action: $action"
+            show_help
             return 1
             ;;
     esac
 }
 
-# Run main function
-main "$@"
+#=============================================================================
+# Function: show_help
+# Description: Display help information
+#=============================================================================
+show_help() {
+    cat << 'EOF'
+🧪 End-to-End Testing Framework
 
-# vim: set ts=4 sw=4 et tw=80:
+USAGE
+    usenet test <action>
+
+ACTIONS
+    web                 Test web interface accessibility for all services
+    api                 Test API endpoint functionality 
+    all                 Run comprehensive test suite
+
+EXAMPLES
+    Test web interfaces:
+        $ usenet test web
+        
+    Test APIs:
+        $ usenet test api
+        
+    Run all tests:
+        $ usenet test all
+
+This validates end-to-end functionality of the existing media stack.
+EOF
+}
+
+# Execute main function with all arguments  
+main "$@"

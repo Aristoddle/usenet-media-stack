@@ -1,0 +1,420 @@
+# Docker Swarm Compatible Media Stack
+# Designed for dynamic N-node distributed deployment
+# Use: docker stack deploy -c docker-compose.swarm.yml usenet
+#
+# ARCHITECTURE: Whatever hardware you have - gaming laptops, Steam Deck, Pi's, old computers
+# Nodes can join/leave dynamically as you need the resources for other tasks
+#
+# DEPLOYMENT:
+# 1. Initialize Swarm: docker swarm init
+# 2. Join nodes: docker swarm join --token <token> <manager-ip>
+# 3. Label nodes based on capability:
+#    docker node update --label-add performance=high gaming-laptop
+#    docker node update --label-add performance=medium steam-deck  
+#    docker node update --label-add performance=low raspberry-pi
+#    docker node update --label-add storage=true nas-box
+# 4. Deploy stack: docker stack deploy -c docker-compose.swarm.yml usenet
+# 5. Scale dynamically: drain nodes when you need them for gaming/other tasks
+
+version: '3.8'
+
+# Overlay networks for Swarm deployment
+networks:
+  media_network:
+    driver: overlay
+    attachable: true
+    driver_opts:
+      encrypted: "true"
+    
+  sharing_network:
+    driver: overlay
+    attachable: true
+    
+  traefik-public:
+    external: true
+
+# NFS-based volumes for distributed storage
+volumes:
+  sabnzbd_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/sabnzbd"
+      
+  transmission_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/transmission"
+      
+  sonarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/sonarr"
+      
+  radarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/radarr"
+      
+  bazarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/bazarr"
+      
+  prowlarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/prowlarr"
+      
+  downloads_volume:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/downloads"
+
+services:
+  # ================================
+  # SABnzbd - Usenet Downloader
+  # Placement: High-performance nodes (laptops)
+  # ================================
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    hostname: sabnzbd
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+    volumes:
+      - sabnzbd_config:/config
+      - downloads_volume:/downloads
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance == high
+          - node.labels.storage == true
+      labels:
+        # Traefik routing
+        - traefik.enable=true
+        - traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.${DOMAIN}`)
+        - traefik.http.routers.sabnzbd.entrypoints=websecure
+        - traefik.http.routers.sabnzbd.tls.certresolver=letsencrypt
+        - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
+        
+        # Prometheus monitoring
+        - prometheus.io/scrape=true
+        - prometheus.io/port=8080
+        - prometheus.io/path=/sabnzbd/api?mode=queue
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+  # ================================
+  # Transmission - BitTorrent Client  
+  # Placement: VPN-capable nodes with good networking
+  # ================================
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    hostname: transmission
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+      - TRANSMISSION_WEB_HOME=/transmission-web-control/
+    volumes:
+      - transmission_config:/config
+      - downloads_volume:/downloads
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.vpn == true
+          - node.labels.storage == true
+      labels:
+        # Traefik routing
+        - traefik.enable=true
+        - traefik.http.routers.transmission.rule=Host(`transmission.${DOMAIN}`)
+        - traefik.http.routers.transmission.entrypoints=websecure
+        - traefik.http.routers.transmission.tls.certresolver=letsencrypt
+        - traefik.http.services.transmission.loadbalancer.server.port=9091
+        
+        # Prometheus monitoring
+        - prometheus.io/scrape=true
+        - prometheus.io/port=9091
+        - prometheus.io/path=/transmission/rpc
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+  # ================================
+  # Sonarr - TV Show Management
+  # Placement: Medium-performance nodes
+  # ================================
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    hostname: sonarr
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+    volumes:
+      - sonarr_config:/config
+      - downloads_volume:/downloads
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance != low
+          - node.labels.storage == true
+        preferences:
+          - spread: node.labels.region
+      labels:
+        # Traefik routing
+        - traefik.enable=true
+        - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
+        - traefik.http.routers.sonarr.entrypoints=websecure
+        - traefik.http.routers.sonarr.tls.certresolver=letsencrypt
+        - traefik.http.services.sonarr.loadbalancer.server.port=8989
+        
+        # Prometheus monitoring
+        - prometheus.io/scrape=true
+        - prometheus.io/port=8989
+        - prometheus.io/path=/api/v3/system/status
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+  # ================================
+  # Radarr - Movie Management
+  # Placement: Medium-performance nodes
+  # ================================
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    hostname: radarr
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+    volumes:
+      - radarr_config:/config
+      - downloads_volume:/downloads
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance != low
+          - node.labels.storage == true
+        preferences:
+          - spread: node.labels.region
+      labels:
+        # Traefik routing
+        - traefik.enable=true
+        - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
+        - traefik.http.routers.radarr.entrypoints=websecure
+        - traefik.http.routers.radarr.tls.certresolver=letsencrypt
+        - traefik.http.services.radarr.loadbalancer.server.port=7878
+        
+        # Prometheus monitoring
+        - prometheus.io/scrape=true
+        - prometheus.io/port=7878
+        - prometheus.io/path=/api/v3/system/status
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+  # ================================
+  # Prowlarr - Indexer Management
+  # Placement: Any node with network access
+  # ================================
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    hostname: prowlarr
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+    volumes:
+      - prowlarr_config:/config
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        preferences:
+          - spread: node.labels.region
+      labels:
+        # Traefik routing
+        - traefik.enable=true
+        - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${DOMAIN}`)
+        - traefik.http.routers.prowlarr.entrypoints=websecure
+        - traefik.http.routers.prowlarr.tls.certresolver=letsencrypt
+        - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+        
+        # Prometheus monitoring
+        - prometheus.io/scrape=true
+        - prometheus.io/port=9696
+        - prometheus.io/path=/api/v1/system/status
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+  # ================================
+  # Jellyfin - Media Server
+  # Placement: High/medium performance nodes with GPU access
+  # Works great on Steam Deck when it's not gaming!
+  # ================================
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    hostname: jellyfin
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+    volumes:
+      - downloads_volume:/media
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance != low
+          - node.labels.storage == true
+        preferences:
+          # Prefer high performance but Steam Deck works too
+          - spread: node.labels.performance
+      labels:
+        # Traefik routing
+        - traefik.enable=true
+        - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
+        - traefik.http.routers.jellyfin.entrypoints=websecure
+        - traefik.http.routers.jellyfin.tls.certresolver=letsencrypt
+        - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'  # Lower reservation so Steam Deck can handle it
+          memory: 512M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+  # ================================
+  # Tdarr - Transcoding Engine
+  # Perfect for Steam Deck when idle - great GPU for transcoding
+  # ================================
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    hostname: tdarr
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+      - TDARR_INSTANCE_NAME=tdarr-{{.Node.Hostname}}
+    volumes:
+      - downloads_volume:/media
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          # Steam Deck has excellent transcoding capabilities
+          - node.labels.performance != low
+        preferences:
+          - spread: node.labels.performance
+      labels:
+        # Traefik routing
+        - traefik.enable=true
+        - traefik.http.routers.tdarr.rule=Host(`tdarr.${DOMAIN}`)
+        - traefik.http.routers.tdarr.entrypoints=websecure
+        - traefik.http.routers.tdarr.tls.certresolver=letsencrypt
+        - traefik.http.services.tdarr.loadbalancer.server.port=8265
+      resources:
+        limits:
+          cpus: '6.0'  # Can use most of Steam Deck's power when available
+          memory: 6G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3

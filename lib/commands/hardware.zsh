@@ -680,7 +680,7 @@ USAGE
     usenet hardware <action> [options]
 
 ACTIONS
-    detect             Show detected hardware specifications
+    list               Show detected hardware specifications
     configure          Interactive resource allocation setup
     optimize           Generate optimized Docker Compose configuration
     status             Show current hardware profile and resource usage
@@ -692,8 +692,8 @@ OPTIONS
     --reset            Reset to default configuration
 
 EXAMPLES
-    Detect hardware:
-        $ usenet hardware detect
+    List hardware capabilities:
+        $ usenet hardware list
         
     Interactive setup:
         $ usenet hardware configure
@@ -863,7 +863,11 @@ main() {
     shift || true
     
     case "$action" in
-        detect)
+        list|detect)
+            # Support both 'list' (preferred) and 'detect' (legacy)
+            if [[ "$action" == "detect" ]]; then
+                warning "Action 'detect' is deprecated, use 'list' instead"
+            fi
             info "Detecting hardware specifications..."
             detect_cpu_info
             detect_memory_info

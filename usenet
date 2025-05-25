@@ -319,6 +319,33 @@ route_command() {
             fi
             ;;
             
+        cluster)
+            if [[ -x "${COMMANDS_DIR}/cluster.zsh" ]]; then
+                exec "${COMMANDS_DIR}/cluster.zsh" "$@"
+            else
+                error "Cluster command not found"
+                exit 1
+            fi
+            ;;
+            
+        test)
+            if [[ -x "${COMMANDS_DIR}/test.zsh" ]]; then
+                exec "${COMMANDS_DIR}/test.zsh" "$@"
+            else
+                error "Test command not found"
+                exit 1
+            fi
+            ;;
+            
+        webtest)
+            if [[ -x "${COMMANDS_DIR}/webtest.zsh" ]]; then
+                exec "${COMMANDS_DIR}/webtest.zsh" "$@"
+            else
+                error "Webtest command not found"
+                exit 1
+            fi
+            ;;
+            
         # Help system (pyenv-style)
         help)
             if [[ $# -eq 0 ]]; then

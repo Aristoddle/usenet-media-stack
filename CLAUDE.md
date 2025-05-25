@@ -1,12 +1,12 @@
 # 🎓 Usenet Media Stack - Hot-Swappable JBOD Media Automation
 
-**Status: VERSION 1.0 - Staff Engineer Quality Tool for Professional Environments**
+**Status: VERSION 1.0 - Dynamic N-Node Distributed Media Automation**
 
-This project demonstrates **deep technical capability** and **product management vision** - a tool designed to impress staff engineer colleagues while showcasing the ability to build genuinely useful, high-quality systems.
+This project demonstrates **deep technical capability** and **product management vision** - a tool designed to impress staff engineer colleagues while showcasing the ability to build genuinely useful, high-quality systems that scale across whatever hardware you have lying around.
 
-**Core Mission**: Create a "just fucking works" hot-swappable JBOD media stack that any technical professional can deploy and immediately appreciate the engineering quality.
+**Core Mission**: Create a "just fucking works" dynamic scaling media stack that can utilize any devices you have - gaming laptops, Steam Deck, Raspberry Pis, old computers - with nodes joining and leaving seamlessly as you need the resources for other tasks.
 
-This project honors **Stanley Eisenstat** (1943-2020), **Dana Angluin**, and **Avi Silberschatz** - the giants who taught us that good code explains itself.
+This project embodies the philosophy that good systems are like good radio stations - they just work, reach everywhere they need to, and people can tune in from anywhere.
 
 ## 🎯 **STAFF ENGINEER GOALS ACHIEVED** (2025-05-25)
 
@@ -946,6 +946,62 @@ When restoring from context compact for documentation development:
 - [ ] Fuzzy content matching for quality upgrades (720p → 4K)
 - [ ] Plex/Jellyfin API integration for watch history preservation
 - [ ] Intelligent upgrade recommendations based on quality scoring
+
+## 🔄 **FUTURE DEVELOPMENT PHASES**
+
+### **🔌 PHASE 4: Hot-Swap API Integration (Deferred - Technical Showcase)**
+**Strategic Value**: Advanced systems programming showcase, staff engineer differentiation
+**Timeline**: 3-4 hours when ready for advanced feature development
+**Dependencies**: Deploy command must be solid first (foundation before advanced features)
+
+**Vision**: Complete zero-downtime JBOD workflow with multi-service API coordination
+```bash
+# The complete hot-swap experience
+usenet storage add /media/new-drive    # Detect → Mount → API Update → Validate
+usenet storage sync                    # Bulk API configuration updates  
+usenet services sync                   # Update all service APIs with current drives
+```
+
+**Technical Implementation Plan**:
+- **Multi-Service API Coordination**: Sonarr/Radarr/Prowlarr root folder management
+- **Atomic Operations**: Transaction-like behavior - all APIs update or none do
+- **State Validation**: Verify services detect new storage before operation completion
+- **Error Recovery**: Automatic rollback on partial API failures with detailed logging
+- **Zero-Downtime**: Services continue operating during drive addition/removal
+
+**API Integration Specification**:
+```bash
+# Sonarr API Integration
+POST /api/v3/rootfolder              # Add new root folder for media storage
+GET /api/v3/rootfolder               # List current root folders
+DELETE /api/v3/rootfolder/{id}       # Remove root folder safely
+
+# Radarr API (identical pattern)
+POST /api/v3/rootfolder              # Movie root folder management
+GET /api/v3/rootfolder               # Current movie storage locations
+DELETE /api/v3/rootfolder/{id}       # Safe removal with data preservation
+
+# Prowlarr API for indexer coordination
+POST /api/v1/indexer                 # Configure indexers for new storage
+GET /api/v1/indexer                  # Current indexer configurations
+PUT /api/v1/indexer/{id}             # Update indexer settings
+```
+
+**Quality Standards (Stan-Compliant)**:
+- **Idempotent Operations**: Safe to run multiple times, handles existing state gracefully
+- **Comprehensive Audit Trail**: Full logging of all API changes with timestamps
+- **Pre-flight Validation**: Service health checks before making any changes
+- **Configuration Backup**: Auto-backup service configs before API modifications
+- **Graceful Degradation**: Partial failures don't break existing functionality
+
+**User Core Requirements Preserved**:
+- **Hot-swappable JBOD**: exFAT drives for camping trips, cross-platform compatibility
+- **No mergerfs needed**: Portable drives, not unified filesystem  
+- **API integration**: Sonarr/Radarr APIs update automatically when drives added/removed
+- **Zero downtime**: Plug drive → detect → API update → no service restart required
+- **Safety first**: Only drives explicitly added to pool are managed by automation
+
+**Why Deferred**: This is a **power user feature** (1% of use cases) that requires **solid foundation first**. Deploy command serves **99% of users** and creates **immediate portfolio value**. Hot-swap workflows become the **advanced technical showcase** after Joe establishes credibility with the core deployment experience.
 
 ---
 
