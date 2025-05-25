@@ -5,6 +5,7 @@ import ServiceTopology from '../components/ServiceTopology.vue'
 import CLISimulator from '../components/CLISimulator.vue'
 import GuidedTour from '../components/GuidedTour.vue'
 import AnimatedHero from '../components/AnimatedHero.vue'
+import InteractiveCLIDemo from '../components/InteractiveCLIDemo.vue'
 
 export default {
   extends: DefaultTheme,
@@ -16,6 +17,7 @@ export default {
     app.component('CLISimulator', CLISimulator)
     app.component('GuidedTour', GuidedTour)
     app.component('AnimatedHero', AnimatedHero)
+    app.component('InteractiveCLIDemo', InteractiveCLIDemo)
     
     // Enhanced responsive animations for mobile-first UX
     if (typeof window !== 'undefined') {

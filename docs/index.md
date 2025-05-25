@@ -31,6 +31,31 @@ Docker Compose files aren't production tools. Our CLI follows **pyenv/git patter
 - **Three-tier help**: Main → component → action specificity
 - **Professional UX**: Tab completion, progress bars, validation
 
+<InteractiveCLIDemo />
+
+---
+
+## 🤝 **Meet the Team**
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; align-items: center;">
+
+<div style="text-align: center;">
+  <img src="https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png" alt="Monty - AI Guide" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #667eea; margin-bottom: 1rem;">
+  <h3 style="color: #667eea; margin-bottom: 0.5rem;">🧠 Monty</h3>
+  <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">AI Media Automation Guide</p>
+  <p style="font-size: 0.85rem; line-height: 1.5;">Your intelligent companion through complex workflows. Helps optimize deployments and troubleshoot issues across 19+ integrated services.</p>
+</div>
+
+<div style="text-align: center;">
+  <img src="/images/avatar.jpg" alt="Joseph Lanzone - Creator" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #f093fb; margin-bottom: 1rem;">
+  <h3 style="color: #f093fb; margin-bottom: 0.5rem;">👨‍💻 Joseph Lanzone</h3>
+  <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">Staff Engineer & Creator</p>
+  <p style="font-size: 0.85rem; line-height: 1.5;">Built this "just fucking works" media stack following Stan Eisenstat's principles. From camping trips to data centers.</p>
+  <a href="mailto:j3lanzone@gmail.com?subject=Resource%20Access%20Request" style="display: inline-block; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; margin-top: 0.5rem; font-size: 0.85rem;">📧 Request Access</a>
+</div>
+
+</div>
+
 ---
 
 ## 🏗️ **Technical Architecture That Impresses**
