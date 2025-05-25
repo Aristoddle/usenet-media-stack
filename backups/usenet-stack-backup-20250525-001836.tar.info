@@ -1,0 +1,10 @@
+# Usenet Media Stack Backup Metadata
+Created: 2025-05-25T00:18:36-04:00
+Version: 2.0.0
+Hostname: JK-homeserver
+Size: 1.0K
+Compress: false
+ExcludeLogs: false
+IncludeMedia: false
+GitCommit: 03176164b6a2b3bf4d3663e45afcfa01f01be3d7
+Services: 

@@ -55,10 +55,12 @@ ACTIONS
     add <path>         Add a new drive to the storage pool
     remove <path>      Remove drive from storage pool (data preserved)
     health             Check health status of all drives
+    apply              Apply storage changes and restart services
+
+PLANNED FEATURES (not yet implemented)
     balance            Rebalance data across available drives
     mount              Mount all configured drives
     unmount            Safely unmount all drives
-    apply              Apply storage changes and restart services
 
 OPTIONS
     --force, -f        Force operation without confirmation
@@ -74,15 +76,12 @@ EXAMPLES
         
     Check drive health:
         $ usenet storage health
-        
-    Balance storage usage:
-        $ usenet storage balance --verbose
 
 NOTES
     • All drives must be pre-mounted in /mnt/ directory
     • JBOD configuration distributes content across drives
-    • Use 'balance' after adding new drives for optimal distribution
     • Health checks use smartctl if available
+    • balance/mount/unmount features planned for future release
 
 HELP
 }
@@ -802,7 +801,9 @@ apply_storage_changes() {
 #=============================================================================
 main() {
     local action="${1:-help}"
-    shift || true
+    if [[ $# -gt 0 ]]; then
+        shift
+    fi
     
     case "$action" in
         status)
