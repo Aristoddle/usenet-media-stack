@@ -396,6 +396,10 @@ route_command() {
             ;;
             
         # Unknown command
+        "")
+            # Empty command - show help
+            show_main_help
+            ;;
         *)
             error "Unknown command: $command"
             print -u2 ""
@@ -503,6 +507,20 @@ parse_global_flags() {
 #   $@ - Command line arguments
 #=============================================================================
 main() {
+    # Handle special cases that exit immediately
+    case "${1:-}" in
+        --version)
+            show_version
+            exit 0
+            ;;
+        --help|-h)
+            if [[ $# -eq 1 ]]; then
+                show_main_help
+                exit 0
+            fi
+            ;;
+    esac
+    
     # Parse global flags first
     local remaining_args=()
     local temp_file=$(mktemp)
