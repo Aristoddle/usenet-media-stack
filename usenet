@@ -44,6 +44,24 @@ if [[ ! -d "${SCRIPT_DIR}/lib" ]]; then
     exit 1
 fi
 
+# Load core functions and configuration
+source "${SCRIPT_DIR}/lib/core/common.zsh" || {
+    print -u2 "ERROR: Cannot load common.zsh"
+    exit 1
+}
+
+source "${SCRIPT_DIR}/lib/core/init.zsh" || {
+    print -u2 "ERROR: Cannot load init.zsh"
+    exit 1
+}
+
+# Initialize configuration
+if ! load_stack_config; then
+    print -u2 "ERROR: Configuration validation failed"
+    print -u2 "Please check your .env file"
+    exit 1
+fi
+
 ##############################################################################
 #                                CONSTANTS                                   #
 ##############################################################################
@@ -102,32 +120,42 @@ show_help() {
 🎬 Usenet Media Stack v2.0
 
 USAGE
-    usenet <command> [options]
+    usenet [GLOBAL_OPTIONS] [COMMAND] [COMMAND_OPTIONS]
+    usenet --<component> [action] [options]
 
-COMMANDS
-    Setup & Deployment
-        setup              Deploy and configure the complete stack
-        update             Update all containers to latest versions
+COMPONENT FLAGS
+    --storage [action]     JBOD storage pool management
+        discover               List all available mounted drives
+        select                 Interactive drive selection TUI
+        add <path>             Add drive to storage pool
+        remove <path>          Remove drive from pool
+        status                 Show storage configuration
+        apply                  Apply changes and restart services
         
-    Service Management
-        status             Show health and status of all services
-        start [service]    Start all services or specific service
-        stop [service]     Stop all services or specific service
-        restart [service]  Restart services
-        logs [service]     View service logs
+    --hardware [action]    Hardware optimization and GPU acceleration  
+        detect                 Show detected hardware specifications
+        configure              Interactive resource allocation
+        optimize               Generate optimized configurations
+        install-drivers        Install GPU drivers and acceleration
+        status                 Show current hardware profile
         
-    Storage Management
-        storage <action>   Manage JBOD storage pool
+    --backup [action]      Configuration backup and restore
+        create                 Create new backup
+        restore <file>         Restore from backup
+        list                   List available backups
         
-    Maintenance
-        backup             Backup all configurations
-        restore <file>     Restore from backup
-        test               Run system tests
-        validate           Pre-deployment validation
-        
-    Information
-        help [command]     Show help for command
-        version            Show version information
+    --tunnel               Cloudflare tunnel management
+
+COMMANDS (Legacy Support)
+    setup                  Deploy and configure the complete stack
+    start [service]        Start all services or specific service  
+    stop [service]         Stop all services or specific service
+    restart [service]      Restart services
+    status                 Show health and status of all services
+    logs [service]         View service logs
+    update                 Update all containers to latest versions
+    test                   Run system tests
+    validate               Pre-deployment validation
 
 OPTIONS
     --verbose, -v      Show detailed output
@@ -141,10 +169,22 @@ EXAMPLES
     Check what's running:
         $ usenet status
         
-    Add a new drive:
-        $ usenet storage add /mnt/disk2
+    Discover all available drives:
+        $ usenet --storage discover
         
-    View logs for debugging:
+    Interactive drive selection:
+        $ usenet --storage select
+        
+    Add a specific drive:
+        $ usenet --storage add /mnt/disk2
+        
+    Hardware optimization:
+        $ usenet --hardware optimize --auto
+        
+    Install GPU drivers:
+        $ usenet --hardware install-drivers
+        
+    View service logs:
         $ usenet logs sonarr
 
 DOCUMENTATION
@@ -227,69 +267,164 @@ show_version() {
 #   route_command setup --verbose
 #=============================================================================
 route_command() {
-    local cmd="${1:-help}"
-    shift || true
+    # Parse arguments using modern flag-based syntax
+    local action=""
+    local storage_args=()
+    local hardware_args=()
+    local backup_args=()
+    local verbose=false
+    local quiet=false
+    local yes=false
     
-    case "$cmd" in
-        # Help system
-        help|--help|-h)
-            show_help "${1:-main}"
-            ;;
-            
-        # Version
-        version|--version|-v)
-            show_version
-            ;;
-            
-        # Setup and deployment
-        setup|install|deploy)
-            exec "${COMMANDS_DIR}/setup.zsh" "$@"
-            ;;
-            
-        # Service management
-        start|stop|restart|status|logs)
-            exec "${COMMANDS_DIR}/manage.zsh" "$cmd" "$@"
-            ;;
-            
-        manage)
-            exec "${COMMANDS_DIR}/manage.zsh" "$@"
-            ;;
-            
-        # Storage management
-        storage)
-            exec "${COMMANDS_DIR}/storage.zsh" "$@"
-            ;;
-            
-        # Updates
-        update|upgrade)
-            exec "${COMMANDS_DIR}/manage.zsh" update "$@"
-            ;;
-            
-        # Testing and validation
-        test)
-            exec "${COMMANDS_DIR}/test.zsh" "$@"
-            ;;
-            
-        validate|check)
-            exec "${COMMANDS_DIR}/validate.zsh" "$@"
-            ;;
-            
-        # Backup and restore
-        backup)
-            exec "${COMMANDS_DIR}/manage.zsh" backup "$@"
-            ;;
-            
-        restore)
-            exec "${COMMANDS_DIR}/backup.zsh" restore "$@"
-            ;;
-            
-        # Unknown command
-        *)
-            print -u2 "${COLOR_RED}Error: Unknown command '${cmd}'${COLOR_RESET}"
-            print -u2 "Try 'usenet help' for available commands"
-            exit 1
-            ;;
-    esac
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            # Help system
+            help|--help|-h)
+                show_help "${2:-main}"
+                return 0
+                ;;
+                
+            # Version
+            version|--version)
+                show_version
+                return 0
+                ;;
+                
+            # Global flags
+            --verbose|-v)
+                verbose=true
+                ;;
+            --quiet|-q)
+                quiet=true
+                ;;
+            --yes|-y)
+                yes=true
+                ;;
+                
+            # Component-specific flags
+            --storage)
+                shift
+                storage_args=("$@")
+                exec "${COMMANDS_DIR}/storage.zsh" "${storage_args[@]}"
+                ;;
+            --storage=*)
+                local storage_cmd="${1#*=}"
+                shift
+                exec "${COMMANDS_DIR}/storage.zsh" "$storage_cmd" "$@"
+                ;;
+                
+            --hardware)
+                shift
+                hardware_args=("$@")
+                exec "${COMMANDS_DIR}/hardware.zsh" "${hardware_args[@]}"
+                ;;
+            --hardware=*)
+                local hardware_cmd="${1#*=}"
+                shift
+                exec "${COMMANDS_DIR}/hardware.zsh" "$hardware_cmd" "$@"
+                ;;
+                
+            --backup)
+                shift
+                backup_args=("$@")
+                exec "${COMMANDS_DIR}/backup.zsh" "${backup_args[@]}"
+                ;;
+            --backup=*)
+                local backup_cmd="${1#*=}"
+                shift
+                exec "${COMMANDS_DIR}/backup.zsh" "$backup_cmd" "$@"
+                ;;
+                
+            --tunnel|--cloudflare)
+                shift
+                exec "${COMMANDS_DIR}/cloudflare.zsh" "$@"
+                ;;
+                
+            # Legacy command support (for backward compatibility)
+            setup|install|deploy)
+                action="$1"
+                shift
+                exec "${COMMANDS_DIR}/setup.zsh" "$@"
+                ;;
+                
+            start|stop|restart|status|logs|update|upgrade)
+                action="$1"
+                shift
+                exec "${COMMANDS_DIR}/manage.zsh" "$action" "$@"
+                ;;
+                
+            test)
+                shift
+                exec "${COMMANDS_DIR}/test.zsh" "$@"
+                ;;
+                
+            validate|check)
+                shift
+                exec "${COMMANDS_DIR}/validate.zsh" "$@"
+                ;;
+                
+            # Legacy component commands (deprecated but supported)
+            storage)
+                print -u2 "${COLOR_YELLOW}Warning: 'usenet storage' is deprecated. Use 'usenet --storage' instead.${COLOR_RESET}"
+                shift
+                exec "${COMMANDS_DIR}/storage.zsh" "$@"
+                ;;
+            hardware)
+                print -u2 "${COLOR_YELLOW}Warning: 'usenet hardware' is deprecated. Use 'usenet --hardware' instead.${COLOR_RESET}"
+                shift
+                exec "${COMMANDS_DIR}/hardware.zsh" "$@"
+                ;;
+            backup)
+                print -u2 "${COLOR_YELLOW}Warning: 'usenet backup' is deprecated. Use 'usenet --backup' instead.${COLOR_RESET}"
+                shift
+                exec "${COMMANDS_DIR}/backup.zsh" "$@"
+                ;;
+                
+            # Unknown argument
+            -*)
+                print -u2 "${COLOR_RED}Error: Unknown option '${1}'${COLOR_RESET}"
+                print -u2 "Try 'usenet --help' for available options"
+                exit 1
+                ;;
+            *)
+                if [[ -z "$action" ]]; then
+                    action="$1"
+                    shift
+                    # Handle remaining args based on action
+                    case "$action" in
+                        setup|install|deploy)
+                            exec "${COMMANDS_DIR}/setup.zsh" "$@"
+                            ;;
+                        start|stop|restart|status|logs|update|upgrade)
+                            exec "${COMMANDS_DIR}/manage.zsh" "$action" "$@"
+                            ;;
+                        test)
+                            exec "${COMMANDS_DIR}/test.zsh" "$@"
+                            ;;
+                        validate|check)
+                            exec "${COMMANDS_DIR}/validate.zsh" "$@"
+                            ;;
+                        *)
+                            print -u2 "${COLOR_RED}Error: Unknown command '${action}'${COLOR_RESET}"
+                            print -u2 "Try 'usenet --help' for available commands"
+                            exit 1
+                            ;;
+                    esac
+                else
+                    print -u2 "${COLOR_RED}Error: Unexpected argument '${1}'${COLOR_RESET}"
+                    print -u2 "Try 'usenet --help' for usage information"
+                    exit 1
+                fi
+                ;;
+        esac
+        shift
+    done
+    
+    # If no arguments provided, show help
+    if [[ -z "$action" ]]; then
+        show_help
+    fi
 }
 
 ##############################################################################

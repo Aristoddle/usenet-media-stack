@@ -264,8 +264,79 @@ show_test_results() {
     fi
 }
 
-# Export functions
-typeset -fx test_start assert_equals assert_not_empty assert_file_exists
-typeset -fx test_pass test_fail run_test_suite show_test_results
+#=============================================================================
+# Function: assert_file_contains
+# Description: Assert that a file contains specific text
+#
+# Arguments:
+#   $1 - File path
+#   $2 - Text to search for
+#   $3 - Optional message
+#
+# Returns:
+#   0 - File contains text
+#   1 - File doesn't contain text
+#=============================================================================
+assert_file_contains() {
+    local file="$1"
+    local text="$2"
+    local message="${3:-File should contain '$text': $file}"
+    
+    if [[ -f "$file" ]] && grep -q "$text" "$file"; then
+        test_pass
+        return 0
+    else
+        test_fail "$message"
+        return 1
+    fi
+}
+
+#=============================================================================
+# Function: test_skip
+# Description: Mark a test as skipped
+#
+# Arguments:
+#   $1 - Test description
+#   $2 - Skip reason (optional)
+#
+# Returns:
+#   0 - Always succeeds
+#=============================================================================
+test_skip() {
+    local description="$1"
+    local reason="${2:-skipped}"
+    
+    print "  ⚠ $description - $reason"
+    return 0
+}
+
+#=============================================================================
+# Function: test_summary
+# Description: Show test summary
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - All tests passed
+#   1 - Some tests failed
+#=============================================================================
+test_summary() {
+    print ""
+    print "Test Summary:"
+    print "  Passed: $TESTS_PASSED"
+    print "  Failed: $TESTS_FAILED"
+    print "  Total:  $TESTS_RUN"
+    
+    if [[ $TESTS_FAILED -eq 0 ]]; then
+        print "✅ All tests passed!"
+        return 0
+    else
+        print "❌ $TESTS_FAILED test(s) failed"
+        return 1
+    fi
+}
+
+# Functions are available when this file is sourced
 
 # vim: set ts=4 sw=4 et tw=80:

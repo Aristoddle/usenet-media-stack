@@ -1,0 +1,236 @@
+#compdef usenet
+
+# Usenet Media Stack ZSH Completion
+# Rich autocompletion for all commands and options
+
+local context state state_descr line
+typeset -A opt_args
+
+_usenet() {
+    local ret=1
+    
+    _arguments -C \
+        '(--help -h)'{--help,-h}'[Show help information]' \
+        '--version[Show version information]' \
+        '(--verbose -v)'{--verbose,-v}'[Show detailed output]' \
+        '(--quiet -q)'{--quiet,-q}'[Suppress non-essential output]' \
+        '(--yes -y)'{--yes,-y}'[Assume yes to all prompts]' \
+        '--storage=[Storage management]:storage action:_usenet_storage_actions' \
+        '--hardware=[Hardware optimization]:hardware action:_usenet_hardware_actions' \
+        '--backup=[Backup management]:backup action:_usenet_backup_actions' \
+        '--tunnel[Cloudflare tunnel management]' \
+        '--cloudflare[Cloudflare tunnel management]' \
+        '1: :_usenet_commands' \
+        '*::arg:->args' \
+        && ret=0
+    
+    case "$state" in
+        args)
+            case $line[1] in
+                --storage)
+                    _usenet_storage_commands && ret=0
+                    ;;
+                --hardware)
+                    _usenet_hardware_commands && ret=0
+                    ;;
+                --backup)
+                    _usenet_backup_commands && ret=0
+                    ;;
+                start|stop|restart|logs)
+                    _usenet_service_commands && ret=0
+                    ;;
+                # Legacy support
+                hardware)
+                    _usenet_hardware_commands && ret=0
+                    ;;
+                storage)
+                    _usenet_storage_commands && ret=0
+                    ;;
+                backup)
+                    _usenet_backup_commands && ret=0
+                    ;;
+                *)
+                    _message "no more arguments" && ret=0
+                    ;;
+            esac
+            ;;
+    esac
+    
+    return ret
+}
+
+_usenet_commands() {
+    local commands; commands=(
+        'setup:Deploy and configure the complete stack'
+        'start:Start all services or specific service'
+        'stop:Stop all services or specific service'
+        'restart:Restart services'
+        'status:Show health and status of all services'
+        'logs:View service logs'
+        'update:Update all containers to latest versions'
+        'test:Run system tests'
+        'validate:Pre-deployment validation'
+        'help:Show help information'
+        'version:Show version information'
+    )
+    _describe 'usenet commands' commands
+}
+
+_usenet_storage_actions() {
+    local actions; actions=(
+        'discover:List all available mounted drives'
+        'select:Interactive drive selection TUI'
+        'add:Add drive to storage pool'
+        'remove:Remove drive from pool'
+        'status:Show storage configuration'
+        'apply:Apply changes and restart services'
+        'health:Check drive health'
+    )
+    _describe 'storage actions' actions
+}
+
+_usenet_hardware_actions() {
+    local actions; actions=(
+        'detect:Show detected hardware specifications'
+        'configure:Interactive resource allocation'
+        'optimize:Generate optimized configurations'
+        'install-drivers:Install GPU drivers and acceleration'
+        'status:Show current hardware profile'
+    )
+    _describe 'hardware actions' actions
+}
+
+_usenet_backup_actions() {
+    local actions; actions=(
+        'create:Create new backup'
+        'restore:Restore from backup'
+        'list:List available backups'
+        'clean:Clean old backups'
+    )
+    _describe 'backup actions' actions
+}
+
+_usenet_hardware_commands() {
+    local commands; commands=(
+        'detect:Show detected hardware specifications'
+        'configure:Interactive resource allocation setup'
+        'optimize:Generate optimized Docker Compose configuration'
+        'status:Show current hardware profile and resource usage'
+        'install-drivers:Install GPU drivers and acceleration libraries'
+    )
+    
+    local options; options=(
+        '--profile:Use specific profile (dedicated/balanced/light)'
+        '--auto:Auto-detect optimal configuration'
+        '--reset:Reset to default configuration'
+        '--help:Show hardware command help'
+    )
+    
+    if (( CURRENT == 2 )); then
+        _describe 'hardware commands' commands
+    else
+        case $line[2] in
+            optimize)
+                _arguments \
+                    '--auto[Auto-detect optimal configuration]' \
+                    '--profile[Use specific profile]:profile:(dedicated high_performance balanced light development custom)'
+                ;;
+            configure)
+                _arguments \
+                    '--profile[Use specific profile]:profile:(dedicated high_performance balanced light development custom)'
+                ;;
+            *)
+                _describe 'hardware options' options
+                ;;
+        esac
+    fi
+}
+
+_usenet_storage_commands() {
+    local commands; commands=(
+        'status:Show current storage configuration and health'
+        'discover:Scan and list all available mounted drives'
+        'select:Interactive drive selection with TUI interface'
+        'add:Add a new drive to the storage pool'
+        'remove:Remove drive from storage pool'
+        'health:Check health status of all drives'
+        'balance:Rebalance data across available drives'
+        'apply:Apply storage changes and restart services'
+        'mount:Mount all configured drives'
+        'unmount:Safely unmount all drives'
+    )
+    
+    if (( CURRENT == 2 )); then
+        _describe 'storage commands' commands
+    else
+        case $line[2] in
+            add|remove)
+                _arguments \
+                    '--force[Force operation without confirmation]' \
+                    '--verbose[Show detailed output]' \
+                    '*:mount point:_directories'
+                ;;
+            *)
+                _arguments \
+                    '--force[Force operation without confirmation]' \
+                    '--verbose[Show detailed output]' \
+                    '--dry-run[Show what would be done without executing]'
+                ;;
+        esac
+    fi
+}
+
+_usenet_service_commands() {
+    local services; services=(
+        'sabnzbd:Usenet downloader'
+        'transmission:BitTorrent client'
+        'sonarr:TV show automation'
+        'radarr:Movie automation'
+        'bazarr:Subtitle automation'
+        'prowlarr:Indexer manager'
+        'whisparr:Adult content manager'
+        'readarr:Book automation'
+        'mylar:Comic book automation'
+        'yacreader:Comic reader server'
+        'jackett:Indexer proxy'
+        'jellyfin:Media server'
+        'overseerr:Request management'
+        'recyclarr:TRaSH guide automation'
+        'tdarr:Transcoding automation'
+        'samba:File sharing (SMB)'
+        'nfs:File sharing (NFS)'
+        'netdata:System monitoring'
+        'portainer:Docker management'
+    )
+    
+    if (( CURRENT == 2 )); then
+        _describe 'services' services
+    fi
+}
+
+_usenet_backup_commands() {
+    local commands; commands=(
+        'create:Create a new backup'
+        'restore:Restore from backup file'
+        'list:List available backups'
+        'clean:Clean old backups'
+    )
+    
+    if (( CURRENT == 2 )); then
+        _describe 'backup commands' commands
+    else
+        case $line[2] in
+            restore)
+                _arguments '*:backup file:_files -g "*.tar.gz"'
+                ;;
+            *)
+                _arguments \
+                    '--compress[Compress backup archive]' \
+                    '--exclude[Exclude pattern]:pattern:' \
+                    '--verbose[Show detailed output]'
+                ;;
+        esac
+    fi
+}
+
+_usenet "$@"

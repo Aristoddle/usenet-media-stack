@@ -212,24 +212,24 @@ test_services() {
     print "\n${COLOR_BOLD}Service Availability${COLOR_RESET}"
     print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
-    # Core services
-    test_url "SABnzbd" "http://localhost:8080/sabnzbd/"
-    test_url "Prowlarr" "http://localhost:9696"
-    test_url "Sonarr" "http://localhost:8989"
-    test_url "Radarr" "http://localhost:7878"
-    test_url "Readarr" "http://localhost:8787"
-    test_url "Lidarr" "http://localhost:8686"
-    test_url "Bazarr" "http://localhost:6767"
-    test_url "Mylar3" "http://localhost:8090"
+    # Core services (using SERVICE_URLS from environment)
+    test_url "SABnzbd" "${SERVICE_URLS[sabnzbd]}/sabnzbd/"
+    test_url "Prowlarr" "${SERVICE_URLS[prowlarr]}"
+    test_url "Sonarr" "${SERVICE_URLS[sonarr]}"
+    test_url "Radarr" "${SERVICE_URLS[radarr]}"
+    test_url "Readarr" "${SERVICE_URLS[readarr]}"
+    test_url "Lidarr" "${SERVICE_URLS[lidarr]}"
+    test_url "Bazarr" "${SERVICE_URLS[bazarr]}"
+    test_url "Mylar3" "${SERVICE_URLS[mylar3]}"
     
     # Media services
-    test_url "Jellyfin" "http://localhost:8096" || \
+    test_url "Jellyfin" "${SERVICE_URLS[jellyfin]}" || \
         test_result "Jellyfin" "skip" "optional service"
-    test_url "Overseerr" "http://localhost:5055" || \
+    test_url "Overseerr" "${SERVICE_URLS[overseerr]}" || \
         test_result "Overseerr" "skip" "optional service"
     
     # Management services
-    test_url "Portainer" "http://localhost:9000" || \
+    test_url "Portainer" "${SERVICE_URLS[portainer]}" || \
         test_result "Portainer" "skip" "optional service"
 }
 
@@ -312,9 +312,12 @@ test_apis() {
     print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
     # SABnzbd API
-    local sab_key=$(grep -oP 'api_key = \K.*' "$CONFIG_DIR/sabnzbd/sabnzbd.ini" 2>/dev/null || true)
+    local sab_key=""
+    if [[ -f "$CONFIG_DIR/sabnzbd/sabnzbd.ini" ]]; then
+        sab_key=$(grep -oP 'api_key = \K.*' "$CONFIG_DIR/sabnzbd/sabnzbd.ini" 2>/dev/null)
+    fi
     if [[ -n "$sab_key" ]]; then
-        test_url "SABnzbd API" "http://localhost:8080/sabnzbd/api?mode=version&apikey=$sab_key"
+        test_url "SABnzbd API" "${SERVICE_URLS[sabnzbd]}/sabnzbd/api?mode=version&apikey=$sab_key"
     else
         test_result "SABnzbd API" "warn" "no API key"
     fi
@@ -322,7 +325,7 @@ test_apis() {
     # Prowlarr API
     local prowlarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/prowlarr/config.xml" 2>/dev/null || true)
     if [[ -n "$prowlarr_key" ]]; then
-        test_url "Prowlarr API" "http://localhost:9696/api/v1/health?apikey=$prowlarr_key"
+        test_url "Prowlarr API" "${SERVICE_URLS[prowlarr]}/api/v1/health?apikey=$prowlarr_key"
     else
         test_result "Prowlarr API" "warn" "no API key"
     fi
@@ -330,7 +333,7 @@ test_apis() {
     # Sonarr API
     local sonarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/sonarr/config.xml" 2>/dev/null || true)
     if [[ -n "$sonarr_key" ]]; then
-        test_url "Sonarr API" "http://localhost:8989/api/v3/health?apikey=$sonarr_key"
+        test_url "Sonarr API" "${SERVICE_URLS[sonarr]}/api/v3/health?apikey=$sonarr_key"
     else
         test_result "Sonarr API" "warn" "no API key"
     fi
@@ -431,7 +434,7 @@ test_performance() {
     
     # Response time test
     local start_time=$(date +%s%N)
-    curl -s -o /dev/null "http://localhost:8989" 2>/dev/null
+    curl -s -o /dev/null "${SERVICE_URLS[sonarr]}" 2>/dev/null
     local end_time=$(date +%s%N)
     local response_time=$(( (end_time - start_time) / 1000000 ))
     
@@ -471,7 +474,7 @@ test_integration() {
     # Test Prowlarr -> Sonarr connection
     local prowlarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/prowlarr/config.xml" 2>/dev/null || true)
     if [[ -n "$prowlarr_key" ]]; then
-        if curl -s -H "X-Api-Key: $prowlarr_key" "http://localhost:9696/api/v1/applications" | grep -q "sonarr"; then
+        if curl -s -H "X-Api-Key: $prowlarr_key" "${SERVICE_URLS[prowlarr]}/api/v1/applications" | grep -q "sonarr"; then
             test_result "Prowlarr → Sonarr" "pass"
         else
             test_result "Prowlarr → Sonarr" "warn" "not configured"
@@ -483,13 +486,121 @@ test_integration() {
     # Test Sonarr -> SABnzbd connection
     local sonarr_key=$(grep -oP '<ApiKey>\K[^<]+' "$CONFIG_DIR/sonarr/config.xml" 2>/dev/null || true)
     if [[ -n "$sonarr_key" ]]; then
-        if curl -s -H "X-Api-Key: $sonarr_key" "http://localhost:8989/api/v3/downloadclient" | grep -q "sabnzbd"; then
+        if curl -s -H "X-Api-Key: $sonarr_key" "${SERVICE_URLS[sonarr]}/api/v3/downloadclient" | grep -q "sabnzbd"; then
             test_result "Sonarr → SABnzbd" "pass"
         else
             test_result "Sonarr → SABnzbd" "warn" "not configured"
         fi
     else
         test_result "Sonarr → SABnzbd" "skip" "no API key"
+    fi
+}
+
+##############################################################################
+#                         UNIT AND INTEGRATION TESTS                         #
+##############################################################################
+
+#=============================================================================
+# Function: test_unit_tests
+# Description: Run unit tests for individual components
+#
+# Executes all unit test files to verify individual function behavior.
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - All unit tests passed
+#   1 - Some unit tests failed
+#
+# Example:
+#   test_unit_tests
+#=============================================================================
+test_unit_tests() {
+    print "\n${COLOR_BOLD}Unit Tests${COLOR_RESET}"
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    local test_dir="${SCRIPT_DIR:h}/test/unit"
+    local tests_run=0
+    local tests_passed=0
+    
+    if [[ -d "$test_dir" ]]; then
+        for test_file in "$test_dir"/*.test.zsh; do
+            [[ ! -f "$test_file" ]] && continue
+            
+            local test_name=$(basename "$test_file" .test.zsh)
+            ((tests_run++))
+            
+            print "Running $test_name unit tests..."
+            if "$test_file" >/dev/null 2>&1; then
+                test_result "$test_name unit tests" "pass"
+                ((tests_passed++))
+            else
+                test_result "$test_name unit tests" "fail" "see test output for details"
+            fi
+        done
+        
+        if [[ $tests_run -eq 0 ]]; then
+            test_result "Unit tests" "skip" "no unit test files found"
+        elif [[ $tests_passed -eq $tests_run ]]; then
+            test_result "All unit tests" "pass" "$tests_passed/$tests_run passed"
+        else
+            test_result "Unit test suite" "fail" "$tests_passed/$tests_run passed"
+        fi
+    else
+        test_result "Unit tests" "skip" "test directory not found"
+    fi
+}
+
+#=============================================================================
+# Function: test_integration_tests
+# Description: Run integration tests for system components
+#
+# Executes integration test files to verify component interactions.
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - All integration tests passed
+#   1 - Some integration tests failed
+#
+# Example:
+#   test_integration_tests
+#=============================================================================
+test_integration_tests() {
+    print "\n${COLOR_BOLD}Integration Tests${COLOR_RESET}"
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    local test_dir="${SCRIPT_DIR:h}/test/integration"
+    local tests_run=0
+    local tests_passed=0
+    
+    if [[ -d "$test_dir" ]]; then
+        for test_file in "$test_dir"/*.test.zsh; do
+            [[ ! -f "$test_file" ]] && continue
+            
+            local test_name=$(basename "$test_file" .test.zsh)
+            ((tests_run++))
+            
+            print "Running $test_name integration tests..."
+            if "$test_file" >/dev/null 2>&1; then
+                test_result "$test_name integration tests" "pass"
+                ((tests_passed++))
+            else
+                test_result "$test_name integration tests" "fail" "see test output for details"
+            fi
+        done
+        
+        if [[ $tests_run -eq 0 ]]; then
+            test_result "Integration tests" "skip" "no integration test files found"
+        elif [[ $tests_passed -eq $tests_run ]]; then
+            test_result "All integration tests" "pass" "$tests_passed/$tests_run passed"
+        else
+            test_result "Integration test suite" "fail" "$tests_passed/$tests_run passed"
+        fi
+    else
+        test_result "Integration tests" "skip" "test directory not found"
     fi
 }
 
@@ -550,6 +661,10 @@ run_full_tests() {
     test_configuration
     test_performance
     test_integration
+    
+    # New unit and integration test suites
+    test_unit_tests
+    test_integration_tests
     
     show_summary
 }
@@ -677,7 +792,7 @@ main() {
                 return 0
                 ;;
             *)
-                log_error "Unknown option: $1"
+                error "Unknown option: $1"
                 show_test_help
                 return 1
                 ;;
@@ -721,8 +836,16 @@ main() {
             test_integration
             show_summary
             ;;
+        unit)
+            test_unit_tests
+            show_summary
+            ;;
+        integration-tests|integration-new)
+            test_integration_tests
+            show_summary
+            ;;
         *)
-            log_error "Unknown test suite: $suite"
+            error "Unknown test suite: $suite"
             show_test_help
             return 1
             ;;

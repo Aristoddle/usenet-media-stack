@@ -38,17 +38,7 @@ typeset -gA INDEXERS
 # Provider configurations loaded from environment  
 typeset -gA PROVIDERS
 
-# Service URLs
-typeset -gA SERVICE_URLS=(
-    [prowlarr]="http://localhost:9696"
-    [sonarr]="http://localhost:8989"
-    [radarr]="http://localhost:7878"
-    [readarr]="http://localhost:8787"
-    [lidarr]="http://localhost:8686"
-    [bazarr]="http://localhost:6767"
-    [mylar3]="http://localhost:8090"
-    [sabnzbd]="http://localhost:8080"
-)
+# Service URLs (loaded from config module)
 
 ##############################################################################
 #                           API KEY MANAGEMENT                               #

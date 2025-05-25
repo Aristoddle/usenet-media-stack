@@ -1,4 +1,4 @@
-version: '3.8'
+# Cloudflare Tunnel configuration - extends main docker-compose.yml
 
 ##############################################################################
 # Cloudflare Tunnel Configuration for Usenet Media Stack
