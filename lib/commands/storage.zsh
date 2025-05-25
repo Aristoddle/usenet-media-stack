@@ -50,12 +50,15 @@ USAGE
 
 ACTIONS
     status             Show current storage configuration and health
-    discover           Scan and list all available mounted drives
+    list               Scan and list all available mounted drives
     select             Interactive drive selection with TUI interface
     add <path>         Add a new drive to the storage pool
     remove <path>      Remove drive from storage pool (data preserved)
     health             Check health status of all drives
     apply              Apply storage changes and restart services
+
+LEGACY ACTIONS (deprecated - use new verbs above)
+    discover           Use 'list' instead
 
 PLANNED FEATURES (not yet implemented)
     balance            Rebalance data across available drives
@@ -70,6 +73,9 @@ OPTIONS
 EXAMPLES
     Check storage status:
         $ usenet storage status
+        
+    List all available drives:
+        $ usenet storage list
         
     Add a new drive:
         $ usenet storage add /mnt/disk2
@@ -809,7 +815,11 @@ main() {
         status)
             show_storage_status
             ;;
-        discover)
+        list|discover)
+            # Support both 'list' (preferred) and 'discover' (legacy)
+            if [[ "$action" == "discover" ]]; then
+                warning "Action 'discover' is deprecated, use 'list' instead"
+            fi
             discover_all_drives
             ;;
         select)

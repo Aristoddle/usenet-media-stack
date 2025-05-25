@@ -1,0 +1,19 @@
+{
+  "name": "usenet-media-stack-web-testing",
+  "version": "1.0.0",
+  "description": "Web UI automation testing for Usenet Media Stack",
+  "main": "test-runner.js",
+  "scripts": {
+    "test": "node test-runner.js",
+    "test-web": "node test-runner.js --suite=web",
+    "test-apis": "node test-runner.js --suite=apis",
+    "test-all": "node test-runner.js --suite=all",
+    "install-browsers": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {},
+  "author": "Usenet Media Stack",
+  "license": "MIT"
+}

@@ -1,0 +1,168 @@
+# Local Docker Swarm Testing Environment
+# Creates a virtualized 3-node Swarm cluster for testing
+# Use: docker-compose -f test-swarm-local.yml up
+#
+# This simulates your 13-node cluster using Docker-in-Docker
+# Perfect for testing Swarm compatibility without real hardware
+
+version: '3.8'
+
+services:
+  # ================================
+  # SWARM MANAGER NODE
+  # Simulates a laptop acting as Swarm manager
+  # ================================
+  swarm-manager:
+    image: docker:dind
+    privileged: true
+    hostname: swarm-manager
+    environment:
+      - DOCKER_TLS_CERTDIR=
+    volumes:
+      - swarm-manager-data:/var/lib/docker
+      - ./config:/config:ro
+      - ./test-stack:/stack:ro
+    command: |
+      sh -c "
+        dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2376 &
+        sleep 10
+        docker swarm init --advertise-addr swarm-manager
+        docker node update --label-add performance=high swarm-manager
+        docker node update --label-add storage=true swarm-manager
+        docker node update --label-add monitoring=true swarm-manager
+        docker node update --label-add gpu=true swarm-manager
+        echo 'Swarm manager initialized. Join token:'
+        docker swarm join-token worker
+        tail -f /dev/null
+      "
+    ports:
+      - "2376:2376"
+      - "80:80"
+      - "443:443"
+      - "8080:8080"    # Traefik
+      - "9090:9090"    # Prometheus
+      - "3000:3000"    # Grafana
+    networks:
+      - swarm-test
+
+  # ================================
+  # SWARM WORKER NODE 1
+  # Simulates a high-performance laptop
+  # ================================
+  swarm-worker-1:
+    image: docker:dind
+    privileged: true
+    hostname: swarm-worker-1
+    environment:
+      - DOCKER_TLS_CERTDIR=
+    volumes:
+      - swarm-worker-1-data:/var/lib/docker
+    command: |
+      sh -c "
+        dockerd --host=unix:///var/run/docker.sock &
+        sleep 15
+        docker swarm join --token $$(docker -H swarm-manager:2376 swarm join-token worker -q) swarm-manager:2377
+        # Label this node after joining
+        sleep 5
+        tail -f /dev/null
+      "
+    depends_on:
+      - swarm-manager
+    networks:
+      - swarm-test
+
+  # ================================
+  # SWARM WORKER NODE 2  
+  # Simulates a Raspberry Pi (low performance)
+  # ================================
+  swarm-worker-2:
+    image: docker:dind
+    privileged: true
+    hostname: swarm-worker-2
+    environment:
+      - DOCKER_TLS_CERTDIR=
+    volumes:
+      - swarm-worker-2-data:/var/lib/docker
+    command: |
+      sh -c "
+        dockerd --host=unix:///var/run/docker.sock &
+        sleep 20
+        docker swarm join --token $$(docker -H swarm-manager:2376 swarm join-token worker -q) swarm-manager:2377
+        sleep 5
+        tail -f /dev/null
+      "
+    depends_on:
+      - swarm-manager
+    networks:
+      - swarm-test
+
+  # ================================
+  # NFS SERVER (SIMULATED)
+  # Provides shared storage for the test cluster
+  # ================================
+  nfs-server:
+    image: itsthenetwork/nfs-server-alpine:latest
+    hostname: nfs-server
+    privileged: true
+    environment:
+      - SHARED_DIRECTORY=/data
+    volumes:
+      - nfs-data:/data
+      - ./config:/data/usenet/config:rw
+      - ./downloads:/data/usenet/downloads:rw
+    ports:
+      - "2049:2049"
+    networks:
+      - swarm-test
+
+  # ================================
+  # TEST DEPLOYMENT HELPER
+  # Automatically deploys the stack to test Swarm
+  # ================================
+  deploy-helper:
+    image: docker:cli
+    hostname: deploy-helper
+    volumes:
+      - ./docker-compose.swarm.yml:/stack/docker-compose.yml:ro
+      - ./.env:/stack/.env:ro
+    environment:
+      - DOCKER_HOST=tcp://swarm-manager:2376
+    command: |
+      sh -c "
+        echo 'Waiting for Swarm to be ready...'
+        sleep 30
+        
+        echo 'Creating external networks...'
+        docker network create --driver overlay traefik-public || true
+        
+        echo 'Labeling worker nodes...'
+        docker node update --label-add performance=high swarm-worker-1 || true
+        docker node update --label-add storage=true swarm-worker-1 || true
+        docker node update --label-add performance=low swarm-worker-2 || true
+        docker node update --label-add vpn=true swarm-worker-2 || true
+        
+        echo 'Deploying test stack...'
+        cd /stack
+        docker stack deploy -c docker-compose.yml usenet-test || true
+        
+        echo 'Stack deployment complete!'
+        docker service ls
+        
+        tail -f /dev/null
+      "
+    depends_on:
+      - swarm-manager
+      - swarm-worker-1
+      - swarm-worker-2
+    networks:
+      - swarm-test
+
+networks:
+  swarm-test:
+    driver: bridge
+
+volumes:
+  swarm-manager-data:
+  swarm-worker-1-data:
+  swarm-worker-2-data:
+  nfs-data:

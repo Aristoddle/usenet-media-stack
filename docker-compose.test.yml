@@ -1,0 +1,74 @@
+# Test override using high port range (20000+) to avoid all conflicts
+# This completely replaces port mappings for clean end-to-end testing
+
+services:
+  # Core media automation services with test ports in 20000+ range
+  sonarr:
+    ports:
+      - "20989:8989"
+      
+  radarr:
+    ports:
+      - "20878:7878"
+      
+  jellyfin:
+    ports:
+      - "20096:8096"
+      
+  overseerr:
+    ports:
+      - "20055:5055"
+      
+  portainer:
+    ports:
+      - "20000:9000"
+      
+  sabnzbd:
+    ports:
+      - "20080:8080"
+      
+  prowlarr:
+    ports:
+      - "20696:9696"
+      
+  readarr:
+    ports:
+      - "20787:8787"
+      
+  whisparr:
+    ports:
+      - "20969:6969"
+      
+  transmission:
+    ports:
+      - "20092:9091"      # Web UI
+      - "20413:51413"     # Peer connections
+      
+  bazarr:
+    ports:
+      - "20767:6767"
+      
+  mylar:
+    ports:
+      - "20090:8090"
+      
+  yacreader:
+    ports:
+      - "20082:8080"
+      
+  netdata:
+    ports:
+      - "21999:19999"
+      
+  # Disable services that need privileged access for testing
+  samba:
+    profiles:
+      - disabled
+      
+  nfs-server:
+    profiles:
+      - disabled
+      
+  # Keep services that don't expose external ports
+  tdarr: {}
+  recyclarr: {}

@@ -1,0 +1,123 @@
+# Minimal test deployment with only essential services for end-to-end testing
+# Uses safe ports and focuses on core media automation workflow
+
+networks:
+  media_network:
+    driver: bridge
+
+services:
+  # Core automation services (just the essentials for testing)
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr-test
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./config/sonarr:/config
+      - ./downloads:/downloads
+      - ./media/tv:/tv
+    ports:
+      - "20989:8989"
+    networks:
+      - media_network
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr-test
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./config/radarr:/config
+      - ./downloads:/downloads
+      - ./media/movies:/movies
+    ports:
+      - "20878:7878"
+    networks:
+      - media_network
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin-test
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./config/jellyfin:/config
+      - ./media:/data/media
+    ports:
+      - "20096:8096"
+    networks:
+      - media_network
+    restart: unless-stopped
+    
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission-test
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./config/transmission:/config
+      - ./downloads:/downloads
+      - ./watch:/watch
+    ports:
+      - "20092:9091"
+      - "20413:51413"
+    networks:
+      - media_network
+    restart: unless-stopped
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd-test
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./config/sabnzbd:/config
+      - ./downloads:/downloads
+    ports:
+      - "20080:8080"
+    networks:
+      - media_network
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr-test
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ./config/prowlarr:/config
+    ports:
+      - "20696:9696"
+    networks:
+      - media_network
+    restart: unless-stopped
+    
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer-test
+    command: -H unix:///var/run/docker.sock
+    ports:
+      - "20000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data_test:/data
+    networks:
+      - media_network
+    restart: unless-stopped
+
+volumes:
+  portainer_data_test:
