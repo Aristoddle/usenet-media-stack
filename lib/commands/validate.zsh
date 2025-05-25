@@ -116,22 +116,47 @@ validate_docker() {
         info "Docker version: $docker_version"
         
         # Check if Docker daemon is running
-        if ! docker info >/dev/null 2>&1; then
+        # Try multiple methods to detect Docker daemon status
+        local docker_running=false
+        
+        # Method 1: Check systemctl status (most reliable on Linux)
+        if command -v systemctl >/dev/null 2>&1; then
+            if systemctl is-active docker >/dev/null 2>&1; then
+                docker_running=true
+            fi
+        fi
+        
+        # Method 2: Try docker info (may fail due to permissions)
+        if [[ "$docker_running" == "false" ]] && docker info >/dev/null 2>&1; then
+            docker_running=true
+        fi
+        
+        # Method 3: Check if Docker socket exists and is accessible
+        if [[ "$docker_running" == "false" ]] && [[ -S /var/run/docker.sock ]]; then
+            # Docker socket exists, daemon likely running but may have permission issues
+            warning "Docker daemon is running but may require permission setup"
+            info "Add user to docker group: sudo usermod -aG docker \$USER && newgrp docker"
+            docker_running=true
+        fi
+        
+        if [[ "$docker_running" == "true" ]]; then
+            success "Docker daemon is running"
+        else
             error "Docker daemon is not running"
             info "Start Docker with: sudo systemctl start docker (Linux) or open Docker Desktop"
             ((errors++))
+        fi
+        
+        # Check Docker Compose (only if Docker daemon is accessible)
+        if [[ "$docker_running" == "true" ]] && docker compose version >/dev/null 2>&1; then
+            local compose_version=$(docker compose version --short 2>/dev/null)
+            success "Docker Compose available: $compose_version"
+        elif [[ "$docker_running" == "true" ]]; then
+            error "Docker Compose not available"
+            info "Install Docker Compose plugin"
+            ((errors++))
         else
-            success "Docker daemon is running"
-            
-            # Check Docker Compose
-            if docker compose version >/dev/null 2>&1; then
-                local compose_version=$(docker compose version --short 2>/dev/null)
-                success "Docker Compose available: $compose_version"
-            else
-                error "Docker Compose not available"
-                info "Install Docker Compose plugin"
-                ((errors++))
-            fi
+            info "Skipping Docker Compose check (daemon not accessible)"
         fi
     fi
     
