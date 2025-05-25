@@ -20,6 +20,7 @@ export default defineConfig({
     
     nav: [
       { text: 'Guide', link: '/getting-started/' },
+      { text: '📚 Free Media', link: '/free-media' },
       { text: 'CLI Reference', link: '/cli/' },
       { text: 'Architecture', link: '/architecture/' },
       { text: 'Advanced', link: '/advanced/' },
@@ -27,6 +28,7 @@ export default defineConfig({
         text: 'Links',
         items: [
           { text: 'GitHub', link: 'https://github.com/Aristoddle/usenet-media-stack' },
+          { text: '📧 Request Credentials', link: 'mailto:j3lanzone@gmail.com?subject=Usenet%20Media%20Stack%20-%20Credential%20Request&body=Hi%20Joe,%0A%0AI\'d%20like%20access%20to%20your%20professional%20media%20automation%20stack.%20Please%20send%20me:%0A%0A-%20Usenet%20provider%20credentials%0A-%20Indexer%20API%20keys%0A-%20Anna\'s%20Archive%20professional%20access%0A-%20VPN%20configuration%0A%0AThanks!' },
           { text: 'Issues', link: 'https://github.com/Aristoddle/usenet-media-stack/issues' },
           { text: 'Roadmap', link: '/roadmap' }
         ]
@@ -129,5 +131,11 @@ export default defineConfig({
     define: {
       __VUE_OPTIONS_API__: false
     }
-  }
+  },
+
+  ignoreDeadLinks: [
+    // Allow localhost links for service documentation
+    /^http:\/\/localhost/,
+    /^https:\/\/localhost/
+  ]
 })

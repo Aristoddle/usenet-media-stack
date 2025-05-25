@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: "Usenet Media Stack"
-  text: "Professional Hot-Swap JBOD Media Automation"
-  tagline: "Deploy once, add devices as needed. Hot-swap storage for portability. GPU acceleration where available."
+  text: "Your Complete Media Automation Solution"
+  tagline: "🎬 Stream anything, anywhere • 📚 Access millions of free books & comics • 🔧 One-command setup • 📱 Mobile-first design"
   image:
     src: /hero-logo.svg
     alt: Usenet Media Stack
@@ -13,8 +13,11 @@ hero:
       text: Quick Start
       link: /getting-started/
     - theme: alt
-      text: View on GitHub
-      link: https://github.com/Aristoddle/usenet-media-stack
+      text: 📚 Get Free Media Access
+      link: /free-media/
+    - theme: alt
+      text: 📧 Request Credentials
+      link: mailto:j3lanzone@gmail.com?subject=Usenet%20Media%20Stack%20-%20Credential%20Request&body=Hi%20Joe,%0A%0AI'd%20like%20access%20to%20your%20professional%20media%20automation%20stack.%20Please%20send%20me:%0A%0A-%20Usenet%20provider%20credentials%0A-%20Indexer%20API%20keys%0A-%20Anna's%20Archive%20professional%20access%0A-%20VPN%20configuration%0A%0AThanks!
 
 features:
   - icon: 🔥
@@ -37,10 +40,24 @@ features:
     title: 19 Production Services
     details: Complete media automation stack. Jellyfin, Sonarr, Radarr, Prowlarr, SABnzbd, Transmission, Overseerr, Tdarr, and more. TRaSH Guide integration.
     
+  - icon: 📚
+    title: Free & Open Media Access
+    details: Professional Anna's Archive integration for books/comics. YACReader for manga/comics. Readarr for audiobooks. Access millions of open-access academic papers, public domain works, and Creative Commons content.
+    
   - icon: 🏗️
     title: Bell Labs Standards
     details: Code quality following Stan Eisenstat principles. 80-character lines, function contracts, comprehensive documentation. Production-ready architecture.
 ---
+
+## 📱 **Perfect for Mobile Users**
+
+**Everything works great on your phone!** Responsive interfaces, touch-friendly controls, and mobile apps for streaming on the go.
+
+### 🚀 **Three Ways to Get Started**
+
+1. **📧 Get Credentials** - Email for instant access to professional indexers and Anna's Archive
+2. **🛠️ DIY Setup** - Deploy your own stack with our one-command installer  
+3. **📚 Browse Free Media** - Start with millions of free books, comics, and academic papers
 
 ## One-Command Deployment
 
