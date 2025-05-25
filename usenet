@@ -11,18 +11,16 @@
 #
 # Dedicated to Stan Eisenstat, who taught us that good code explains itself.
 #
-# This is the single entry point for the Usenet Media Stack. All operations
-# go through this script, which routes commands to appropriate handlers in
-# the lib/ directory. This design ensures consistency, maintainability, and
-# a clean user experience.
+# This implements a pure subcommand architecture following pyenv's successful
+# pattern. All operations use the format: usenet <command> [action] [options]
 #
-# Design principles (The Stan Way):
-# - One entry point, one responsibility
-# - Clear command routing, no magic
-# - Helpful error messages for humans
-# - No clever tricks, just clarity
+# Design principles (The Stan Way + Pyenv Pattern):
+# - Pure subcommand routing, no flag-based commands
+# - Consistent action verbs across all components
+# - Auto-help when required arguments missing
+# - Clear error messages with suggested corrections
 #
-# Usage: usenet <command> [options]
+# Usage: usenet <command> [action] [options]
 # Try 'usenet help' for detailed information.
 ##############################################################################
 
@@ -84,54 +82,149 @@ show_version() {
 
 #=============================================================================
 # Function: show_main_help
-# Description: Display main help screen
+# Description: Display main help screen (pyenv-style)
 #=============================================================================
 show_main_help() {
     print "🎬 ${COLOR_GREEN}Usenet Media Stack${COLOR_RESET} v1.0.0"
     print ""
     print "${COLOR_YELLOW}USAGE${COLOR_RESET}"
-    print "    usenet <command> [options]"
-    print "    usenet <command> --help        # Command-specific help"
+    print "    usenet <command> [<args>]"
     print ""
     print "${COLOR_YELLOW}PRIMARY WORKFLOWS${COLOR_RESET}"
     print "    ${COLOR_GREEN}deploy${COLOR_RESET}                 Interactive full deployment"
-    print "    ${COLOR_GREEN}deploy --auto${COLOR_RESET}          Auto-detect and deploy everything"
-    print "    ${COLOR_GREEN}deploy --profile <name>${COLOR_RESET} Deploy with specific performance profile"
+    print "    ${COLOR_GREEN}validate${COLOR_RESET}               Pre-flight system checks"
     print ""
     print "${COLOR_YELLOW}COMPONENT MANAGEMENT${COLOR_RESET}"
-    print "    ${COLOR_GREEN}storage${COLOR_RESET} <action>       JBOD storage pool management"
-    print "    ${COLOR_GREEN}hardware${COLOR_RESET} <action>      Hardware optimization and GPU acceleration"
-    print "    ${COLOR_GREEN}services${COLOR_RESET} <action>      Service management (start/stop/logs/status)"
-    print ""
-    print "${COLOR_YELLOW}SYSTEM OPERATIONS${COLOR_RESET}"
-    print "    ${COLOR_GREEN}backup${COLOR_RESET} <action>        Configuration backup and restore"
-    print "    ${COLOR_GREEN}tunnel${COLOR_RESET} <action>        Cloudflare tunnel management"
-    print "    ${COLOR_GREEN}validate${COLOR_RESET}               Pre-flight system checks"
+    print "    ${COLOR_GREEN}storage${COLOR_RESET}                JBOD storage pool management"
+    print "    ${COLOR_GREEN}hardware${COLOR_RESET}               Hardware optimization and GPU acceleration"
+    print "    ${COLOR_GREEN}services${COLOR_RESET}               Service management (start/stop/logs/status)"
+    print "    ${COLOR_GREEN}backup${COLOR_RESET}                 Configuration backup and restore"
+    print "    ${COLOR_GREEN}tunnel${COLOR_RESET}                 Cloudflare tunnel management"
     print ""
     print "${COLOR_YELLOW}GLOBAL OPTIONS${COLOR_RESET}"
     print "    --verbose, -v          Show detailed output"
     print "    --dry-run, -n          Show what would be done without executing"
     print "    --quiet, -q            Suppress non-essential output"
     print "    --profile <name>       Use specific performance profile"
-    print "    --help, -h             Show help information"
     print "    --version              Show version information"
     print ""
     print "${COLOR_YELLOW}EXAMPLES${COLOR_RESET}"
     print "    Complete deployment:"
     print "        ${COLOR_CYAN}usenet deploy${COLOR_RESET}"
     print ""
-    print "    Auto-configure everything:"
-    print "        ${COLOR_CYAN}usenet deploy --auto --profile balanced${COLOR_RESET}"
+    print "    List available drives:"
+    print "        ${COLOR_CYAN}usenet storage list${COLOR_RESET}"
     print ""
     print "    Add a drive to storage pool:"
     print "        ${COLOR_CYAN}usenet storage add /media/user/Movies_4TB${COLOR_RESET}"
     print ""
-    print "    Check service status:"
-    print "        ${COLOR_CYAN}usenet services status${COLOR_RESET}"
+    print "    Check hardware capabilities:"
+    print "        ${COLOR_CYAN}usenet hardware list${COLOR_RESET}"
+    print ""
+    print "    Show service status:"
+    print "        ${COLOR_CYAN}usenet services list${COLOR_RESET}"
     print ""
     print "${COLOR_YELLOW}GET STARTED${COLOR_RESET}"
     print "    Run ${COLOR_GREEN}usenet deploy${COLOR_RESET} for interactive setup"
-    print "    Run ${COLOR_GREEN}usenet <command> --help${COLOR_RESET} for command-specific help"
+    print "    Run ${COLOR_GREEN}usenet help <command>${COLOR_RESET} for command-specific help"
+    print ""
+    print "See 'usenet help <command>' for information on a specific command."
+}
+
+#=============================================================================
+# Function: show_command_help
+# Description: Display help for a specific command
+#
+# Arguments:
+#   $1 - Command name
+#=============================================================================
+show_command_help() {
+    local command="$1"
+    
+    case "$command" in
+        storage)
+            print "${COLOR_GREEN}usenet storage${COLOR_RESET} - JBOD storage pool management"
+            print ""
+            print "${COLOR_YELLOW}USAGE${COLOR_RESET}"
+            print "    usenet storage <action> [options]"
+            print ""
+            print "${COLOR_YELLOW}ACTIONS${COLOR_RESET}"
+            print "    ${COLOR_GREEN}list${COLOR_RESET}                   List all available drives"
+            print "    ${COLOR_GREEN}status${COLOR_RESET}                 Show current storage pool configuration"
+            print "    ${COLOR_GREEN}add${COLOR_RESET} <path>             Add drive to storage pool"
+            print "    ${COLOR_GREEN}remove${COLOR_RESET} <path>          Remove drive from storage pool"
+            print "    ${COLOR_GREEN}sync${COLOR_RESET}                   Update service APIs with current pool"
+            print ""
+            print "${COLOR_YELLOW}EXAMPLES${COLOR_RESET}"
+            print "    List all drives:"
+            print "        ${COLOR_CYAN}usenet storage list${COLOR_RESET}"
+            print ""
+            print "    Add a drive:"
+            print "        ${COLOR_CYAN}usenet storage add /media/user/Movies_4TB${COLOR_RESET}"
+            ;;
+        hardware)
+            print "${COLOR_GREEN}usenet hardware${COLOR_RESET} - Hardware optimization and GPU acceleration"
+            print ""
+            print "${COLOR_YELLOW}USAGE${COLOR_RESET}"
+            print "    usenet hardware <action> [options]"
+            print ""
+            print "${COLOR_YELLOW}ACTIONS${COLOR_RESET}"
+            print "    ${COLOR_GREEN}list${COLOR_RESET}                   Show hardware capabilities"
+            print "    ${COLOR_GREEN}configure${COLOR_RESET}              Interactive resource allocation"
+            print "    ${COLOR_GREEN}install-drivers${COLOR_RESET}        Install GPU drivers and acceleration"
+            print "    ${COLOR_GREEN}optimize${COLOR_RESET} [--auto]      Generate optimized configurations"
+            print ""
+            print "${COLOR_YELLOW}EXAMPLES${COLOR_RESET}"
+            print "    Check hardware:"
+            print "        ${COLOR_CYAN}usenet hardware list${COLOR_RESET}"
+            print ""
+            print "    Auto-optimize:"
+            print "        ${COLOR_CYAN}usenet hardware optimize --auto${COLOR_RESET}"
+            ;;
+        services)
+            print "${COLOR_GREEN}usenet services${COLOR_RESET} - Service management"
+            print ""
+            print "${COLOR_YELLOW}USAGE${COLOR_RESET}"
+            print "    usenet services <action> [service]"
+            print ""
+            print "${COLOR_YELLOW}ACTIONS${COLOR_RESET}"
+            print "    ${COLOR_GREEN}list${COLOR_RESET}                   Show all service health"
+            print "    ${COLOR_GREEN}start${COLOR_RESET} [service]        Start all services or specific service"
+            print "    ${COLOR_GREEN}stop${COLOR_RESET} [service]         Stop all services or specific service"
+            print "    ${COLOR_GREEN}restart${COLOR_RESET} [service]      Restart services"
+            print "    ${COLOR_GREEN}logs${COLOR_RESET} <service>         View service logs"
+            print "    ${COLOR_GREEN}sync${COLOR_RESET}                   Update all service APIs"
+            ;;
+        backup)
+            print "${COLOR_GREEN}usenet backup${COLOR_RESET} - Configuration backup and restore"
+            print ""
+            print "${COLOR_YELLOW}USAGE${COLOR_RESET}"
+            print "    usenet backup <action> [options]"
+            print ""
+            print "${COLOR_YELLOW}ACTIONS${COLOR_RESET}"
+            print "    ${COLOR_GREEN}list${COLOR_RESET}                   List available backups"
+            print "    ${COLOR_GREEN}create${COLOR_RESET} [path]          Create backup (default: auto-generated path)"
+            print "    ${COLOR_GREEN}show${COLOR_RESET} <backup>          Show backup contents"
+            print "    ${COLOR_GREEN}restore${COLOR_RESET} <backup>       Restore from backup"
+            ;;
+        deploy)
+            print "${COLOR_GREEN}usenet deploy${COLOR_RESET} - Interactive deployment"
+            print ""
+            print "${COLOR_YELLOW}USAGE${COLOR_RESET}"
+            print "    usenet deploy [options]"
+            print ""
+            print "${COLOR_YELLOW}OPTIONS${COLOR_RESET}"
+            print "    --auto                 Auto-detect and configure everything"
+            print "    --profile <name>       Use specific performance profile"
+            print "    --storage-only         Configure storage only"
+            print "    --hardware-only        Configure hardware only"
+            ;;
+        *)
+            error "Unknown command: $command"
+            print -u2 "Run 'usenet help' for a list of available commands"
+            return 1
+            ;;
+    esac
 }
 
 ##############################################################################
@@ -140,7 +233,7 @@ show_main_help() {
 
 #=============================================================================
 # Function: route_command
-# Description: Route to appropriate command handler
+# Description: Route to appropriate command handler (pure subcommand)
 #
 # Arguments:
 #   $1 - Command name
@@ -157,7 +250,19 @@ route_command() {
                 exec "${COMMANDS_DIR}/deploy.zsh" "$@"
             else
                 error "Deploy command not implemented yet"
-                error "Use 'usenet setup' for now (legacy)"
+                error "Use 'usenet setup' for now (legacy fallback)"
+                if [[ -x "${COMMANDS_DIR}/setup.zsh" ]]; then
+                    exec "${COMMANDS_DIR}/setup.zsh" "$@"
+                fi
+                exit 1
+            fi
+            ;;
+            
+        validate)
+            if [[ -x "${COMMANDS_DIR}/validate.zsh" ]]; then
+                exec "${COMMANDS_DIR}/validate.zsh" "$@"
+            else
+                error "Validate command not found"
                 exit 1
             fi
             ;;
@@ -196,7 +301,6 @@ route_command() {
             fi
             ;;
             
-        # System operations
         backup)
             if [[ -x "${COMMANDS_DIR}/backup.zsh" ]]; then
                 exec "${COMMANDS_DIR}/backup.zsh" "$@"
@@ -215,18 +319,49 @@ route_command() {
             fi
             ;;
             
-        validate)
-            if [[ -x "${COMMANDS_DIR}/validate.zsh" ]]; then
-                exec "${COMMANDS_DIR}/validate.zsh" "$@"
+        # Help system (pyenv-style)
+        help)
+            if [[ $# -eq 0 ]]; then
+                show_main_help
             else
-                error "Validate command not found"
-                exit 1
+                show_command_help "$1"
             fi
             ;;
             
-        # Legacy support (with deprecation warnings)
+        # Version
+        version|--version)
+            show_version
+            ;;
+            
+        # Legacy support with deprecation warnings
+        --storage)
+            warning "Legacy syntax '--storage' is deprecated"
+            warning "Use 'usenet storage' instead"
+            route_command storage "$@"
+            ;;
+            
+        --hardware)
+            warning "Legacy syntax '--hardware' is deprecated"
+            warning "Use 'usenet hardware' instead"
+            route_command hardware "$@"
+            ;;
+            
+        --backup)
+            warning "Legacy syntax '--backup' is deprecated"
+            warning "Use 'usenet backup' instead"
+            route_command backup "$@"
+            ;;
+            
+        --tunnel|--cloudflare)
+            warning "Legacy syntax '$command' is deprecated"
+            warning "Use 'usenet tunnel' instead"
+            route_command tunnel "$@"
+            ;;
+            
+        # Legacy direct commands
         setup|install)
-            warning "Legacy command '$command' - use 'usenet deploy' instead"
+            warning "Legacy command '$command' is deprecated"
+            warning "Use 'usenet deploy' instead"
             if [[ -x "${COMMANDS_DIR}/setup.zsh" ]]; then
                 exec "${COMMANDS_DIR}/setup.zsh" "$@"
             else
@@ -236,7 +371,8 @@ route_command() {
             ;;
             
         start|stop|restart|status|logs|update|upgrade)
-            warning "Legacy command '$command' - use 'usenet services $command' instead"
+            warning "Legacy command '$command' is deprecated"
+            warning "Use 'usenet services $command' instead"
             if [[ -x "${COMMANDS_DIR}/manage.zsh" ]]; then
                 exec "${COMMANDS_DIR}/manage.zsh" "$command" "$@"
             else
@@ -254,34 +390,9 @@ route_command() {
             fi
             ;;
             
-        # Legacy flag support (backward compatibility)
-        --storage)
-            warning "Legacy flag '--storage' - use 'usenet storage' instead"
-            route_command storage "$@"
-            ;;
-            
-        --hardware)
-            warning "Legacy flag '--hardware' - use 'usenet hardware' instead" 
-            route_command hardware "$@"
-            ;;
-            
-        --backup)
-            warning "Legacy flag '--backup' - use 'usenet backup' instead"
-            route_command backup "$@"
-            ;;
-            
-        --tunnel|--cloudflare)
-            warning "Legacy flag '$command' - use 'usenet tunnel' instead"
-            route_command tunnel "$@"
-            ;;
-            
-        # Help and version
-        help|--help|-h)
+        # Global flags (when used as first argument)
+        --help|-h)
             show_main_help
-            ;;
-            
-        version|--version)
-            show_version
             ;;
             
         # Unknown command
@@ -291,7 +402,8 @@ route_command() {
             print -u2 "Available commands:"
             print -u2 "  deploy, storage, hardware, services, backup, tunnel, validate"
             print -u2 ""
-            print -u2 "Run 'usenet --help' for more information"
+            print -u2 "Run 'usenet help' for more information"
+            print -u2 "Run 'usenet help <command>' for command-specific help"
             exit 1
             ;;
     esac
@@ -337,13 +449,19 @@ parse_global_flags() {
             --profile=*)
                 PROFILE="${1#--profile=}"
                 ;;
-            --help|-h)
-                # Don't consume help flag here - let it be processed later
-                args+=("help")
-                ;;
             --version)
                 show_version
                 exit 0
+                ;;
+            --help|-h)
+                # Only show main help if it's the only argument
+                if [[ $# -eq 1 ]]; then
+                    show_main_help
+                    exit 0
+                else
+                    # Pass through to command-specific help
+                    args+=("$1")
+                fi
                 ;;
             --)
                 # End of global flags
@@ -379,7 +497,7 @@ parse_global_flags() {
 
 #=============================================================================
 # Function: main
-# Description: Main entry point
+# Description: Main entry point (pyenv-style)
 #
 # Arguments:
 #   $@ - Command line arguments
@@ -395,7 +513,7 @@ main() {
     done < "$temp_file"
     rm -f "$temp_file"
     
-    # If no arguments, show help
+    # If no arguments, show help (pyenv behavior)
     if [[ ${#remaining_args[@]} -eq 0 ]]; then
         show_main_help
         exit 0
