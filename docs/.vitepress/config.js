@@ -23,6 +23,7 @@ export default defineConfig({
       { text: 'CLI Reference', link: '/cli/' },
       { text: 'Architecture', link: '/architecture/' },
       { text: 'Advanced', link: '/advanced/' },
+      { text: '📊 Visualizations', link: '/visualizations' },
       { text: '📚 Free Media', link: '/free-media' },
       { 
         text: 'Links',

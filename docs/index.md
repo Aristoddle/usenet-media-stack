@@ -4,28 +4,7 @@ layout: page
 
 <AnimatedHero />
 
-## 🎯 **What This Actually Does**
-
-**The Problem**: Media automation tools break when you move drives around. I take portable drives camping, switch between different computers, and need my media stack to just work everywhere.
-
-**The Solution**: A smart media stack that automatically adapts to whatever storage you plug in. Add a drive, and all your services immediately see it. No manual configuration, no breaking things.
-
-### **Real Example**
-```bash
-# At home: Working from 29 drives (ZFS + cloud + external)
-usenet storage list  # Shows everything: Dropbox, 8TB exFAT, local drives
-
-# Going camping: Grab portable drive  
-usenet storage add /media/camping-drive
-# → Sonarr, Radarr, Jellyfin automatically see new storage
-# → Downloads continue seamlessly
-# → No service restarts needed
-
-# Back home: Plug drive back in
-# → Everything syncs automatically
-```
-
-<InteractiveCLIDemo />
+<PathSelector />
 
 ---
 
