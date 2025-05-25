@@ -198,7 +198,9 @@ HELP
         if [[ -f "$help_file" ]]; then
             cat "$help_file"
         else
-            print -u2 "${COLOR_RED}No help available for: ${topic}${COLOR_RESET}"
+            local msg="${COLOR_RED}No help available for: "
+            msg="${msg}${topic}${COLOR_RESET}"
+            print -u2 "$msg"
             print -u2 "Try 'usenet help' for general help"
             return 1
         fi
@@ -225,21 +227,45 @@ show_version() {
     print "Usenet Media Stack"
     print "Version: ${VERSION}"
     print "Build Date: ${BUILD_DATE}"
-    print "Platform: $(uname -s) $(uname -m)"
+    local platform_os platform_arch
+    platform_os=$(uname -s 2>/dev/null)
+    if [[ $? -eq 0 ]]; then
+        platform_arch=$(uname -m 2>/dev/null)
+        if [[ $? -eq 0 ]]; then
+            print "Platform: ${platform_os} ${platform_arch}"
+        else
+            print "Platform: ${platform_os} ${COLOR_RED}unknown${COLOR_RESET}"
+        fi
+    else
+        print "Platform: ${COLOR_RED}unknown${COLOR_RESET}"
+    fi
     print ""
     
     # Check for dependencies
     print "Components:"
     if command -v docker &>/dev/null; then
-        local docker_version=$(docker --version 2>/dev/null | cut -d' ' -f3 | sed 's/,$//')
-        print "  Docker: ${docker_version}"
+        local docker_version
+        docker_version=$(docker --version 2>/dev/null)
+        if [[ $? -eq 0 && -n "$docker_version" ]]; then
+            docker_version=$(echo "$docker_version" | cut -d' ' -f3 | \
+                            sed 's/,$//')
+            print "  Docker: ${docker_version}"
+        else
+            print "  Docker: ${COLOR_RED}error getting version${COLOR_RESET}"
+        fi
     else
         print "  Docker: ${COLOR_RED}not installed${COLOR_RESET}"
     fi
     
     if docker compose version &>/dev/null 2>&1; then
-        local compose_version=$(docker compose version | cut -d' ' -f4)
-        print "  Compose: ${compose_version}"
+        local compose_version
+        compose_version=$(docker compose version 2>/dev/null)
+        if [[ $? -eq 0 && -n "$compose_version" ]]; then
+            compose_version=$(echo "$compose_version" | cut -d' ' -f4)
+            print "  Compose: ${compose_version}"
+        else
+            print "  Compose: ${COLOR_RED}error getting version${COLOR_RESET}"
+        fi
     else
         print "  Compose: ${COLOR_RED}not installed${COLOR_RESET}"
     fi
@@ -250,21 +276,134 @@ show_version() {
 ##############################################################################
 
 #=============================================================================
-# Function: route_command
-# Description: Route commands to appropriate handlers
+# Function: route_component_flags
+# Description: Route modern component flags (--storage, --hardware, --backup)
 #
-# Main command dispatcher that routes user commands to the appropriate
-# handler scripts in the lib/commands/ directory. Handles special cases
-# and shortcuts for common operations.
+# Arguments:
+#   $1 - Flag name
+#   $@ - Remaining arguments
+#=============================================================================
+route_component_flags() {
+    local flag="$1"
+    if [[ $# -gt 0 ]]; then
+        shift
+    fi
+    
+    case "$flag" in
+        --storage)
+            local storage_args=("$@")
+            if [[ -x "${COMMANDS_DIR}/storage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/storage.zsh" "${storage_args[@]}"
+            else
+                local err="${COLOR_RED}storage.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --storage=*)
+            local storage_cmd="${flag#*=}"
+            if [[ -x "${COMMANDS_DIR}/storage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/storage.zsh" "$storage_cmd" "$@"
+            else
+                local err="${COLOR_RED}storage.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --hardware)
+            local hardware_args=("$@")
+            if [[ -x "${COMMANDS_DIR}/hardware.zsh" ]]; then
+                exec "${COMMANDS_DIR}/hardware.zsh" "${hardware_args[@]}"
+            else
+                local err="${COLOR_RED}hardware.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --hardware=*)
+            local hardware_cmd="${flag#*=}"
+            if [[ -x "${COMMANDS_DIR}/hardware.zsh" ]]; then
+                exec "${COMMANDS_DIR}/hardware.zsh" "$hardware_cmd" "$@"
+            else
+                local err="${COLOR_RED}hardware.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --backup)
+            local backup_args=("$@")
+            if [[ -x "${COMMANDS_DIR}/backup.zsh" ]]; then
+                exec "${COMMANDS_DIR}/backup.zsh" "${backup_args[@]}"
+            else
+                local err="${COLOR_RED}backup.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        --backup=*)
+            local backup_cmd="${flag#*=}"
+            if [[ -x "${COMMANDS_DIR}/backup.zsh" ]]; then
+                exec "${COMMANDS_DIR}/backup.zsh" "$backup_cmd" "$@"
+            else
+                local err="${COLOR_RED}backup.zsh missing${COLOR_RESET}"
+                print -u2 "$err"
+                exit 1
+            fi
+            ;;
+        *)
+            return 1  # Unknown flag
+            ;;
+    esac
+}
+
+#=============================================================================
+# Function: route_legacy_commands
+# Description: Route legacy commands with deprecation warnings
+#
+# Arguments:
+#   $1 - Command name
+#   $@ - Remaining arguments
+#=============================================================================
+route_legacy_commands() {
+    local command="$1"
+    if [[ $# -gt 0 ]]; then
+        shift
+    fi
+    
+    case "$command" in
+        storage)
+            local warn="${COLOR_YELLOW}Warning: 'usenet storage' is "
+            warn="${warn}deprecated."
+            warn="${warn} Use 'usenet --storage' instead.${COLOR_RESET}"
+            print -u2 "$warn"
+            exec "${COMMANDS_DIR}/storage.zsh" "$@"
+            ;;
+        hardware)
+            local warn="${COLOR_YELLOW}Warning: 'usenet hardware' is "
+            warn="${warn}deprecated."
+            warn="${warn} Use 'usenet --hardware' instead.${COLOR_RESET}"
+            print -u2 "$warn"
+            exec "${COMMANDS_DIR}/hardware.zsh" "$@"
+            ;;
+        backup)
+            local warn="${COLOR_YELLOW}Warning: 'usenet backup' is "
+            warn="${warn}deprecated."
+            warn="${warn} Use 'usenet --backup' instead.${COLOR_RESET}"
+            print -u2 "$warn"
+            exec "${COMMANDS_DIR}/backup.zsh" "$@"
+            ;;
+        *)
+            return 1  # Unknown command
+            ;;
+    esac
+}
+
+#=============================================================================
+# Function: route_command
+# Description: Main command router (simplified for clarity)
 #
 # Arguments:
 #   $@ - All command line arguments
-#
-# Returns:
-#   Exit code from the executed command
-#
-# Example:
-#   route_command setup --verbose
 #=============================================================================
 route_command() {
     # Parse arguments using modern flag-based syntax
@@ -303,37 +442,9 @@ route_command() {
                 ;;
                 
             # Component-specific flags
-            --storage)
-                shift
-                storage_args=("$@")
-                exec "${COMMANDS_DIR}/storage.zsh" "${storage_args[@]}"
-                ;;
-            --storage=*)
-                local storage_cmd="${1#*=}"
-                shift
-                exec "${COMMANDS_DIR}/storage.zsh" "$storage_cmd" "$@"
-                ;;
-                
-            --hardware)
-                shift
-                hardware_args=("$@")
-                exec "${COMMANDS_DIR}/hardware.zsh" "${hardware_args[@]}"
-                ;;
-            --hardware=*)
-                local hardware_cmd="${1#*=}"
-                shift
-                exec "${COMMANDS_DIR}/hardware.zsh" "$hardware_cmd" "$@"
-                ;;
-                
-            --backup)
-                shift
-                backup_args=("$@")
-                exec "${COMMANDS_DIR}/backup.zsh" "${backup_args[@]}"
-                ;;
-            --backup=*)
-                local backup_cmd="${1#*=}"
-                shift
-                exec "${COMMANDS_DIR}/backup.zsh" "$backup_cmd" "$@"
+            --storage|--storage=*|--hardware|--hardware=*|--backup|--backup=*)
+                route_component_flags "$1" "${@:2}"
+                return $?
                 ;;
                 
             --tunnel|--cloudflare)
@@ -365,25 +476,16 @@ route_command() {
                 ;;
                 
             # Legacy component commands (deprecated but supported)
-            storage)
-                print -u2 "${COLOR_YELLOW}Warning: 'usenet storage' is deprecated. Use 'usenet --storage' instead.${COLOR_RESET}"
-                shift
-                exec "${COMMANDS_DIR}/storage.zsh" "$@"
-                ;;
-            hardware)
-                print -u2 "${COLOR_YELLOW}Warning: 'usenet hardware' is deprecated. Use 'usenet --hardware' instead.${COLOR_RESET}"
-                shift
-                exec "${COMMANDS_DIR}/hardware.zsh" "$@"
-                ;;
-            backup)
-                print -u2 "${COLOR_YELLOW}Warning: 'usenet backup' is deprecated. Use 'usenet --backup' instead.${COLOR_RESET}"
-                shift
-                exec "${COMMANDS_DIR}/backup.zsh" "$@"
+            storage|hardware|backup)
+                route_legacy_commands "$1" "${@:2}"
+                return $?
                 ;;
                 
             # Unknown argument
             -*)
-                print -u2 "${COLOR_RED}Error: Unknown option '${1}'${COLOR_RESET}"
+                local err="${COLOR_RED}Error: Unknown option "
+                err="${err}'${1}'${COLOR_RESET}"
+                print -u2 "$err"
                 print -u2 "Try 'usenet --help' for available options"
                 exit 1
                 ;;
@@ -406,19 +508,25 @@ route_command() {
                             exec "${COMMANDS_DIR}/validate.zsh" "$@"
                             ;;
                         *)
-                            print -u2 "${COLOR_RED}Error: Unknown command '${action}'${COLOR_RESET}"
-                            print -u2 "Try 'usenet --help' for available commands"
+                            local err="${COLOR_RED}Error: Unknown command "
+                            err="${err}'${action}'${COLOR_RESET}"
+                            print -u2 "$err"
+                            print -u2 "Try 'usenet --help' for commands"
                             exit 1
                             ;;
                     esac
                 else
-                    print -u2 "${COLOR_RED}Error: Unexpected argument '${1}'${COLOR_RESET}"
+                    local err="${COLOR_RED}Error: Unexpected argument "
+                    err="${err}'${1}'${COLOR_RESET}"
+                    print -u2 "$err"
                     print -u2 "Try 'usenet --help' for usage information"
                     exit 1
                 fi
                 ;;
         esac
-        shift
+        if [[ $# -gt 0 ]]; then
+            shift
+        fi
     done
     
     # If no arguments provided, show help
