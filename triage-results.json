@@ -1,0 +1,27 @@
+[
+  {
+    "service": "bazarr",
+    "status": "error",
+    "title": "Bazarr"
+  },
+  {
+    "service": "readarr",
+    "status": "working",
+    "title": "Readarr"
+  },
+  {
+    "service": "yacreader",
+    "status": "failed",
+    "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8082/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8082/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "service": "tdarr",
+    "status": "error",
+    "title": "Tdarr"
+  },
+  {
+    "service": "mylar",
+    "status": "error",
+    "title": "Mylar - Home"
+  }
+]
