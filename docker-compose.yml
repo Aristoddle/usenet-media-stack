@@ -84,19 +84,12 @@ services:
       -w "WORKGROUP"
       -n
     volumes:
-      - /media/joe:/media:rw
+      - /home/joe/usenet/media:/media:rw
       - /home/joe/usenet/downloads:/downloads:rw
       - /home/joe/usenet/config:/config:rw
-      # Mount all storage drives for flexible sharing
-      - /media/joe/Fast_8TB_1:/tv/fast1:rw
-      - /media/joe/Fast_8TB_2:/tv/fast2:rw
-      - /media/joe/Fast_8TB_3:/tv/fast3:rw
-      - /media/joe/Fast_4TB_1:/movies/fast1:rw
-      - /media/joe/Fast_4TB_2:/movies/fast2:rw
-      - /media/joe/Slow_4TB_1:/movies/archive1:rw
-      - /media/joe/Slow_4TB_2:/movies/archive2:rw
-      - /media/joe/Slow_2TB_1:/tv/archive1:rw
-      - /media/joe/Slow_2TB_2:/tv/archive2:rw
+      # Mount media directories (working local setup)
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/movies:/movies:rw
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -315,16 +308,8 @@ services:
     volumes:
       - /home/joe/usenet/config/sonarr:/config
       - /home/joe/usenet/downloads:/downloads
-      # Multi-drive TV storage mounts
-      - /media/joe/Fast_8TB_1:/tv/fast1:rw
-      - /media/joe/Fast_8TB_2:/tv/fast2:rw
-      - /media/joe/Fast_8TB_3:/tv/fast3:rw
-      - /media/joe/Fast_4TB_1:/tv/fast4:rw
-      - /media/joe/Fast_4TB_2:/tv/fast5:rw
-      - /media/joe/Slow_4TB_1:/tv/slow1:rw
-      - /media/joe/Slow_4TB_2:/tv/slow2:rw
-      - /media/joe/Slow_2TB_1:/tv/slow3:rw
-      - /media/joe/Slow_2TB_2:/tv/slow4:rw
+      # Media storage mount  
+      - /home/joe/usenet/media/tv:/tv:rw
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -361,16 +346,8 @@ services:
     volumes:
       - /home/joe/usenet/config/radarr:/config
       - /home/joe/usenet/downloads:/downloads
-      # Multi-drive Movie storage mounts
-      - /media/joe/Fast_8TB_1:/movies/fast1:rw
-      - /media/joe/Fast_8TB_2:/movies/fast2:rw
-      - /media/joe/Fast_8TB_3:/movies/fast3:rw
-      - /media/joe/Fast_4TB_1:/movies/fast4:rw
-      - /media/joe/Fast_4TB_2:/movies/fast5:rw
-      - /media/joe/Slow_4TB_1:/movies/slow1:rw
-      - /media/joe/Slow_4TB_2:/movies/slow2:rw
-      - /media/joe/Slow_2TB_1:/movies/slow3:rw
-      - /media/joe/Slow_2TB_2:/movies/slow4:rw
+      # Media storage mount
+      - /home/joe/usenet/media/movies:/movies:rw
     ports:
       - "7878:7878"
     restart: unless-stopped
@@ -407,24 +384,24 @@ services:
     volumes:
       - /home/joe/usenet/config/bazarr:/config
       # Same storage mounts as Sonarr/Radarr for subtitle access
-      - /media/joe/Fast_8TB_1:/movies/fast1:rw
-      - /media/joe/Fast_8TB_2:/movies/fast2:rw
-      - /media/joe/Fast_8TB_3:/movies/fast3:rw
-      - /media/joe/Fast_4TB_1:/movies/fast4:rw
-      - /media/joe/Fast_4TB_2:/movies/fast5:rw
-      - /media/joe/Fast_8TB_1:/tv/fast1:rw
-      - /media/joe/Fast_8TB_2:/tv/fast2:rw
-      - /media/joe/Fast_8TB_3:/tv/fast3:rw
-      - /media/joe/Fast_4TB_1:/tv/fast4:rw
-      - /media/joe/Fast_4TB_2:/tv/fast5:rw
-      - /media/joe/Slow_4TB_1:/movies/slow1:rw
-      - /media/joe/Slow_4TB_2:/movies/slow2:rw
-      - /media/joe/Slow_2TB_1:/movies/slow3:rw
-      - /media/joe/Slow_2TB_2:/movies/slow4:rw
-      - /media/joe/Slow_4TB_1:/tv/slow1:rw
-      - /media/joe/Slow_4TB_2:/tv/slow2:rw
-      - /media/joe/Slow_2TB_1:/tv/slow3:rw
-      - /media/joe/Slow_2TB_2:/tv/slow4:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
     ports:
       - "6767:6767"
     restart: unless-stopped
@@ -778,15 +755,15 @@ services:
       - /home/joe/usenet/config/stash/blobs:/blobs
       - /home/joe/usenet/config/stash/generated:/generated
       # Multi-drive adult storage mounts (same pattern as other services)
-      - /media/joe/Fast_8TB_1:/data/fast1:rw
-      - /media/joe/Fast_8TB_2:/data/fast2:rw
-      - /media/joe/Fast_8TB_3:/data/fast3:rw
-      - /media/joe/Fast_4TB_1:/data/fast4:rw
-      - /media/joe/Fast_4TB_2:/data/fast5:rw
-      - /media/joe/Slow_4TB_1:/data/slow1:rw
-      - /media/joe/Slow_4TB_2:/data/slow2:rw
-      - /media/joe/Slow_2TB_1:/data/slow3:rw
-      - /media/joe/Slow_2TB_2:/data/slow4:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
+      - /home/joe/usenet/media/tv:/tv:rw
     ports:
       - "9999:9999"
     restart: unless-stopped
