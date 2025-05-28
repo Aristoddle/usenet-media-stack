@@ -2,34 +2,35 @@
 layout: page
 ---
 
-# Usenet Media Stack
+# Digital Liberation Stack
 
-**Professional automated media acquisition and streaming. One command deployment.**
+**Break free from paywalls. Access humanity's knowledge without restrictions.**
 
-Built for people who need their media setup to work reliably across multiple devices and changing storage configurations. Usenet-powered with curated free content resources.
+The tools corporations don't want you to have: 70M+ books from Anna's Archive, zero-restriction academic papers, complete media automation, and your data under your control.
 
 <PathSelector />
 
 <div style="text-align: center; margin: 3rem 0;">
-  <a href="/getting-started/" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">🚀 Get Started (5 minutes)</a>
+  <a href="/getting-started/" style="display: inline-block; background: linear-gradient(135deg, #C41E3A 0%, #FF6B35 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">⚡ Start Your Liberation</a>
+  <a href="/free-media/" style="display: inline-block; background: linear-gradient(135deg, #00FF41 0%, #1A1A1A 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">📚 Access Free Resources</a>
 </div>
 
 <p style="text-align: center; color: #64748b; font-size: 0.9rem;">Works on Linux • Takes 5 minutes • Free & open source</p>
 
 ---
 
-## ✅ Is This For You?
+## ✅ Why Digital Liberation Matters
 
-### **You might want this if:**
-- You use multiple computers/devices for media
-- You take portable drives places (camping, travel, friends' houses)
-- You're tired of reconfiguring everything when hardware changes
-- You want professional-grade reliability without complexity
+### **You need this if:**
+- You believe knowledge should be free and accessible
+- You're tired of paying for information that should be public
+- You want to break free from corporate surveillance
+- You need professional-grade tools that put you in control
 
-### **This probably isn't for you if:**
-- You have one computer that never changes
-- You're happy with basic Plex setups
-- You don't want to learn any command line tools
+### **This isn't for you if:**
+- You're comfortable with corporate paywalls
+- You don't mind your media consumption being tracked
+- You trust Netflix/Amazon to keep your content available
 
 ---
 
