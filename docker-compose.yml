@@ -43,85 +43,14 @@
 
 # Note: version field is deprecated in Compose v2.x and removed
 
-# Define networks for service isolation and Swarm compatibility
-networks:
-  media_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-  
-  sharing_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
+# NETWORKING: Use default bridge for maximum compatibility  
+# Removed custom networks to prevent subnet conflicts with Docker Desktop extensions
+# All services communicate via container names on default bridge network
+# This approach works reliably across Linux/macOS/Windows Docker environments
 
-# Define volumes for configuration persistence across Swarm nodes
+# Define volumes for configuration persistence
 volumes:
-  sabnzbd_config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/config/sabnzbd
-  
-  transmission_config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/config/transmission
-  
-  # Additional configs follow same pattern
-  sonarr_config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/config/sonarr
-  radarr_config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/config/radarr
-  bazarr_config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/config/bazarr
-  prowlarr_config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/config/prowlarr
-  
-  stash_config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/config/stash
-  
-  # Shared storage volumes
-  downloads_volume:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /home/joe/usenet/downloads
-  
-  media_fast_volume:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: /media/joe
-  
-  # Portainer persistent data
+  # Only keep true Docker volumes (not bind mounts)
   portainer_data:
     driver: local
 
@@ -135,8 +64,6 @@ services:
     image: dperson/samba:latest
     container_name: samba
     hostname: media-server
-    networks:
-      - sharing_network
     ports:
       - "139:139"
       - "445:445"
@@ -158,7 +85,6 @@ services:
       -n
     volumes:
       - /media/joe:/media:rw
-      - downloads_volume:/downloads:rw
       - /home/joe/usenet/downloads:/downloads:rw
       - /home/joe/usenet/config:/config:rw
       # Mount all storage drives for flexible sharing
@@ -201,8 +127,6 @@ services:
     image: erichough/nfs-server:latest
     container_name: nfs-server
     hostname: nfs-server
-    networks:
-      - sharing_network
     ports:
       - "2049:2049"
       - "111:111"
@@ -247,8 +171,6 @@ services:
     image: netdata/netdata:latest
     container_name: netdata
     hostname: netdata-media-server
-    networks:
-      - media_network
     ports:
       - "19999:19999"
     cap_add:
@@ -282,8 +204,6 @@ services:
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
-    networks:
-      - media_network
     ports:
       - "9000:9000"
       - "8000:8000"
@@ -311,15 +231,13 @@ services:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
     hostname: sabnzbd
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - sabnzbd_config:/config
-      - downloads_volume:/downloads
+      - /home/joe/usenet/config/sabnzbd:/config
+      - /home/joe/usenet/downloads:/downloads
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -352,16 +270,14 @@ services:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
     hostname: transmission
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
       - TRANSMISSION_WEB_HOME=/transmission-web-control/
     volumes:
-      - transmission_config:/config
-      - downloads_volume:/downloads
+      - /home/joe/usenet/config/transmission:/config
+      - /home/joe/usenet/downloads:/downloads
       - /home/joe/usenet/downloads/watch:/watch
     ports:
       - "9092:9091"
@@ -392,15 +308,13 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     hostname: sonarr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - sonarr_config:/config
-      - downloads_volume:/downloads
+      - /home/joe/usenet/config/sonarr:/config
+      - /home/joe/usenet/downloads:/downloads
       # Multi-drive TV storage mounts
       - /media/joe/Fast_8TB_1:/tv/fast1:rw
       - /media/joe/Fast_8TB_2:/tv/fast2:rw
@@ -440,15 +354,13 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     hostname: radarr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - radarr_config:/config
-      - downloads_volume:/downloads
+      - /home/joe/usenet/config/radarr:/config
+      - /home/joe/usenet/downloads:/downloads
       # Multi-drive Movie storage mounts
       - /media/joe/Fast_8TB_1:/movies/fast1:rw
       - /media/joe/Fast_8TB_2:/movies/fast2:rw
@@ -488,14 +400,12 @@ services:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
     hostname: bazarr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - bazarr_config:/config
+      - /home/joe/usenet/config/bazarr:/config
       # Same storage mounts as Sonarr/Radarr for subtitle access
       - /media/joe/Fast_8TB_1:/movies/fast1:rw
       - /media/joe/Fast_8TB_2:/movies/fast2:rw
@@ -544,14 +454,12 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     hostname: prowlarr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - prowlarr_config:/config
+      - /home/joe/usenet/config/prowlarr:/config
     ports:
       - "9696:9696"
     restart: unless-stopped
@@ -578,15 +486,13 @@ services:
     image: hotio/whisparr:nightly
     container_name: whisparr
     hostname: whisparr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
       - /home/joe/usenet/config/whisparr:/config
-      - downloads_volume:/downloads
+      - /home/joe/usenet/downloads:/downloads
       - /home/joe/usenet/media/movies:/movies
       - /home/joe/usenet/media/tv:/tv
     ports:
@@ -612,15 +518,13 @@ services:
     image: hotio/readarr:latest
     container_name: readarr
     hostname: readarr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
       - /home/joe/usenet/config/readarr:/config
-      - downloads_volume:/downloads
+      - /home/joe/usenet/downloads:/downloads
       - /home/joe/usenet/media/books:/books
     ports:
       - "8787:8787"
@@ -642,15 +546,13 @@ services:
     image: linuxserver/mylar3:latest
     container_name: mylar
     hostname: mylar
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
       - /home/joe/usenet/config/mylar:/config
-      - downloads_volume:/downloads
+      - /home/joe/usenet/downloads:/downloads
       - /home/joe/usenet/media/comics:/comics
     ports:
       - "8090:8090"
@@ -672,8 +574,6 @@ services:
     image: yacreader/yacreaderlibraryserver:latest
     container_name: yacreader
     hostname: yacreader
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
@@ -701,8 +601,6 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     hostname: jellyfin
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
@@ -735,8 +633,6 @@ services:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
     hostname: overseerr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
@@ -763,8 +659,6 @@ services:
     image: ghcr.io/recyclarr/recyclarr:latest
     container_name: recyclarr
     hostname: recyclarr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
@@ -789,8 +683,6 @@ services:
     image: ghcr.io/haveagitgat/tdarr:latest
     container_name: tdarr
     hostname: tdarr
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000
@@ -838,8 +730,6 @@ services:
     image: nginx:alpine
     container_name: usenet-docs
     hostname: docs
-    networks:
-      - media_network
     volumes:
       - /home/joe/usenet/docs/.vitepress/dist:/usr/share/nginx/html:ro
     ports:
@@ -870,8 +760,6 @@ services:
     image: stashapp/stash:latest
     container_name: stash
     hostname: stash
-    networks:
-      - media_network
     environment:
       - PUID=1000
       - PGID=1000

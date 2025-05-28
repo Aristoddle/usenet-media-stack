@@ -162,6 +162,74 @@ check_docker_status() {
 ##############################################################################
 
 #=============================================================================
+# Function: check_port_conflicts
+# Description: Check for port conflicts before starting services
+#
+# Detects if any ports required by the stack are already in use and provides
+# guidance on resolution. This prevents Docker bind errors and provides
+# actionable feedback to users.
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - No conflicts detected
+#   1 - Conflicts detected (with guidance)
+#=============================================================================
+check_port_conflicts() {
+    local -a required_ports=(
+        "8080:SABnzbd"
+        "9092:Transmission" 
+        "8989:Sonarr"
+        "7878:Radarr"
+        "6767:Bazarr"
+        "9696:Prowlarr"
+        "8787:Readarr"
+        "8090:Mylar3"
+        "8082:YACReader"
+        "8096:Jellyfin"
+        "5055:Overseerr"
+        "8265:Tdarr"
+        "19999:Netdata"
+        "9000:Portainer"
+        "139:Samba"
+        "445:Samba"
+        "2049:NFS"
+        "9999:Stash"
+    )
+    
+    local conflicts=0
+    local -a conflict_details=()
+    
+    for port_service in "${required_ports[@]}"; do
+        local port="${port_service%%:*}"
+        local service="${port_service##*:}"
+        
+        if netstat -tln 2>/dev/null | grep -q ":${port} "; then
+            conflicts=1
+            conflict_details+=("Port $port ($service) is already in use")
+        fi
+    done
+    
+    if [[ $conflicts -eq 1 ]]; then
+        warning "Port conflicts detected:"
+        for detail in "${conflict_details[@]}"; do
+            print "  • $detail"
+        done
+        print
+        info "Resolution options:"
+        print "  1. Stop conflicting services: './usenet --stop' then retry"
+        print "  2. Kill specific processes: 'sudo fuser -k <port>/tcp'"
+        print "  3. Reboot system to clear all port bindings"
+        print "  4. Check for other Docker containers: 'docker ps'"
+        print
+        return 1
+    fi
+    
+    return 0
+}
+
+#=============================================================================
 # Function: start_services
 # Description: Start all or specific services
 #
@@ -181,6 +249,32 @@ check_docker_status() {
 #=============================================================================
 start_services() {
     local service="${1:-}"
+    
+    # Initialize intelligent orchestration system
+    local orchestrator_path="${SCRIPT_DIR:h}/core/intelligent-orchestrator.zsh"
+    if [[ -f "$orchestrator_path" ]]; then
+        info "🧠 Initializing intelligent orchestration..."
+        source "$orchestrator_path"
+        
+        # Run comprehensive diagnostics
+        if ! diagnose_docker_state; then
+            warning "Issues detected - attempting intelligent auto-fix..."
+            if intelligent_auto_fix; then
+                info "✅ Auto-fix successful - proceeding with startup"
+            else
+                error "Auto-fix failed - manual intervention required"
+                return 1
+            fi
+        fi
+    else
+        # Fallback to basic conflict checking
+        if [[ -z "$service" ]]; then
+            if ! check_port_conflicts; then
+                error "Cannot start services due to port conflicts"
+                return 1
+            fi
+        fi
+    fi
     
     if [[ -n "$service" ]]; then
         info "Starting $service..."
