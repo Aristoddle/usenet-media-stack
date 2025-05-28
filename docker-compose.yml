@@ -130,11 +130,11 @@ services:
       - SYS_ADMIN
     privileged: true
     volumes:
-      - /media/joe:/media/joe:rw
+      - /home/joe/usenet/media:/media:rw
       - /home/joe/usenet/downloads:/downloads:rw
       - /home/joe/usenet/config:/config:rw
     environment:
-      - SHARED_DIRECTORY=/media/joe
+      - SHARED_DIRECTORY=/media
       - SHARED_DIRECTORY_2=/downloads
       - SHARED_DIRECTORY_3=/config
       - SYNC=true
@@ -273,7 +273,7 @@ services:
       - /home/joe/usenet/downloads:/downloads
       - /home/joe/usenet/downloads/watch:/watch
     ports:
-      - "9092:9091"
+      - "9093:9091"
       - "51413:51413"
       - "51413:51413/udp"
     restart: unless-stopped
@@ -559,7 +559,7 @@ services:
       - /home/joe/usenet/config/yacreader:/config
       - /home/joe/usenet/media/comics:/comics
     ports:
-      - "8082:8080"
+      - "8083:8080"
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -765,7 +765,7 @@ services:
       - /home/joe/usenet/media/tv:/tv:rw
       - /home/joe/usenet/media/tv:/tv:rw
     ports:
-      - "9999:9999"
+      - "9998:9999"
     restart: unless-stopped
     logging:
       driver: "json-file"

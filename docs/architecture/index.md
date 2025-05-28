@@ -39,11 +39,10 @@ Three core principles make this system work reliably across any hardware setup:
 - **NFS** (2049) - Unix/Linux file sharing
 - **Cloudflare Tunnel** - Secure remote access
 
-### **📊 Monitoring & Management (4 Services)**
+### **📊 Monitoring & Management (3 Services)**
 - **Netdata** (19999) - Real-time system monitoring
 - **Portainer** (9000) - Docker container management
-- **Jackett** (9117) - Torrent tracker proxy
-- **Whisparr** + **Mylar3** - Specialized content automation
+- **Mylar3** (8090) - Comic/graphic novel automation
 
 </details>
 

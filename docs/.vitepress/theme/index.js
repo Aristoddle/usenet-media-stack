@@ -6,7 +6,7 @@ import DefaultTheme from 'vitepress/theme'
 // import CLISimulator from '../components/CLISimulator.vue'
 // import GuidedTour from '../components/GuidedTour.vue'
 import AnimatedHero from '../components/AnimatedHero.vue'
-// import InteractiveCLIDemo from '../components/InteractiveCLIDemo.vue'
+import InteractiveCLIDemo from '../components/InteractiveCLIDemo.vue'
 import PathSelector from '../components/PathSelector.vue'
 // import PerformanceBenchmarks from '../components/PerformanceBenchmarks.vue'
 // import ServiceNetworkTopology from '../components/ServiceNetworkTopology.vue'
@@ -22,7 +22,7 @@ export default {
     // app.component('CLISimulator', CLISimulator)
     // app.component('GuidedTour', GuidedTour)
     app.component('AnimatedHero', AnimatedHero)
-    // app.component('InteractiveCLIDemo', InteractiveCLIDemo)
+    app.component('InteractiveCLIDemo', InteractiveCLIDemo)
     app.component('PathSelector', PathSelector)
     // app.component('PerformanceBenchmarks', PerformanceBenchmarks)
     // app.component('ServiceNetworkTopology', ServiceNetworkTopology)
