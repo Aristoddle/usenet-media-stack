@@ -288,13 +288,38 @@ start_services() {
     else
         info "Starting all services..."
         if docker compose up -d; then
-            success "All services started"
+            # Wait for services to stabilize and check health
+            info "Waiting for services to stabilize..."
+            sleep 10
             
-            # Show status
-            print "\n${COLOR_BOLD}Service Status:${COLOR_RESET}"
-            docker compose ps --format "table {{.Service}}\t{{.Status}}" | head -20
+            # Check if services are actually running (not just created)
+            local failed_services=()
+            local service_list
+            service_list=$(docker compose ps --services)
             
-            return 0
+            for service in ${(@f)service_list}; do
+                local status=$(docker compose ps "$service" --format "{{.Status}}")
+                if [[ "$status" != *"Up"* ]]; then
+                    failed_services+=("$service")
+                fi
+            done
+            
+            if [[ ${#failed_services[@]} -gt 0 ]]; then
+                warning "Some services failed to start properly:"
+                for service in "${failed_services[@]}"; do
+                    error "  ✗ $service"
+                done
+                info "Use './usenet --status' to check service health"
+                return 1
+            else
+                success "All services started and running"
+                
+                # Show status
+                print "\n${COLOR_BOLD}Service Status:${COLOR_RESET}"
+                docker compose ps --format "table {{.Service}}\t{{.Status}}" | head -20
+                
+                return 0
+            fi
         else
             error "Failed to start services"
             return 1
@@ -377,14 +402,38 @@ restart_services() {
     else
         info "Restarting all services..."
         if docker compose restart; then
-            success "All services restarted"
+            # Wait for services to stabilize and check health
+            info "Waiting for services to stabilize after restart..."
+            sleep 10
             
-            # Show status after restart
-            sleep 5
-            print "\n${COLOR_BOLD}Service Status:${COLOR_RESET}"
-            docker compose ps --format "table {{.Service}}\t{{.Status}}" | head -20
+            # Check if services are actually running after restart
+            local failed_services=()
+            local service_list
+            service_list=$(docker compose ps --services)
             
-            return 0
+            for service in ${(@f)service_list}; do
+                local status=$(docker compose ps "$service" --format "{{.Status}}")
+                if [[ "$status" != *"Up"* ]]; then
+                    failed_services+=("$service")
+                fi
+            done
+            
+            if [[ ${#failed_services[@]} -gt 0 ]]; then
+                warning "Some services failed to restart properly:"
+                for service in "${failed_services[@]}"; do
+                    error "  ✗ $service"
+                done
+                info "Use './usenet --status' to check service health"
+                return 1
+            else
+                success "All services restarted successfully"
+                
+                # Show status after restart
+                print "\n${COLOR_BOLD}Service Status:${COLOR_RESET}"
+                docker compose ps --format "table {{.Service}}\t{{.Status}}" | head -20
+                
+                return 0
+            fi
         else
             error "Failed to restart services"
             return 1

@@ -84,6 +84,8 @@ docs/.vitepress/dist/hashmap.json
 
 # Keep intelligence data but ignore temporary files
 !.intelligence/
+!.intelligence/*.log
+!.intelligence/*.md
 .intelligence/*.tmp
 
 # Config database and log files
