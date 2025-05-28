@@ -1,0 +1,28 @@
+{
+  "projects": {
+    "/home/joe/usenet": {
+      "allowedTools": [],
+      "mcpServers": {
+        "filesystem": {
+          "command": "npx",
+          "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/joe"],
+          "env": {}
+        },
+        "github-backup": {
+          "command": "npx", 
+          "args": ["-y", "@modelcontextprotocol/server-github"],
+          "env": {
+            "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+          }
+        },
+        "memory-backup": {
+          "command": "npx",
+          "args": ["-y", "@modelcontextprotocol/server-memory"],
+          "env": {}
+        }
+      },
+      "enableAllProjectMcpServers": true,
+      "hasTrustDialogAccepted": true
+    }
+  }
+}
