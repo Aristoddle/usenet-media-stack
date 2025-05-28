@@ -1,24 +1,24 @@
 #!/usr/bin/env zsh
 ##############################################################################
-# File: ./lib/commands/deploy.zsh  
+# File: ./lib/commands/deploy.zsh
 # Project: Usenet Media Stack
-# Description: Unified deployment command - the portfolio centerpiece
+# Description: Production-ready deployment with systematic port conflict resolution
 # Author: Joseph Lanzone <mailto:j3lanzone@gmail.com>
 # Created: 2025-05-25
-# Modified: 2025-05-25
-# Version: 1.0.0
+# Modified: 2025-05-27
+# Version: 2.0.0
 # License: MIT
 #
-# The deploy command is the crown jewel - a single command that demonstrates
-# both technical depth and product intuition. It orchestrates hardware 
-# detection, storage configuration, validation, and service deployment into
-# a seamless "just fucking works" experience.
+# Implements systematic deployment workflow based on lessons learned from
+# manual port conflict resolution. This version automatically handles:
+# - Orphaned docker-proxy process cleanup
+# - System service conflicts (Samba, NFS, RPC)
+# - Development server conflicts
+# - Pre-deployment validation with auto-fix
+# - Service deployment monitoring
+# - Post-deployment verification
 #
-# This command showcases:
-# - Workflow orchestration (systems thinking)
-# - Error handling and recovery (operational maturity) 
-# - User experience design (product intuition)
-# - Professional CLI patterns (industry standards)
+# Built using beam search problem-solving methodology from memory-backup MCP.
 ##############################################################################
 
 ##############################################################################
@@ -629,6 +629,195 @@ parse_deploy_options() {
 ##############################################################################
 
 #=============================================================================
+# Function: deploy_with_port_resolution
+# Description: Production deployment with systematic port conflict resolution
+#
+# Arguments:
+#   $@ - Command line arguments
+#
+# Returns:
+#   0 - Deployment completed successfully
+#   1 - Deployment failed
+#=============================================================================
+deploy_with_port_resolution() {
+    local auto_fix=false
+    local force_deploy=false
+    local validate_only=false
+    
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --auto|--fix)
+                auto_fix=true
+                shift
+                ;;
+            --force)
+                force_deploy=true
+                shift
+                ;;
+            --validate-only)
+                validate_only=true
+                shift
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+    
+    print "${COLOR_BOLD}🚀 Production Deployment with Port Conflict Resolution${COLOR_RESET}"
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    # Phase 1: Pre-deployment validation with auto-fix
+    if [[ "$force_deploy" != "true" ]]; then
+        print "\n${COLOR_BLUE}Phase 1: System Validation & Conflict Resolution${COLOR_RESET}"
+        
+        export FIX_ISSUES="$auto_fix"
+        local validation_cmd="${PROJECT_ROOT}/lib/commands/validate.zsh"
+        
+        if [[ "$auto_fix" == "true" ]]; then
+            info "Running validation with automatic conflict resolution..."
+        else
+            info "Running validation (use --auto for automatic fixes)..."
+        fi
+        
+        local validation_success=false
+        if [[ "$auto_fix" == "true" ]]; then
+            if "$validation_cmd" all --fix; then
+                validation_success=true
+            fi
+        else
+            if "$validation_cmd" all; then
+                validation_success=true
+            fi
+        fi
+        
+        if [[ "$validation_success" != "true" ]]; then
+            error "Pre-deployment validation failed"
+            if [[ "$auto_fix" != "true" ]]; then
+                info "Resolution options:"
+                info "  1. Run 'usenet deploy --auto' for automatic conflict resolution"
+                info "  2. Fix issues manually and re-run deployment"
+            fi
+            return 1
+        fi
+        
+        success "✅ System validation passed!"
+        
+        if [[ "$validate_only" == "true" ]]; then
+            info "Validation complete (--validate-only specified)"
+            return 0
+        fi
+    else
+        warning "⚠️  Skipping validation (--force specified)"
+    fi
+    
+    # Phase 2: Service deployment
+    print "\n${COLOR_BLUE}Phase 2: Docker Service Deployment${COLOR_RESET}"
+    
+    info "Starting Docker Compose deployment..."
+    
+    if ! docker compose up -d; then
+        error "Docker Compose deployment failed"
+        info "Checking for specific service failures..."
+        
+        # Show failed services
+        local failed_services=$(docker compose ps --filter "status=exited" --format "table {{.Service}}\t{{.Status}}")
+        if [[ -n "$failed_services" ]]; then
+            warning "Failed services detected:"
+            echo "$failed_services"
+        fi
+        
+        return 1
+    fi
+    
+    # Monitor service startup
+    info "Monitoring service startup progress..."
+    local max_wait=60
+    local wait_count=0
+    
+    while [[ $wait_count -lt $max_wait ]]; do
+        local running_count=$(docker compose ps --format "json" | jq -r '.[] | select(.State == "running") | .Service' 2>/dev/null | wc -l)
+        local total_count=$(docker compose ps --format "json" | jq -r '.[].Service' 2>/dev/null | wc -l)
+        
+        if [[ $running_count -eq $total_count ]]; then
+            success "All $total_count services are running!"
+            break
+        fi
+        
+        info "Services starting: $running_count/$total_count running..."
+        sleep 2
+        ((wait_count += 2))
+    done
+    
+    # Phase 3: Post-deployment verification
+    print "\n${COLOR_BLUE}Phase 3: Service Verification${COLOR_RESET}"
+    
+    local verification_errors=0
+    
+    # Service status check
+    local service_status=$(docker compose ps --format "table {{.Service}}\t{{.Status}}\t{{.Ports}}")
+    local running_count=$(echo "$service_status" | grep -c "Up" || echo "0")
+    local total_count=$(docker compose config --services | wc -l)
+    
+    if [[ $running_count -eq $total_count ]]; then
+        success "✅ All $total_count services are running"
+    else
+        warning "⚠️  Service status: $running_count/$total_count running"
+        ((verification_errors++))
+    fi
+    
+    # Key service connectivity check
+    info "Testing service connectivity..."
+    local key_services=(
+        "8096:Jellyfin"
+        "9696:Prowlarr"  
+        "8989:Sonarr"
+        "7878:Radarr"
+        "8080:SABnzbd"
+        "5055:Overseerr"
+    )
+    
+    local responding_services=0
+    for service in $key_services; do
+        local port=${service%%:*}
+        local name=${service##*:}
+        
+        if curl -s --connect-timeout 2 --max-time 5 "http://localhost:$port" >/dev/null 2>&1; then
+            success "✓ $name responding on port $port"
+            ((responding_services++))
+        else
+            warning "⚠️  $name not responding on port $port (may still be starting)"
+        fi
+    done
+    
+    # Deployment summary
+    print "\n${COLOR_BOLD}📊 Deployment Summary${COLOR_RESET}"
+    print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    echo "$service_status"
+    
+    if [[ $verification_errors -eq 0 && $responding_services -eq ${#key_services[@]} ]]; then
+        print "\n${COLOR_GREEN}🎉 Deployment completed successfully!${COLOR_RESET}"
+        
+        print "\n${COLOR_BOLD}Access your services:${COLOR_RESET}"
+        print "  • Jellyfin (Media Server): http://localhost:8096"
+        print "  • Overseerr (Requests): http://localhost:5055"
+        print "  • Prowlarr (Indexers): http://localhost:9696"
+        print "  • Sonarr (TV): http://localhost:8989"
+        print "  • Radarr (Movies): http://localhost:7878"
+        print "  • SABnzbd (Downloads): http://localhost:8080"
+        print "  • Portainer (Management): http://localhost:9000"
+        
+        return 0
+    else
+        warning "⚠️  Deployment completed with issues"
+        info "Run 'usenet services list' to check service status"
+        return 1
+    fi
+}
+
+#=============================================================================
 # Function: main
 # Description: Main deployment orchestration
 #
@@ -641,6 +830,14 @@ parse_deploy_options() {
 #=============================================================================
 main() {
     local action="${1:-deploy}"
+    
+    # Check for new deployment method with automatic conflict resolution
+    for arg in "$@"; do
+        if [[ "$arg" == "--auto" ]] || [[ "$arg" == "--fix" ]]; then
+            deploy_with_port_resolution "$@"
+            return $?
+        fi
+    done
     
     # Handle help request
     if [[ "$action" == "help" ]] || [[ "$action" == "--help" ]] || [[ "$action" == "-h" ]]; then

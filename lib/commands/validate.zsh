@@ -537,29 +537,358 @@ validate_network() {
         ((errors++))
     fi
     
-    # Check port availability for common services
-    local services=(
-        "8989:Sonarr"
-        "7878:Radarr" 
+    # Comprehensive port conflict validation
+    validate_port_conflicts || ((errors += $?))
+    
+    return $errors
+}
+
+#=============================================================================
+# Function: validate_port_conflicts
+# Description: Comprehensive port conflict detection and resolution
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   0 - No port conflicts
+#   N - Number of port conflicts found
+#=============================================================================
+validate_port_conflicts() {
+    local errors=0
+    local fix_issues=${FIX_ISSUES:-false}
+    
+    info "Comprehensive port conflict analysis..."
+    
+    # Complete port mapping from docker-compose.yml
+    local required_ports=(
+        "111:NFS Portmapper"
+        "139:Samba NetBIOS"
+        "445:Samba SMB"
+        "2049:NFS Server"
+        "4173:Documentation Site"
+        "5055:Overseerr"
+        "6767:Bazarr"
+        "6969:Whisparr"
+        "7878:Radarr"
+        "8000:Portainer Data"
         "8080:SABnzbd"
-        "9696:Prowlarr"
+        "8083:YACReader"
+        "8090:Mylar3"
         "8096:Jellyfin"
+        "8265:Tdarr Server"
+        "8266:Tdarr Web"
+        "8787:Readarr"
+        "8989:Sonarr"
+        "9000:Portainer"
+        "9093:Transmission Web"
+        "9696:Prowlarr"
+        "9998:Stash"
+        "19999:Netdata"
+        "51413:Transmission P2P"
     )
     
-    info "Checking port availability..."
-    for service in $services; do
+    local conflicts_found=()
+    local orphaned_docker_proxies=()
+    local system_services=()
+    
+    # Analyze each required port
+    for service in $required_ports; do
         local port=${service%%:*}
         local name=${service##*:}
         
-        if netstat -tuln 2>/dev/null | grep -q ":$port "; then
-            warning "Port $port already in use (needed for $name)"
+        # Check what's using this port
+        local lsof_output=$(sudo lsof -i :$port 2>/dev/null)
+        
+        if [[ -n "$lsof_output" ]]; then
+            # Parse the output to identify the type of conflict
+            local process_info=$(echo "$lsof_output" | tail -n +2)
+            
+            # First check if this is our Docker services running correctly
+            if docker compose ps --format "table {{.Service}}\t{{.Status}}" 2>/dev/null | grep -q "Up"; then
+                # Check if this port belongs to our running services
+                local our_service_ports=$(docker compose ps --format "json" 2>/dev/null | jq -r '.[] | select(.State == "running") | .Publishers[]?.PublishedPort // empty' 2>/dev/null | sort -n)
+                
+                if echo "$our_service_ports" | grep -q "^$port$"; then
+                    # This port is used by our correctly running services
+                    success "Port $port in use by running $name service ✓"
+                    continue
+                fi
+            fi
+            
+            if echo "$process_info" | grep -q "docker-pr"; then
+                # Orphaned docker-proxy process (not our running services)
+                local pids=$(echo "$process_info" | awk '$1 ~ /docker-pr/ {print $2}' | tr '\n' ' ')
+                orphaned_docker_proxies+=("$port:$name:$pids")
+                error "Port $port ($name) blocked by orphaned docker-proxy processes: $pids"
+            elif echo "$process_info" | grep -qE "(smbd|nmbd|rpcbind|nfs|systemd)"; then
+                # System service conflict
+                local service_name=$(echo "$process_info" | awk 'NR==1 {print $1}')
+                system_services+=("$port:$name:$service_name")
+                error "Port $port ($name) blocked by system service: $service_name"
+            else
+                # Other process conflict - but check if it's Docker Desktop managing our services
+                local process_name=$(echo "$process_info" | awk 'NR==1 {print $1}')
+                local pid=$(echo "$process_info" | awk 'NR==1 {print $2}')
+                
+                if [[ "$process_name" =~ "com.docke" ]] && docker compose ps --services 2>/dev/null | grep -q .; then
+                    # This is likely Docker Desktop managing our services - check if service is actually running
+                    local service_status=$(docker compose ps --format "table {{.Service}}\t{{.Ports}}" 2>/dev/null | grep ":$port->" || true)
+                    if [[ -n "$service_status" ]]; then
+                        success "Port $port in use by running Docker service ✓"
+                        continue
+                    fi
+                fi
+                
+                conflicts_found+=("$port:$name:$process_name:$pid")
+                error "Port $port ($name) blocked by process: $process_name (PID $pid)"
+            fi
             ((errors++))
         else
             success "Port $port available for $name"
         fi
     done
     
+    # Show summary and resolution options
+    if [[ $errors -gt 0 ]]; then
+        print ""
+        warning "Found $errors port conflict(s)"
+        
+        if [[ ${#orphaned_docker_proxies[@]} -gt 0 ]]; then
+            info "Orphaned docker-proxy processes found: ${#orphaned_docker_proxies[@]}"
+            for conflict in $orphaned_docker_proxies; do
+                local port=${conflict%%:*}
+                local name=$(echo $conflict | cut -d: -f2)
+                local pids=$(echo $conflict | cut -d: -f3-)
+                info "  Port $port ($name): PIDs $pids"
+            done
+        fi
+        
+        if [[ ${#system_services[@]} -gt 0 ]]; then
+            info "System service conflicts found: ${#system_services[@]}"
+            for conflict in $system_services; do
+                local port=${conflict%%:*}
+                local name=$(echo $conflict | cut -d: -f2)
+                local service=$(echo $conflict | cut -d: -f3)
+                info "  Port $port ($name): $service"
+            done
+        fi
+        
+        if [[ ${#conflicts_found[@]} -gt 0 ]]; then
+            info "Other process conflicts found: ${#conflicts_found[@]}"
+            for conflict in $conflicts_found; do
+                local port=${conflict%%:*}
+                local name=$(echo $conflict | cut -d: -f2)
+                local process=$(echo $conflict | cut -d: -f3)
+                local pid=$(echo $conflict | cut -d: -f4)
+                info "  Port $port ($name): $process (PID $pid)"
+            done
+        fi
+        
+        if [[ "$fix_issues" == "true" ]]; then
+            info "Attempting automatic conflict resolution..."
+            resolve_port_conflicts "${orphaned_docker_proxies[*]}" "${system_services[*]}" "${conflicts_found[*]}"
+            return $?
+        else
+            print ""
+            info "Resolution options:"
+            info "  1. Run with --fix to attempt automatic resolution"
+            info "  2. Manual resolution commands:"
+            
+            if [[ ${#orphaned_docker_proxies[@]} -gt 0 ]]; then
+                info "     # Clean orphaned docker-proxy processes:"
+                for conflict in $orphaned_docker_proxies; do
+                    local pids=$(echo $conflict | cut -d: -f3-)
+                    info "     sudo kill $pids"
+                done
+            fi
+            
+            if [[ ${#system_services[@]} -gt 0 ]]; then
+                info "     # Disable conflicting system services:"
+                for conflict in $system_services; do
+                    local service=$(echo $conflict | cut -d: -f3)
+                    case "$service" in
+                        smbd|nmbd)
+                            info "     sudo systemctl stop smbd nmbd && sudo systemctl disable smbd nmbd"
+                            ;;
+                        rpcbind)
+                            info "     sudo systemctl stop rpcbind rpcbind.socket && sudo systemctl disable rpcbind rpcbind.socket"
+                            ;;
+                        *)
+                            info "     sudo systemctl stop $service && sudo systemctl disable $service"
+                            ;;
+                    esac
+                done
+            fi
+            
+            if [[ ${#conflicts_found[@]} -gt 0 ]]; then
+                info "     # Kill other conflicting processes:"
+                for conflict in $conflicts_found; do
+                    local pid=$(echo $conflict | cut -d: -f4)
+                    info "     sudo kill $pid"
+                done
+            fi
+        fi
+    else
+        success "All required ports are available"
+    fi
+    
     return $errors
+}
+
+#=============================================================================
+# Function: resolve_port_conflicts
+# Description: Automatically resolve detected port conflicts
+#
+# Arguments:
+#   $1 - Array of orphaned docker-proxy conflicts
+#   $2 - Array of system service conflicts  
+#   $3 - Array of other process conflicts
+#
+# Returns:
+#   0 - All conflicts resolved
+#   1 - Some conflicts could not be resolved
+#=============================================================================
+resolve_port_conflicts() {
+    # Arrays are passed as space-separated strings
+    local orphaned_proxies_str="$1"
+    local system_services_str="$2" 
+    local other_conflicts_str="$3"
+    local resolution_errors=0
+    
+    # Convert strings back to arrays
+    local orphaned_proxies=(${(s/ /)orphaned_proxies_str})
+    local system_services=(${(s/ /)system_services_str})
+    local other_conflicts=(${(s/ /)other_conflicts_str})
+    
+    info "Starting automatic port conflict resolution..."
+    
+    # 1. Clean orphaned docker-proxy processes
+    if [[ ${#orphaned_proxies[@]} -gt 0 ]]; then
+        info "Cleaning orphaned docker-proxy processes..."
+        for conflict in $orphaned_proxies; do
+            local port=${conflict%%:*}
+            local name=$(echo $conflict | cut -d: -f2)
+            local pids=$(echo $conflict | cut -d: -f3-)
+            
+            info "Killing docker-proxy PIDs for port $port ($name): $pids"
+            if sudo kill $pids 2>/dev/null; then
+                success "Cleaned docker-proxy processes for port $port"
+            else
+                error "Failed to kill docker-proxy processes for port $port"
+                ((resolution_errors++))
+            fi
+        done
+    fi
+    
+    # 2. Disable conflicting system services
+    if [[ ${#system_services[@]} -gt 0 ]]; then
+        info "Disabling conflicting system services..."
+        for conflict in $system_services; do
+            local port=${conflict%%:*}
+            local name=$(echo $conflict | cut -d: -f2)
+            local service=$(echo $conflict | cut -d: -f3)
+            
+            case "$service" in
+                smbd|nmbd)
+                    info "Stopping system Samba services..."
+                    if sudo systemctl stop smbd nmbd 2>/dev/null && sudo systemctl disable smbd nmbd 2>/dev/null; then
+                        success "Disabled system Samba services (port $port will use Docker Samba)"
+                    else
+                        error "Failed to disable system Samba services"
+                        ((resolution_errors++))
+                    fi
+                    ;;
+                rpcbind)
+                    info "Stopping system RPC services..."
+                    if sudo systemctl stop rpcbind rpcbind.socket 2>/dev/null && sudo systemctl disable rpcbind rpcbind.socket 2>/dev/null; then
+                        success "Disabled system RPC services (port $port will use Docker NFS)"
+                    else
+                        error "Failed to disable system RPC services"
+                        ((resolution_errors++))
+                    fi
+                    ;;
+                nfs-server)
+                    info "Stopping system NFS server..."
+                    if sudo systemctl stop nfs-server 2>/dev/null && sudo systemctl disable nfs-server 2>/dev/null; then
+                        success "Disabled system NFS server (port $port will use Docker NFS)"
+                    else
+                        error "Failed to disable system NFS server"
+                        ((resolution_errors++))
+                    fi
+                    ;;
+                *)
+                    warning "Unknown system service: $service - manual intervention required"
+                    ((resolution_errors++))
+                    ;;
+            esac
+        done
+    fi
+    
+    # 3. Handle other process conflicts (more carefully)
+    if [[ ${#other_conflicts[@]} -gt 0 ]]; then
+        warning "Other process conflicts require manual review:"
+        for conflict in $other_conflicts; do
+            local port=${conflict%%:*}
+            local name=$(echo $conflict | cut -d: -f2)
+            local process=$(echo $conflict | cut -d: -f3)
+            local pid=$(echo $conflict | cut -d: -f4)
+            
+            # Only auto-kill safe processes
+            case "$process" in
+                node|npm|yarn|dev-server|vitepress)
+                    info "Killing development server: $process (PID $pid)"
+                    if kill $pid 2>/dev/null; then
+                        success "Killed development server on port $port"
+                    else
+                        error "Failed to kill development server (PID $pid)"
+                        ((resolution_errors++))
+                    fi
+                    ;;
+                gvfsd-smb)
+                    info "Killing GNOME virtual filesystem process: $process (PID $pid)"
+                    if kill $pid 2>/dev/null; then
+                        success "Killed GNOME VFS process on port $port"
+                    else
+                        error "Failed to kill GNOME VFS process (PID $pid)"
+                        ((resolution_errors++))
+                    fi
+                    ;;
+                *)
+                    warning "Process $process (PID $pid) on port $port requires manual intervention"
+                    info "Run: sudo kill $pid"
+                    ((resolution_errors++))
+                    ;;
+            esac
+        done
+    fi
+    
+    # 4. Verify resolution
+    if [[ $resolution_errors -eq 0 ]]; then
+        info "Verifying port conflict resolution..."
+        sleep 2  # Allow time for services to fully stop
+        
+        # Re-check ports briefly
+        local remaining_conflicts=0
+        for conflict in $orphaned_proxies $system_services; do
+            local port=${conflict%%:*}
+            if sudo lsof -i :$port >/dev/null 2>&1; then
+                ((remaining_conflicts++))
+            fi
+        done
+        
+        if [[ $remaining_conflicts -eq 0 ]]; then
+            success "All port conflicts resolved successfully!"
+            info "System is ready for service deployment"
+            return 0
+        else
+            warning "$remaining_conflicts port conflicts still remain"
+            return 1
+        fi
+    else
+        error "$resolution_errors conflicts could not be resolved automatically"
+        return 1
+    fi
 }
 
 #=============================================================================
