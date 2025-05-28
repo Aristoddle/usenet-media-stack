@@ -2,35 +2,40 @@
 layout: page
 ---
 
-# Digital Liberation Stack
+# Usenet Media Stack
 
-**Break free from paywalls. Access humanity's knowledge without restrictions.**
+**Working media services with honest documentation and visual validation.**
 
-The tools corporations don't want you to have: 70M+ books from Anna's Archive, zero-restriction academic papers, complete media automation, and your data under your control.
+7 confirmed operational services providing media streaming, automation, and management.
 
-<PathSelector />
+<ServiceStatus />
 
 <div style="text-align: center; margin: 3rem 0;">
-  <a href="/getting-started/" style="display: inline-block; background: linear-gradient(135deg, #C41E3A 0%, #FF6B35 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">⚡ Start Your Liberation</a>
-  <a href="/free-media/" style="display: inline-block; background: linear-gradient(135deg, #00FF41 0%, #1A1A1A 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">📚 Access Free Resources</a>
+  <a href="/getting-started/" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">🚀 Deploy Working Services</a>
+  <a href="/docs/SERVICES/" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1.1rem; margin: 0.5rem;">📸 View Screenshots</a>
 </div>
 
-<p style="text-align: center; color: #64748b; font-size: 0.9rem;">Works on Linux • Takes 5 minutes • Free & open source</p>
+<p style="text-align: center; color: #64748b; font-size: 0.9rem;">Tested on 2025-05-28 • Visual validation • Real functionality</p>
 
 ---
 
-## ✅ Why Digital Liberation Matters
+## ✅ What Actually Works
 
-### **You need this if:**
-- You believe knowledge should be free and accessible
-- You're tired of paying for information that should be public
-- You want to break free from corporate surveillance
-- You need professional-grade tools that put you in control
+### **Core Media Stack (Validated)**
+- **🎬 Jellyfin** - Full media streaming with GPU transcoding
+- **🔍 Prowlarr** - Indexer management and search 
+- **🐳 Portainer** - Container management interface
 
-### **This isn't for you if:**
-- You're comfortable with corporate paywalls
-- You don't mind your media consumption being tracked
-- You trust Netflix/Amazon to keep your content available
+### **Content Automation (Working)**
+- **📚 Readarr** - Book and audiobook automation
+- **📝 Bazarr** - Subtitle automation (40+ languages)
+- **🎞️ Tdarr** - Video transcoding and optimization  
+- **📖 YACReader** - Comic and manga library
+
+### **Known Issues**
+- ❌ **Sonarr/Radarr** - .NET startup errors (TV/Movie automation)
+- ❌ **SABnzbd** - Configuration issues (downloader)
+- ❌ **Overseerr** - Setup loop problems (request management)
 
 ---
 
@@ -40,79 +45,84 @@ The tools corporations don't want you to have: 70M+ books from Anna's Archive, z
 
 <div style="text-align: center; padding: 1.5rem;">
   <div style="font-size: 3rem; margin-bottom: 1rem;">1️⃣</div>
-  <h3>Download & Run</h3>
-  <p>One command sets up 19 integrated services with hardware optimization</p>
+  <h3>One-Command Deploy</h3>
+  <p>Automated deployment with port conflict resolution and validation</p>
 </div>
 
 <div style="text-align: center; padding: 1.5rem;">
   <div style="font-size: 3rem; margin-bottom: 1rem;">2️⃣</div>
-  <h3>Add Your Drives</h3>
-  <p>System detects and configures any storage automatically - no manual setup</p>
+  <h3>Visual Validation</h3>
+  <p>Playwright testing confirms services work - not just containers running</p>
 </div>
 
 <div style="text-align: center; padding: 1.5rem;">
   <div style="font-size: 3rem; margin-bottom: 1rem;">3️⃣</div>
-  <h3>Access Anywhere</h3>
-  <p>Secure remote access works automatically - no port forwarding needed</p>
+  <h3>Honest Documentation</h3>
+  <p>Real functionality over aspirational claims with proof screenshots</p>
 </div>
 
 </div>
 
 ```bash
-# Literally this simple
+# Actually tested deployment
 git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
 ./usenet deploy --auto
+
+# Result: 7 working services with visual confirmation
 ```
 
 ---
 
-## 🎯 What You Get
+## 🎯 Technical Validation
 
-- **Media Automation**: Sonarr, Radarr, Prowlarr handle finding and downloading content
-- **Media Server**: Jellyfin streams everything with GPU acceleration (60+ FPS 4K transcoding)
-- **Smart Storage**: Add/remove any drives without breaking anything
-- **Remote Access**: Secure Cloudflare tunnels - access from anywhere safely
-- **Professional Tools**: CLI that actually works like professional tools should
+**Testing Methodology**:
+- ✅ **Playwright automated testing** - Visual confirmation of web interfaces
+- ✅ **Docker health checks** - Container status validation
+- ✅ **Port accessibility** - Network connectivity verification
+- ✅ **Screenshot capture** - Visual proof of functionality
 
-**Real performance**: 67 FPS 4K transcoding (vs 2.3 FPS CPU-only) • 29 drives detected automatically • 74% less power usage
-
----
-
-## 💬 Who Uses This
-
-<div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #667eea; margin: 1rem 0;">
-<p style="font-style: italic; margin-bottom: 0.5rem;">"I run this on 4 different machines and it just works. Finally don't have to reconfigure everything when I move drives around."</p>
-<p style="color: #64748b; font-size: 0.9rem; margin: 0;">— Software engineer who travels frequently</p>
-</div>
-
-<div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f093fb; margin: 1rem 0;">
-<p style="font-style: italic; margin-bottom: 0.5rem;">"The GPU acceleration actually works. 4K transcoding went from 2 FPS to 60+ FPS. My electricity bill thanks me."</p>
-<p style="color: #64748b; font-size: 0.9rem; margin: 0;">— Home lab enthusiast with AMD hardware</p>
-</div>
+**Performance Confirmed**:
+- **AMD GPU acceleration** - VAAPI transcoding working
+- **Port conflict resolution** - Automatic cleanup of orphaned processes
+- **Storage discovery** - 28+ drives detected automatically
 
 ---
 
-## 🚀 Ready to Start?
+## 💬 Honest Assessment
+
+<div style="background: #f0fdf4; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #10b981; margin: 1rem 0;">
+<p style="font-style: italic; margin-bottom: 0.5rem;">"This is what I actually use. 7 services provide real value: media streaming + search + automation for books/subtitles/comics."</p>
+<p style="color: #64748b; font-size: 0.9rem; margin: 0;">— Tested and validated 2025-05-28</p>
+</div>
+
+<div style="background: #fef2f2; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ef4444; margin: 1rem 0;">
+<p style="font-style: italic; margin-bottom: 0.5rem;">"TV/Movie automation (Sonarr/Radarr) is broken due to .NET startup errors. Working on fixes but documenting reality."</p>
+<p style="color: #64748b; font-size: 0.9rem; margin: 0;">— Known issues documented with evidence</p>
+</div>
+
+---
+
+## 🚀 Ready to Deploy?
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
 
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
-  <h3 style="margin-top: 0; color: white;">🎯 Guided Setup</h3>
-  <p>Step-by-step walkthrough with explanations</p>
-  <a href="/getting-started/" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-top: 0.5rem;">Start Here →</a>
+<div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+  <h3 style="margin-top: 0; color: white;">✅ Working Services</h3>
+  <p>Deploy the 7 confirmed working services</p>
+  <a href="/getting-started/" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-top: 0.5rem;">Deploy Now →</a>
 </div>
 
-<div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
-  <h3 style="margin-top: 0; color: white;">⚡ Quick Install</h3>
-  <p>For experienced users who know Docker</p>
-  <a href="https://github.com/Aristoddle/usenet-media-stack" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-top: 0.5rem;">GitHub →</a>
+<div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+  <h3 style="margin-top: 0; color: white;">📸 Visual Proof</h3>
+  <p>See screenshots of all working services</p>
+  <a href="/docs/SERVICES/" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-top: 0.5rem;">View Screenshots →</a>
 </div>
 
-<div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 1.5rem; border-radius: 12px; text-align: center;">
-  <h3 style="margin-top: 0;">📚 Learn More</h3>
-  <p>Understand how it works before installing</p>
-  <a href="/architecture/" style="display: inline-block; background: rgba(0,0,0,0.1); color: #333; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-top: 0.5rem;">Architecture →</a>
+<div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+  <h3 style="margin-top: 0; color: white;">🔧 Contribute</h3>
+  <p>Help fix the broken services</p>
+  <a href="https://github.com/Aristoddle/usenet-media-stack/issues" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; margin-top: 0.5rem;">GitHub Issues →</a>
 </div>
 
 </div>
@@ -122,14 +132,14 @@ cd usenet-media-stack
 ## 🤝 About
 
 <div style="display: grid; grid-template-columns: 120px 1fr; gap: 1.5rem; align-items: center; margin: 2rem 0;">
-  <img src="/images/avatar.jpg" alt="Joe" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #f093fb;">
+  <img src="/images/avatar.jpg" alt="Joe" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #10b981;">
   <div>
-    <h3 style="margin-top: 0; color: #f093fb;">Built by Joe</h3>
-    <p style="margin-bottom: 0;">I actually use this daily on 4+ different machines. Started because I was tired of media stacks breaking every time I changed something. Now it just works everywhere.</p>
+    <h3 style="margin-top: 0; color: #10b981;">Built by Joe</h3>
+    <p style="margin-bottom: 0;">Honest documentation over marketing claims. I use these 7 working services daily. The broken ones are documented as such with plans to fix them.</p>
   </div>
 </div>
 
-**Need help?** I actually respond to emails: [j3lanzone@gmail.com](mailto:j3lanzone@gmail.com?subject=Media%20Stack%20Question)
+**Contact**: [j3lanzone@gmail.com](mailto:j3lanzone@gmail.com?subject=Media%20Stack%20Question)
 
 ---
 
@@ -138,21 +148,26 @@ cd usenet-media-stack
 
 <div style="padding: 1rem;">
 
-**What's Running**: 19 integrated services (Sonarr, Radarr, Jellyfin, Prowlarr, SABnzbd, Bazarr, Overseerr, Tdarr, etc.)
+**Validated Services**: 7/19 total services working (37% success rate)
 
-**Performance**: 
-- AMD Ryzen 7 7840HS + Radeon 780M Graphics
-- 4K HEVC → 1080p: 2.3 FPS CPU → 67 FPS GPU (29x improvement)
-- Power usage: 185W CPU → 48W GPU (74% reduction)
-- Storage: 29 drives detected (ZFS, cloud, external, JBOD)
+**Testing Infrastructure**: 
+- Playwright browser automation for UI validation
+- Docker health checks for container status
+- Network connectivity testing for all ports
+- Screenshot capture for visual proof
 
-**Platform**: Linux (tested on Ubuntu, Debian, Arch)
-**Access**: Secure Cloudflare tunnels, no exposed ports
-**Storage**: Works with any mix of ZFS, cloud storage, external drives
+**Performance Verified**: 
+- AMD GPU VAAPI acceleration working
+- 28+ storage devices detected automatically
+- Port conflict resolution handles orphaned processes
+
+**Platform**: Linux (Ubuntu 24.04 tested)
+**Security**: All sensitive data in environment variables
+**Documentation**: Real screenshots and validated claims only
 
 </div>
 </details>
 
 ---
 
-*Built with care for daily use. Shared because good tools should be shared.*
+*Real functionality over aspirational claims. Tested 2025-05-28.*
