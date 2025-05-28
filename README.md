@@ -1,14 +1,14 @@
 # 🎬 Usenet Media Stack
 
-> **Professional-grade hot-swappable JBOD media automation** with intelligent deployment and "just fucking works" usability.
+> **Working media server stack** with 7 confirmed operational services including Jellyfin streaming, Prowlarr indexing, and content automation.
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![Services](https://img.shields.io/badge/Working%20Services-7%2F19-orange.svg)](docs/SERVICES.md)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20WSL-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Shell](https://img.shields.io/badge/Shell-ZSH%20%7C%20Bash-orange.svg)]()
-[![Standards](https://img.shields.io/badge/Standards-Bell%20Labs-gold.svg)](#acknowledgments)
+[![Validated](https://img.shields.io/badge/Tested-2025--05--28-green.svg)](docs/SERVICES.md)
 
-**Deploy once, add devices as needed. Hot-swap storage for portability. GPU acceleration where available.**
+**Real functionality over aspirational claims. Tested and validated working services.**
 
 ## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)**
 
@@ -35,32 +35,35 @@ cd usenet-media-stack
 ./usenet deploy --auto
 ```
 
-**Result**: 19-service media automation stack with hardware optimization and dynamic storage management.
+**Result**: 7 confirmed working services providing media streaming, search, and content automation.
 
-### **What You Get Immediately**
+### **What Actually Works** ✅
 ```bash
-# 🎬 Media Services
+# 🎬 Core Media Stack (Tested & Confirmed)
 jellyfin     (8096) # → Media streaming with GPU transcoding
-overseerr    (5055) # → Beautiful request management interface  
-yacreader    (8082) # → Comic/manga server and reader
+prowlarr     (9696) # → Indexer management for search
+portainer    (9000) # → Container management interface
 
-# 📺 Automation Stack  
-sonarr       (8989) # → TV automation with TRaSH Guide optimization
-radarr       (7878) # → Movie automation with custom quality profiles
+# 📚 Content Automation (Working)  
 readarr      (8787) # → Book/audiobook automation
-bazarr       (6767) # → Subtitle automation (40+ languages)
-prowlarr     (9696) # → Universal indexer management
+bazarr       (6767) # → Subtitle automation
+tdarr        (8265) # → Video transcoding engine
+yacreader    (8083) # → Comic/manga library
 
-# 🔧 Download & Processing
-sabnzbd      (8080) # → High-speed Usenet downloading
-transmission (9092) # → BitTorrent client with VPN protection
-tdarr        (8265) # → Automated transcoding with GPU acceleration
-recyclarr           # → TRaSH Guide auto-optimization
-
-# 📊 Management & Monitoring
-portainer    (9000) # → Docker container management
-netdata     (19999) # → Real-time system monitoring
+# ❌ Known Issues
+# sonarr/radarr - .NET startup errors (core TV/movie automation)
+# overseerr - setup loop issues  
+# sabnzbd - configuration problems
 ```
+
+### **📊 Current Status**
+- ✅ **7 services confirmed working** via automated testing
+- ✅ **Media streaming operational** (Jellyfin + transcoding)  
+- ✅ **Search infrastructure ready** (Prowlarr + indexers)
+- ✅ **Content automation partial** (Books, subtitles, comics)
+- ❌ **TV/Movie automation blocked** (Sonarr/Radarr issues)
+
+**📸 [View Service Screenshots](docs/SERVICES.md)** | **🔧 [See All Working Services](docs/SERVICES.md)**
 
 ---
 

@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "capturedAt": "2025-05-28T07:39:02.590Z",
+    "workingServices": 5,
+    "totalServices": 7,
+    "successRate": "71%"
+  },
+  "services": [
+    {
+      "service": "jellyfin",
+      "title": "Jellyfin",
+      "url": "http://localhost:8096/web/#/wizardstart.html",
+      "desc": "Media Server",
+      "features": "Stream movies, TV shows, music with hardware transcoding",
+      "status": "documented"
+    },
+    {
+      "service": "prowlarr",
+      "title": "Indexers - Prowlarr",
+      "url": "http://localhost:9696/",
+      "desc": "Indexer Manager",
+      "features": "Unified indexer management for usenet and torrent sources",
+      "status": "documented"
+    },
+    {
+      "service": "portainer",
+      "title": "Portainer",
+      "url": "http://localhost:9000/timeout.html#!/auth",
+      "desc": "Container Management",
+      "features": "Docker container management and monitoring interface",
+      "status": "documented"
+    },
+    {
+      "service": "readarr",
+      "title": "Readarr",
+      "url": "http://localhost:8787/",
+      "desc": "Book Automation",
+      "features": "Automated book and audiobook downloading and organization",
+      "status": "documented"
+    },
+    {
+      "service": "yacreader",
+      "title": "Libraries",
+      "url": "http://localhost:8083/",
+      "desc": "Comic Reader",
+      "features": "Digital comic and manga library management",
+      "status": "documented"
+    }
+  ]
+}
