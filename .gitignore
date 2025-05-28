@@ -76,4 +76,9 @@ volumes/
 
 # Allow documentation
 !README.md
-!docs/ 
+!docs/ .env
+.env.local*
+config/*/config.xml
+config/*/db/
+config/*/*.db*
+config/*/logs/

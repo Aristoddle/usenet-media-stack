@@ -111,6 +111,12 @@ show_main_help() {
     print "    --profile <name>       Use specific performance profile"
     print "    --version              Show version information"
     print ""
+    print "${COLOR_YELLOW}SERVICE MANAGEMENT (Agent-Friendly)${COLOR_RESET}"
+    print "    --start                Start all services"
+    print "    --stop, --shutdown     Stop all services"
+    print "    --restart              Restart all services" 
+    print "    --status               Show service status"
+    print ""
     print "${COLOR_YELLOW}EXAMPLES${COLOR_RESET}"
     print "    Complete deployment:"
     print "        ${COLOR_CYAN}usenet deploy${COLOR_RESET}"
@@ -408,6 +414,46 @@ route_command() {
             route_command tunnel "$@"
             ;;
             
+        # Service management flags (agent-friendly)
+        --start)
+            info "Starting all services..."
+            if [[ -x "${COMMANDS_DIR}/manage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/manage.zsh" start "$@"
+            else
+                error "Management command not found"
+                exit 1
+            fi
+            ;;
+            
+        --stop|--shutdown)
+            info "Stopping all services..."
+            if [[ -x "${COMMANDS_DIR}/manage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/manage.zsh" stop "$@"
+            else
+                error "Management command not found"
+                exit 1
+            fi
+            ;;
+            
+        --restart)
+            info "Restarting all services..."
+            if [[ -x "${COMMANDS_DIR}/manage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/manage.zsh" restart "$@"
+            else
+                error "Management command not found"
+                exit 1
+            fi
+            ;;
+            
+        --status)
+            if [[ -x "${COMMANDS_DIR}/manage.zsh" ]]; then
+                exec "${COMMANDS_DIR}/manage.zsh" list "$@"
+            else
+                error "Management command not found"
+                exit 1
+            fi
+            ;;
+
         # Legacy direct commands
         setup|install)
             warning "Legacy command '$command' is deprecated"
