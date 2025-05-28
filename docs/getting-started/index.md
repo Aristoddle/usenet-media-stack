@@ -2,6 +2,12 @@
 
 Welcome to the Usenet Media Stack! This guide will get you up and running in minutes.
 
+## Interactive CLI Demo
+
+Try our commands directly in this interactive terminal simulator:
+
+<CLISimulator />
+
 ## Quick Start
 
 ```bash

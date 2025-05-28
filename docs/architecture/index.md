@@ -2,6 +2,8 @@
 
 **The technical story behind "it just works everywhere"**
 
+<SystemArchitecture />
+
 Three core principles make this system work reliably across any hardware setup:
 
 ## 📦 **What You Get**
