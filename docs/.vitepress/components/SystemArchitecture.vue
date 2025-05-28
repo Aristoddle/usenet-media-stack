@@ -70,9 +70,9 @@
               <rect x="220" y="280" width="80" height="40" rx="5" fill="#3eaf7c" :class="{ active: selectedService === 'radarr' }"/>
               <text x="260" y="305" text-anchor="middle" class="service-text">Radarr</text>
             </g>
-            <g class="service-node" @click.stop="selectService('prowlarr')">
-              <rect x="120" y="330" width="80" height="40" rx="5" fill="#3eaf7c" :class="{ active: selectedService === 'prowlarr' }"/>
-              <text x="160" y="355" text-anchor="middle" class="service-text">Prowlarr</text>
+            <g class="service-node operational" @click.stop="selectService('prowlarr')">
+              <rect x="120" y="330" width="80" height="40" rx="5" fill="#10B981" :class="{ active: selectedService === 'prowlarr' }"/>
+              <text x="160" y="355" text-anchor="middle" class="service-text">Prowlarr ✅</text>
             </g>
             <g class="service-node" @click.stop="selectService('bazarr')">
               <rect x="220" y="330" width="80" height="40" rx="5" fill="#3eaf7c" :class="{ active: selectedService === 'bazarr' }"/>
@@ -95,9 +95,9 @@
               <rect x="420" y="330" width="80" height="40" rx="5" fill="#9b59b6" :class="{ active: selectedService === 'tdarr' }"/>
               <text x="460" y="355" text-anchor="middle" class="service-text">Tdarr</text>
             </g>
-            <g class="service-node" @click.stop="selectService('yacreader')">
-              <rect x="520" y="330" width="80" height="40" rx="5" fill="#2980b9" :class="{ active: selectedService === 'yacreader' }"/>
-              <text x="560" y="355" text-anchor="middle" class="service-text">YACReader</text>
+            <g class="service-node operational" @click.stop="selectService('yacreader')">
+              <rect x="520" y="330" width="80" height="40" rx="5" fill="#10B981" :class="{ active: selectedService === 'yacreader' }"/>
+              <text x="560" y="355" text-anchor="middle" class="service-text">YACReader ✅</text>
             </g>
           </g>
 
@@ -108,9 +108,9 @@
               <rect x="720" y="280" width="80" height="40" rx="5" fill="#e74c3c" :class="{ active: selectedService === 'sabnzbd' }"/>
               <text x="760" y="305" text-anchor="middle" class="service-text">SABnzbd</text>
             </g>
-            <g class="service-node" @click.stop="selectService('transmission')">
-              <rect x="820" y="280" width="80" height="40" rx="5" fill="#e74c3c" :class="{ active: selectedService === 'transmission' }"/>
-              <text x="860" y="305" text-anchor="middle" class="service-text">Transmission</text>
+            <g class="service-node operational" @click.stop="selectService('transmission')">
+              <rect x="820" y="280" width="80" height="40" rx="5" fill="#10B981" :class="{ active: selectedService === 'transmission' }"/>
+              <text x="860" y="305" text-anchor="middle" class="service-text">Transmission ✅</text>
             </g>
           </g>
 
@@ -255,16 +255,16 @@ const selectService = (service) => {
 }
 
 const serviceDetails = {
-  sonarr: { name: 'Sonarr', description: 'TV show automation with TRaSH Guide optimization', port: '8989', type: 'Media Automation' },
-  radarr: { name: 'Radarr', description: 'Movie automation with custom quality profiles', port: '7878', type: 'Media Automation' },
-  prowlarr: { name: 'Prowlarr', description: 'Universal indexer management', port: '9696', type: 'Media Automation' },
-  bazarr: { name: 'Bazarr', description: 'Subtitle automation for 40+ languages', port: '6767', type: 'Media Automation' },
-  jellyfin: { name: 'Jellyfin', description: 'Open-source media server with hardware transcoding', port: '8096', type: 'Media Server' },
-  overseerr: { name: 'Overseerr', description: 'Beautiful request management interface', port: '5055', type: 'Media Server' },
-  tdarr: { name: 'Tdarr', description: 'Automated transcoding with GPU acceleration', port: '8265', type: 'Processing' },
-  yacreader: { name: 'YACReader', description: 'Comic/manga server and reader', port: '8082', type: 'Media Server' },
-  sabnzbd: { name: 'SABnzbd', description: 'High-speed Usenet downloader', port: '8080', type: 'Download Client' },
-  transmission: { name: 'Transmission', description: 'BitTorrent client', port: '9092', type: 'Download Client' },
+  sonarr: { name: 'Sonarr', description: 'TV show automation with TRaSH Guide optimization - Currently not running due to port conflicts', port: '8989', type: 'Media Automation', status: 'stopped' },
+  radarr: { name: 'Radarr', description: 'Movie automation with custom quality profiles - Currently not running due to port conflicts', port: '7878', type: 'Media Automation', status: 'stopped' },
+  prowlarr: { name: 'Prowlarr', description: 'Universal indexer management for breaking paywall barriers - OPERATIONAL ✅', port: '9696', type: 'Media Automation', status: 'running' },
+  bazarr: { name: 'Bazarr', description: 'Subtitle automation for 40+ languages - Currently not running due to port conflicts', port: '6767', type: 'Media Automation', status: 'stopped' },
+  jellyfin: { name: 'Jellyfin', description: 'Open-source media server with hardware transcoding - Currently not running due to port conflicts', port: '8096', type: 'Media Server', status: 'stopped' },
+  overseerr: { name: 'Overseerr', description: 'Beautiful request management interface - Currently not running due to port conflicts', port: '5055', type: 'Media Server', status: 'stopped' },
+  tdarr: { name: 'Tdarr', description: 'Automated transcoding with GPU acceleration - Currently not running due to port conflicts', port: '8265', type: 'Processing', status: 'stopped' },
+  yacreader: { name: 'YACReader', description: 'Comic/manga server and reader - OPERATIONAL ✅', port: '8083', type: 'Media Server', status: 'running' },
+  sabnzbd: { name: 'SABnzbd', description: 'High-speed Usenet downloader - Currently not running due to port conflicts', port: '8080', type: 'Download Client', status: 'stopped' },
+  transmission: { name: 'Transmission', description: 'P2P liberation network - OPERATIONAL ✅', port: '9093', type: 'Download Client', status: 'running' },
   portainer: { name: 'Portainer', description: 'Docker container management', port: '9000', type: 'Management' },
   netdata: { name: 'Netdata', description: 'Real-time system monitoring', port: '19999', type: 'Monitoring' },
   cloudflare: { name: 'Cloudflare Tunnel', description: 'Secure remote access with zero exposed ports', port: '443', type: 'Network' },

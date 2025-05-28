@@ -24,6 +24,10 @@ Automatic GPU detection and optimization for maximum performance.
 
 ## Performance Gains
 
-- 4K HEVC: 2-5 FPS → 60+ FPS
-- Power usage: 200W CPU → 50W GPU
+<PerformanceMetrics />
+
+### Real-World Benefits
+- 4K HEVC: 2-5 FPS → 60+ FPS (1200% improvement)
+- Power usage: 200W CPU → 50W GPU (75% reduction)  
 - Multiple streams: 8+ concurrent 4K transcodes
+- HDR10+ tone mapping with zero quality loss
