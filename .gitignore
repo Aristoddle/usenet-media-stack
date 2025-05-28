@@ -74,10 +74,19 @@ volumes/
 !config/templates/
 !config/examples/
 
-# Allow documentation
+# Allow documentation but ignore build artifacts
 !README.md
-!docs/ .env
-.env.local*
+!docs/
+docs/node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/assets/
+docs/.vitepress/dist/hashmap.json
+
+# Keep intelligence data but ignore temporary files
+!.intelligence/
+.intelligence/*.tmp
+
+# Config database and log files
 config/*/config.xml
 config/*/db/
 config/*/*.db*
