@@ -1,14 +1,68 @@
 # 🎓 Usenet Media Stack - Hot-Swappable JBOD Media Automation
 
-**Status: VERSION 1.0 - Dynamic N-Node Distributed Media Automation**
+**Status: DEVELOPMENT - Core Architecture Complete, Services Integration In Progress**
 
 This project demonstrates **deep technical capability** and **product management vision** - a tool designed to impress staff engineer colleagues while showcasing the ability to build genuinely useful, high-quality systems that scale across whatever hardware you have lying around.
 
 **Core Mission**: Create a "just fucking works" dynamic scaling media stack that can utilize any devices you have - gaming laptops, Steam Deck, Raspberry Pis, old computers - with nodes joining and leaving seamlessly as you need the resources for other tasks.
 
+## 🚨 **CURRENT STATE REALITY CHECK** (2025-05-28)
+
+**What's Actually Working**:
+- ✅ Docker networking fixed (no more subnet conflicts)
+- ✅ Storage discovery system operational (`usenet storage discover` finds drives)
+- ✅ Dynamic docker-compose.storage.yml generation
+- ✅ Prowlarr service running successfully (http://localhost:9696)
+- ✅ Intelligent port conflict detection system
+- ✅ Professional CLI with agent-friendly commands
+
+**What Needs Investigation**:
+- ❓ **JBOD Reality**: Only one drive currently accessible (/media/joe/Fast_8TB_3). Unknown if other drives are physically connected, properly mounted, or accessible
+- ❓ **Service Dependencies**: Most services not starting - unclear if due to missing dependencies, port conflicts, or configuration issues
+- ❓ **Hot-Swap Testing**: Storage system generates configs but actual hot-swap functionality untested
+- ❓ **Docker Proxy Issues**: Persistent docker-proxy processes holding ports prevent clean startup
+
 This project embodies the philosophy that good systems are like good radio stations - they just work, reach everywhere they need to, and people can tune in from anywhere.
 
-## 🎯 **STAFF ENGINEER GOALS ACHIEVED** (2025-05-25)
+## 📋 **CRITICAL NEXT ACTIONS FOR FUTURE AGENT**
+
+### **Immediate Investigation Required**
+1. **Storage Reality Check**: Run `ls -la /media/joe/` to understand actual drive availability. The system shows one 8TB NVMe but there may be many more drives physically connected
+2. **Service Dependency Analysis**: Understand why only Prowlarr starts successfully while other services fail
+3. **Port Conflict Resolution**: Implement reliable cleanup of docker-proxy processes that hold ports across sessions
+
+### **Architecture Completion Tasks**
+1. **Hot-Swap Testing**: Physically unplug/plug drives and verify the storage discovery system adapts
+2. **Service Orchestration**: Get core automation services (Sonarr, Radarr, SABnzbd, Jellyfin) operational
+3. **docker-compose.storage.yml Debugging**: Fix service name mismatch (`nfs` vs `nfs-server`)
+
+### **Known Working Components**
+- ✅ `usenet storage discover` - Finds mounted drives
+- ✅ `usenet storage add <path>` - Adds drive to storage pool  
+- ✅ `usenet storage apply` - Generates mount configurations
+- ✅ `usenet --start/--stop/--status` - Agent-friendly service management
+- ✅ Intelligent port conflict detection and learning system
+
+### **Unknown/Unverified Claims**
+- ❓ True JBOD capability across multiple physical drives
+- ❓ Hot-swap functionality with live service updates
+- ❓ Service integration with storage changes
+- ❓ Actual performance benefits of hardware optimization
+
+### **Session 2025-05-28 Achievements**
+- ✅ **Fixed Docker Networking**: Removed hardcoded subnet configurations causing conflicts with Docker Desktop extensions
+- ✅ **Proved Networking Solution**: Prowlarr service running successfully at http://localhost:9696
+- ✅ **Implemented Storage Discovery**: System can find and add drives to storage pool via CLI commands
+- ✅ **Added Intelligence System**: Port conflict detection, learning, and auto-documentation
+- ✅ **Created Agent-Friendly CLI**: `--start/--stop/--status` commands for automated management
+- ✅ **Documented Unknowns**: Clear separation of working features vs unverified claims
+
+### **Git Commits This Session**
+- `9658ad5` - Fix Docker networking conflicts and add intelligent orchestration
+- `dc949b7` - Add comprehensive Docker networking documentation  
+- `d5d14c8` - Implement working hot-swappable JBOD storage system
+
+## 🎯 **STAFF ENGINEER GOALS** (Partially Achieved)
 
 This tool demonstrates **dual capability**:
 1. **Technical Depth**: Hot-swappable JBOD with dynamic Docker Compose generation, TRaSH Guide integration, and hardware optimization
