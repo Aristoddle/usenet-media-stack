@@ -88,6 +88,10 @@ docs/.vitepress/dist/hashmap.json
 !.intelligence/*.md
 .intelligence/*.tmp
 
+# Node.js dependencies
+node_modules/
+*/node_modules/
+
 # Config database and log files
 config/*/config.xml
 config/*/db/
