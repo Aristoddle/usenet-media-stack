@@ -1,0 +1,561 @@
+{
+  "summary": {
+    "total": 32,
+    "passed": 25,
+    "failed": 7,
+    "duration": "12s",
+    "timestamp": "2025-05-28T06:37:00.684Z"
+  },
+  "tests": [
+    {
+      "name": "sonarr_error",
+      "passed": false,
+      "details": {
+        "error": "page.goto: net::ERR_SOCKET_NOT_CONNECTED at http://localhost:8989/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8989/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+      },
+      "timestamp": "2025-05-28T06:37:01.263Z"
+    },
+    {
+      "name": "radarr_error",
+      "passed": false,
+      "details": {
+        "error": "page.goto: net::ERR_CONNECTION_RESET at http://localhost:7878/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:7878/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+      },
+      "timestamp": "2025-05-28T06:37:02.291Z"
+    },
+    {
+      "name": "jellyfin_loading",
+      "passed": true,
+      "details": {
+        "loadTime": 220
+      },
+      "timestamp": "2025-05-28T06:37:03.533Z"
+    },
+    {
+      "name": "jellyfin_title",
+      "passed": true,
+      "details": {
+        "title": "Jellyfin"
+      },
+      "timestamp": "2025-05-28T06:37:03.538Z"
+    },
+    {
+      "name": "jellyfin_elements",
+      "passed": false,
+      "details": {
+        "found": 0,
+        "expected": 4
+      },
+      "timestamp": "2025-05-28T06:37:03.584Z"
+    },
+    {
+      "name": "jellyfin_navigation",
+      "passed": true,
+      "details": {},
+      "timestamp": "2025-05-28T06:37:03.587Z"
+    },
+    {
+      "name": "jellyfin_performance",
+      "passed": true,
+      "details": {
+        "loadTime": 220
+      },
+      "timestamp": "2025-05-28T06:37:03.587Z"
+    },
+    {
+      "name": "overseerr_loading",
+      "passed": true,
+      "details": {
+        "loadTime": 1824
+      },
+      "timestamp": "2025-05-28T06:37:06.434Z"
+    },
+    {
+      "name": "overseerr_title",
+      "passed": true,
+      "details": {
+        "title": "Setup - Overseerr"
+      },
+      "timestamp": "2025-05-28T06:37:06.466Z"
+    },
+    {
+      "name": "overseerr_elements",
+      "passed": false,
+      "details": {
+        "found": 0,
+        "expected": 4
+      },
+      "timestamp": "2025-05-28T06:37:06.486Z"
+    },
+    {
+      "name": "overseerr_navigation",
+      "passed": true,
+      "details": {},
+      "timestamp": "2025-05-28T06:37:06.486Z"
+    },
+    {
+      "name": "overseerr_performance",
+      "passed": true,
+      "details": {
+        "loadTime": 1824
+      },
+      "timestamp": "2025-05-28T06:37:06.486Z"
+    },
+    {
+      "name": "portainer_loading",
+      "passed": true,
+      "details": {
+        "loadTime": 453
+      },
+      "timestamp": "2025-05-28T06:37:07.961Z"
+    },
+    {
+      "name": "portainer_title",
+      "passed": true,
+      "details": {
+        "title": "Portainer"
+      },
+      "timestamp": "2025-05-28T06:37:08.014Z"
+    },
+    {
+      "name": "portainer_elements",
+      "passed": false,
+      "details": {
+        "found": 0,
+        "expected": 4
+      },
+      "timestamp": "2025-05-28T06:37:08.045Z"
+    },
+    {
+      "name": "portainer_navigation",
+      "passed": true,
+      "details": {},
+      "timestamp": "2025-05-28T06:37:08.046Z"
+    },
+    {
+      "name": "portainer_performance",
+      "passed": true,
+      "details": {
+        "loadTime": 453
+      },
+      "timestamp": "2025-05-28T06:37:08.046Z"
+    },
+    {
+      "name": "sabnzbd_loading",
+      "passed": true,
+      "details": {
+        "loadTime": 117
+      },
+      "timestamp": "2025-05-28T06:37:09.184Z"
+    },
+    {
+      "name": "sabnzbd_title",
+      "passed": false,
+      "details": {
+        "title": ""
+      },
+      "timestamp": "2025-05-28T06:37:09.236Z"
+    },
+    {
+      "name": "sabnzbd_elements",
+      "passed": true,
+      "details": {
+        "found": 3,
+        "expected": 4
+      },
+      "timestamp": "2025-05-28T06:37:09.271Z"
+    },
+    {
+      "name": "sabnzbd_navigation",
+      "passed": true,
+      "details": {},
+      "timestamp": "2025-05-28T06:37:09.272Z"
+    },
+    {
+      "name": "sabnzbd_performance",
+      "passed": true,
+      "details": {
+        "loadTime": 117
+      },
+      "timestamp": "2025-05-28T06:37:09.272Z"
+    },
+    {
+      "name": "prowlarr_loading",
+      "passed": true,
+      "details": {
+        "loadTime": 40
+      },
+      "timestamp": "2025-05-28T06:37:10.333Z"
+    },
+    {
+      "name": "prowlarr_title",
+      "passed": true,
+      "details": {
+        "title": "Prowlarr"
+      },
+      "timestamp": "2025-05-28T06:37:10.336Z"
+    },
+    {
+      "name": "prowlarr_elements",
+      "passed": false,
+      "details": {
+        "found": 0,
+        "expected": 3
+      },
+      "timestamp": "2025-05-28T06:37:10.355Z"
+    },
+    {
+      "name": "prowlarr_navigation",
+      "passed": true,
+      "details": {},
+      "timestamp": "2025-05-28T06:37:10.356Z"
+    },
+    {
+      "name": "prowlarr_performance",
+      "passed": true,
+      "details": {
+        "loadTime": 40
+      },
+      "timestamp": "2025-05-28T06:37:10.356Z"
+    },
+    {
+      "name": "netdata_loading",
+      "passed": true,
+      "details": {
+        "loadTime": 50
+      },
+      "timestamp": "2025-05-28T06:37:11.427Z"
+    },
+    {
+      "name": "netdata_title",
+      "passed": true,
+      "details": {
+        "title": "Netdata"
+      },
+      "timestamp": "2025-05-28T06:37:11.431Z"
+    },
+    {
+      "name": "netdata_elements",
+      "passed": true,
+      "details": {
+        "found": 2,
+        "expected": 4
+      },
+      "timestamp": "2025-05-28T06:37:11.458Z"
+    },
+    {
+      "name": "netdata_navigation",
+      "passed": true,
+      "details": {},
+      "timestamp": "2025-05-28T06:37:11.458Z"
+    },
+    {
+      "name": "netdata_performance",
+      "passed": true,
+      "details": {
+        "loadTime": 50
+      },
+      "timestamp": "2025-05-28T06:37:11.458Z"
+    }
+  ],
+  "services": [
+    {
+      "name": "sonarr",
+      "port": 8989,
+      "tests": [
+        {
+          "name": "sonarr_error",
+          "passed": false,
+          "details": {
+            "error": "page.goto: net::ERR_SOCKET_NOT_CONNECTED at http://localhost:8989/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:8989/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+          },
+          "timestamp": "2025-05-28T06:37:01.263Z"
+        }
+      ]
+    },
+    {
+      "name": "radarr",
+      "port": 7878,
+      "tests": [
+        {
+          "name": "radarr_error",
+          "passed": false,
+          "details": {
+            "error": "page.goto: net::ERR_CONNECTION_RESET at http://localhost:7878/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:7878/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+          },
+          "timestamp": "2025-05-28T06:37:02.291Z"
+        }
+      ]
+    },
+    {
+      "name": "jellyfin",
+      "port": 8096,
+      "tests": [
+        {
+          "name": "jellyfin_loading",
+          "passed": true,
+          "details": {
+            "loadTime": 220
+          },
+          "timestamp": "2025-05-28T06:37:03.533Z"
+        },
+        {
+          "name": "jellyfin_title",
+          "passed": true,
+          "details": {
+            "title": "Jellyfin"
+          },
+          "timestamp": "2025-05-28T06:37:03.538Z"
+        },
+        {
+          "name": "jellyfin_elements",
+          "passed": false,
+          "details": {
+            "found": 0,
+            "expected": 4
+          },
+          "timestamp": "2025-05-28T06:37:03.584Z"
+        },
+        {
+          "name": "jellyfin_navigation",
+          "passed": true,
+          "details": {},
+          "timestamp": "2025-05-28T06:37:03.587Z"
+        },
+        {
+          "name": "jellyfin_performance",
+          "passed": true,
+          "details": {
+            "loadTime": 220
+          },
+          "timestamp": "2025-05-28T06:37:03.587Z"
+        }
+      ]
+    },
+    {
+      "name": "overseerr",
+      "port": 5055,
+      "tests": [
+        {
+          "name": "overseerr_loading",
+          "passed": true,
+          "details": {
+            "loadTime": 1824
+          },
+          "timestamp": "2025-05-28T06:37:06.434Z"
+        },
+        {
+          "name": "overseerr_title",
+          "passed": true,
+          "details": {
+            "title": "Setup - Overseerr"
+          },
+          "timestamp": "2025-05-28T06:37:06.466Z"
+        },
+        {
+          "name": "overseerr_elements",
+          "passed": false,
+          "details": {
+            "found": 0,
+            "expected": 4
+          },
+          "timestamp": "2025-05-28T06:37:06.486Z"
+        },
+        {
+          "name": "overseerr_navigation",
+          "passed": true,
+          "details": {},
+          "timestamp": "2025-05-28T06:37:06.486Z"
+        },
+        {
+          "name": "overseerr_performance",
+          "passed": true,
+          "details": {
+            "loadTime": 1824
+          },
+          "timestamp": "2025-05-28T06:37:06.486Z"
+        }
+      ]
+    },
+    {
+      "name": "portainer",
+      "port": 9000,
+      "tests": [
+        {
+          "name": "portainer_loading",
+          "passed": true,
+          "details": {
+            "loadTime": 453
+          },
+          "timestamp": "2025-05-28T06:37:07.961Z"
+        },
+        {
+          "name": "portainer_title",
+          "passed": true,
+          "details": {
+            "title": "Portainer"
+          },
+          "timestamp": "2025-05-28T06:37:08.014Z"
+        },
+        {
+          "name": "portainer_elements",
+          "passed": false,
+          "details": {
+            "found": 0,
+            "expected": 4
+          },
+          "timestamp": "2025-05-28T06:37:08.045Z"
+        },
+        {
+          "name": "portainer_navigation",
+          "passed": true,
+          "details": {},
+          "timestamp": "2025-05-28T06:37:08.046Z"
+        },
+        {
+          "name": "portainer_performance",
+          "passed": true,
+          "details": {
+            "loadTime": 453
+          },
+          "timestamp": "2025-05-28T06:37:08.046Z"
+        }
+      ]
+    },
+    {
+      "name": "sabnzbd",
+      "port": 8080,
+      "tests": [
+        {
+          "name": "sabnzbd_loading",
+          "passed": true,
+          "details": {
+            "loadTime": 117
+          },
+          "timestamp": "2025-05-28T06:37:09.184Z"
+        },
+        {
+          "name": "sabnzbd_title",
+          "passed": false,
+          "details": {
+            "title": ""
+          },
+          "timestamp": "2025-05-28T06:37:09.236Z"
+        },
+        {
+          "name": "sabnzbd_elements",
+          "passed": true,
+          "details": {
+            "found": 3,
+            "expected": 4
+          },
+          "timestamp": "2025-05-28T06:37:09.271Z"
+        },
+        {
+          "name": "sabnzbd_navigation",
+          "passed": true,
+          "details": {},
+          "timestamp": "2025-05-28T06:37:09.272Z"
+        },
+        {
+          "name": "sabnzbd_performance",
+          "passed": true,
+          "details": {
+            "loadTime": 117
+          },
+          "timestamp": "2025-05-28T06:37:09.272Z"
+        }
+      ]
+    },
+    {
+      "name": "prowlarr",
+      "port": 9696,
+      "tests": [
+        {
+          "name": "prowlarr_loading",
+          "passed": true,
+          "details": {
+            "loadTime": 40
+          },
+          "timestamp": "2025-05-28T06:37:10.333Z"
+        },
+        {
+          "name": "prowlarr_title",
+          "passed": true,
+          "details": {
+            "title": "Prowlarr"
+          },
+          "timestamp": "2025-05-28T06:37:10.336Z"
+        },
+        {
+          "name": "prowlarr_elements",
+          "passed": false,
+          "details": {
+            "found": 0,
+            "expected": 3
+          },
+          "timestamp": "2025-05-28T06:37:10.355Z"
+        },
+        {
+          "name": "prowlarr_navigation",
+          "passed": true,
+          "details": {},
+          "timestamp": "2025-05-28T06:37:10.356Z"
+        },
+        {
+          "name": "prowlarr_performance",
+          "passed": true,
+          "details": {
+            "loadTime": 40
+          },
+          "timestamp": "2025-05-28T06:37:10.356Z"
+        }
+      ]
+    },
+    {
+      "name": "netdata",
+      "port": 19999,
+      "tests": [
+        {
+          "name": "netdata_loading",
+          "passed": true,
+          "details": {
+            "loadTime": 50
+          },
+          "timestamp": "2025-05-28T06:37:11.427Z"
+        },
+        {
+          "name": "netdata_title",
+          "passed": true,
+          "details": {
+            "title": "Netdata"
+          },
+          "timestamp": "2025-05-28T06:37:11.431Z"
+        },
+        {
+          "name": "netdata_elements",
+          "passed": true,
+          "details": {
+            "found": 2,
+            "expected": 4
+          },
+          "timestamp": "2025-05-28T06:37:11.458Z"
+        },
+        {
+          "name": "netdata_navigation",
+          "passed": true,
+          "details": {},
+          "timestamp": "2025-05-28T06:37:11.458Z"
+        },
+        {
+          "name": "netdata_performance",
+          "passed": true,
+          "details": {
+            "loadTime": 50
+          },
+          "timestamp": "2025-05-28T06:37:11.458Z"
+        }
+      ]
+    }
+  ]
+}

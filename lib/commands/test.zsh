@@ -63,27 +63,28 @@ OPTIONS:
     --timeout <seconds>    Set test timeout (default: 300)
     --no-cleanup          Don't clean up test artifacts
     --format <type>        Output format: text, json, html (default: text)
-    --parallel             Run compatible tests in parallel
+    --parallel             Run compatible tests in parallel (default for >10 services)
+    --no-parallel          Force sequential execution (disable auto-parallel)
     --profile <name>       Use specific test profile (ci, dev, production)
 
 EXAMPLES:
     # Quick validation
     usenet test smoke
     
-    # Full web interface testing with screenshots
-    usenet test web --screenshot --verbose
+    # Fast parallel web interface testing (auto-parallel with 19+ services)
+    usenet test web --verbose
     
-    # Complete E2E testing
-    usenet test e2e --destructive
+    # Force sequential testing for debugging
+    usenet test web --no-parallel --verbose
+    
+    # Complete E2E testing with parallel execution
+    usenet test e2e --parallel
     
     # Test fresh deployment (WARNING: destructive)
     usenet test deployment --destructive
     
-    # Generate HTML report
-    usenet test report --format html
-    
-    # Clean CI testing
-    usenet test all --profile ci --parallel
+    # Fast CI testing with parallel execution
+    usenet test all --profile ci --parallel --format json
 
 TEST PROFILES:
     ci          Fast, parallel, minimal output
@@ -231,33 +232,95 @@ run_web_tests() {
 test_web_interfaces_legacy() {
     info "🌐 Testing web interfaces for all media services..."
     
-    # Define services and their expected ports
+    # Define all 23 services and their expected ports
     local -A services=(
+        # Core Media Automation  
         [sonarr]="8989"
         [radarr]="7878"
+        [readarr]="8787"
+        [bazarr]="6767"
+        [whisparr]="6969"
+        [prowlarr]="9696"
+        [mylar]="8090"
+        [jackett]="9117"
+        
+        # Media Servers
         [jellyfin]="8096"
         [overseerr]="5055"
-        [portainer]="9000"
-        [sabnzbd]="8080"
-        [prowlarr]="9696"
-        [readarr]="8787"
-        [whisparr]="6969"
-        [bazarr]="6767"
-        [tdarr]="8265"
         [yacreader]="8083"
-        [mylar]="8090"
-        [netdata]="19999"
         [stash]="9998"
+        [tautulli]="8181"
+        
+        # Downloads & Processing
+        [sabnzbd]="8080"
+        [transmission]="9093"
+        [tdarr]="8265"
+        
+        # Infrastructure & Management
+        [portainer]="9000"
+        [netdata]="19999"
+        
+        # Documentation & Utilities
+        [usenet-docs]="4173"
+        
+        # Note: Excluded services without web interfaces:
+        # recyclarr, unpackerr, samba, nfs-server
     )
     
-    local failures=0
-    local successes=0
+    # Determine parallel execution based on flag and service count
+    local use_parallel="false"
+    if [[ "$FLAG_PARALLEL" == "true" ]]; then
+        use_parallel="true"
+    elif [[ "$FLAG_PARALLEL" == "auto" ]] && [[ ${#services} -gt 5 ]]; then
+        use_parallel="true"
+    fi
+    
+    if [[ "$use_parallel" == "true" ]]; then
+        test_web_interfaces_parallel
+    else
+        test_web_interfaces_sequential
+    fi
+}
+
+test_web_interfaces_sequential() {
+    # Define services directly (same as parent function)
+    local -A services=(
+        # Core Media Automation  
+        [sonarr]="8989"
+        [radarr]="7878"
+        [readarr]="8787"
+        [bazarr]="6767"
+        [whisparr]="6969"
+        [prowlarr]="9696"
+        [mylar]="8090"
+        [jackett]="9117"
+        
+        # Media Servers
+        [jellyfin]="8096"
+        [overseerr]="5055"
+        [yacreader]="8083"
+        [stash]="9998"
+        [tautulli]="8181"
+        
+        # Downloads & Processing
+        [sabnzbd]="8080"
+        [transmission]="9093"
+        [tdarr]="8265"
+        
+        # Infrastructure & Management
+        [portainer]="9000"
+        [netdata]="19999"
+        
+        # Documentation & Utilities
+        [usenet-docs]="4173"
+    )
+    local failures=0 successes=0
     
     for service port in ${(kv)services}; do
         local url="http://localhost:${port}"
         
         # Test basic connectivity with timeout
-        if timeout 5 curl -s -f -m 3 "$url" >/dev/null 2>&1; then
+        if curl -s -f --max-time 3 --connect-timeout 1 "$url" >/dev/null 2>&1; then
             success "✓ ${service} (${url}) - Accessible"
             ((successes++))
         else
@@ -270,6 +333,94 @@ test_web_interfaces_legacy() {
         success "🎉 All ${successes} web interfaces are accessible!"
     else
         warning "⚠ ${failures} service(s) failed, ${successes} succeeded"
+    fi
+    
+    return $failures
+}
+
+test_web_interfaces_parallel() {
+    # Define services directly (same as parent function)
+    local -A services=(
+        # Core Media Automation  
+        [sonarr]="8989"
+        [radarr]="7878"
+        [readarr]="8787"
+        [bazarr]="6767"
+        [whisparr]="6969"
+        [prowlarr]="9696"
+        [mylar]="8090"
+        [jackett]="9117"
+        
+        # Media Servers
+        [jellyfin]="8096"
+        [overseerr]="5055"
+        [yacreader]="8083"
+        [stash]="9998"
+        [tautulli]="8181"
+        
+        # Downloads & Processing
+        [sabnzbd]="8080"
+        [transmission]="9093"
+        [tdarr]="8265"
+        
+        # Infrastructure & Management
+        [portainer]="9000"
+        [netdata]="19999"
+        
+        # Documentation & Utilities
+        [usenet-docs]="4173"
+    )
+    local temp_dir=$(mktemp -d)
+    local pids=()
+    
+    info "Running parallel web interface tests..."
+    
+    # Launch parallel test jobs
+    for service port in ${(kv)services}; do
+        (
+            local url="http://localhost:${port}"
+            local result_file="$temp_dir/${service}.result"
+            
+            if curl -s -f --max-time 3 --connect-timeout 1 "$url" >/dev/null 2>&1; then
+                echo "SUCCESS:${service}:${url}" > "$result_file"
+            else
+                echo "FAILURE:${service}:${url}" > "$result_file"
+            fi
+        ) &
+        pids+=($!)
+    done
+    
+    # Wait for all parallel jobs to complete
+    for pid in $pids; do
+        wait $pid
+    done
+    
+    # Collect and display results
+    local failures=0 successes=0
+    for result_file in "$temp_dir"/*.result; do
+        [[ -f "$result_file" ]] || continue
+        
+        local result=$(cat "$result_file")
+        local status=${result%%:*}
+        local service=${result#*:}; service=${service%%:*}
+        local url=${result##*:}
+        
+        if [[ "$status" == "SUCCESS" ]]; then
+            success "✓ ${service} (${url}) - Accessible"
+            ((successes++))
+        else
+            error "✗ ${service} (${url}) - Not accessible"
+            ((failures++))
+        fi
+    done
+    
+    # Cleanup
+    rm -rf "$temp_dir"
+    
+    if [[ $failures -eq 0 ]]; then
+        success "🎉 All ${successes} web interfaces are accessible! (parallel)"
+    else
+        warning "⚠ ${failures} service(s) failed, ${successes} succeeded (parallel)"
     fi
     
     return $failures
@@ -318,14 +469,30 @@ test_api_endpoints_legacy() {
         [bazarr]="6767"
     )
     
-    local failures=0
-    local successes=0
+    # Determine parallel execution for API tests
+    local use_parallel="false"
+    if [[ "$FLAG_PARALLEL" == "true" ]]; then
+        use_parallel="true"
+    elif [[ "$FLAG_PARALLEL" == "auto" ]] && [[ ${#api_services} -gt 3 ]]; then
+        use_parallel="true"
+    fi
+    
+    if [[ "$use_parallel" == "true" ]]; then
+        test_api_endpoints_parallel
+    else
+        test_api_endpoints_sequential
+    fi
+}
+
+test_api_endpoints_sequential() {
+    local -A api_services=("${(@kv)1}")
+    local failures=0 successes=0
     
     for service port in ${(kv)api_services}; do
         local api_url="http://localhost:${port}/api/v3/system/status"
         
         # Test API endpoint accessibility (expect 401 without API key)
-        local response=$(timeout 5 curl -s -w "%{http_code}" -o /dev/null "$api_url" 2>/dev/null || echo "000")
+        local response=$(curl -s -w "%{http_code}" -o /dev/null --max-time 3 --connect-timeout 1 "$api_url" 2>/dev/null || echo "000")
         
         case "$response" in
             200)
@@ -358,6 +525,73 @@ test_api_endpoints_legacy() {
     return $failures
 }
 
+test_api_endpoints_parallel() {
+    local -A api_services=("${(@kv)1}")
+    local temp_dir=$(mktemp -d)
+    local pids=()
+    
+    info "Running parallel API endpoint tests..."
+    
+    # Launch parallel API test jobs
+    for service port in ${(kv)api_services}; do
+        (
+            local api_url="http://localhost:${port}/api/v3/system/status"
+            local result_file="$temp_dir/${service}_api.result"
+            
+            local response=$(curl -s -w "%{http_code}" -o /dev/null --max-time 3 --connect-timeout 1 "$api_url" 2>/dev/null || echo "000")
+            echo "${service}:${response}" > "$result_file"
+        ) &
+        pids+=($!)
+    done
+    
+    # Wait for all parallel jobs to complete
+    for pid in $pids; do
+        wait $pid
+    done
+    
+    # Collect and display results
+    local failures=0 successes=0
+    for result_file in "$temp_dir"/*_api.result; do
+        [[ -f "$result_file" ]] || continue
+        
+        local result=$(cat "$result_file")
+        local service=${result%%:*}
+        local response=${result##*:}
+        
+        case "$response" in
+            200)
+                success "✓ ${service} API - Public endpoint accessible"
+                ((successes++))
+                ;;
+            401)
+                success "✓ ${service} API - Protected (requires authentication)"
+                ((successes++))
+                ;;
+            404)
+                warning "⚠ ${service} API - Endpoint not found (may use different version)"
+                ;;
+            000)
+                error "✗ ${service} API - Service not responding"
+                ((failures++))
+                ;;
+            *)
+                warning "⚠ ${service} API - Unexpected response: ${response}"
+                ;;
+        esac
+    done
+    
+    # Cleanup
+    rm -rf "$temp_dir"
+    
+    if [[ $failures -eq 0 ]]; then
+        success "🎉 All ${successes} API endpoints responded correctly! (parallel)"
+    else
+        warning "⚠ ${failures} API(s) failed, ${successes} succeeded (parallel)"
+    fi
+    
+    return $failures
+}
+
 #=============================================================================
 # Smoke Tests: Quick validation
 #=============================================================================
@@ -384,15 +618,38 @@ run_smoke_tests() {
         ((failed++))
     fi
     
-    # Test 3: Key ports accessible
+    # Test 3: Key ports accessible (parallel)
     local key_ports=(8096 5055 9696 8080 9000)
-    local accessible=0
+    local temp_dir=$(mktemp -d)
+    local pids=()
     
+    # Test ports in parallel
     for port in $key_ports; do
-        if timeout 3 bash -c "cat < /dev/null > /dev/tcp/localhost/$port" 2>/dev/null; then
+        (
+            if curl -s --max-time 2 --connect-timeout 1 "http://localhost:$port" >/dev/null 2>&1; then
+                echo "SUCCESS" > "$temp_dir/port_$port.result"
+            else
+                echo "FAILURE" > "$temp_dir/port_$port.result"
+            fi
+        ) &
+        pids+=($!)
+    done
+    
+    # Wait for all tests to complete
+    for pid in $pids; do
+        wait $pid
+    done
+    
+    # Count successes
+    local accessible=0
+    for result_file in "$temp_dir"/port_*.result; do
+        [[ -f "$result_file" ]] || continue
+        if [[ "$(cat "$result_file")" == "SUCCESS" ]]; then
             ((accessible++))
         fi
     done
+    
+    rm -rf "$temp_dir"
     
     if [[ $accessible -ge 3 ]]; then
         success "✅ Key services accessible ($accessible/5 ports)"
@@ -511,7 +768,7 @@ main() {
     local FLAG_TIMEOUT="300"
     local FLAG_NO_CLEANUP="false"
     local FLAG_FORMAT="text"
-    local FLAG_PARALLEL="false"
+    local FLAG_PARALLEL="auto"  # auto, true, false
     local FLAG_PROFILE="dev"
     
     while [[ $# -gt 0 ]]; do
@@ -544,6 +801,10 @@ main() {
                 FLAG_PARALLEL="true"
                 shift
                 ;;
+            --no-parallel)
+                FLAG_PARALLEL="false"
+                shift
+                ;;
             --profile)
                 FLAG_PROFILE="$2"
                 shift 2
@@ -563,7 +824,7 @@ main() {
     
     # Route to appropriate function
     case "$action" in
-        help|--help|-h)
+        help)
             show_test_help
             ;;
         unit)
@@ -572,7 +833,7 @@ main() {
         integration)
             run_integration_tests
             ;;
-        web|ui)
+        web)
             run_web_tests
             ;;
         api)
