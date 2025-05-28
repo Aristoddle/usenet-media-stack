@@ -14,6 +14,10 @@ config/*/
 # But include example configs
 !config/examples/
 
+# Claude Code configuration (contains sensitive tokens)
+.claude.json
+.claude/
+
 # Download directories
 downloads/
 media/
