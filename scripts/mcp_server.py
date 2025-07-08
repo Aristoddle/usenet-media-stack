@@ -9,6 +9,9 @@ import sys
 import asyncio
 from typing import Dict, Any, List
 import logging
+import os
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # MCP server implementation
 class UsenetMCPServer:
@@ -137,8 +140,8 @@ class UsenetMCPServer:
             api_key = "ensk-proj-X66QlUj UWzWuG-EQdDQZsPv8G6WogtBmFc_PwdzQTHYkp-NHDrP7-eRFfLZW6VJW_nemJP7YCoT3BlbkFJlrmnNyDop2mkwtogG3SNTky-W69b5xrG1dIIeafcPGObovSJfh3o8Rm2A7HqiCIGac_ScsZAUA"
             
             cmd = [
-                sys.executable, 
-                "/home/joe/usenet/scripts/generate_images.py",
+                sys.executable,
+                os.path.join(ROOT_DIR, 'scripts', 'generate_images.py'),
                 api_key
             ]
             
@@ -160,7 +163,7 @@ class UsenetMCPServer:
             # Check Docker services
             result = subprocess.run(
                 ["docker", "compose", "ps", "--format", "json"],
-                cwd="/home/joe/usenet",
+                cwd=ROOT_DIR,
                 capture_output=True,
                 text=True
             )
@@ -184,7 +187,7 @@ class UsenetMCPServer:
         
         try:
             result = subprocess.run(
-                ["/home/joe/usenet/usenet", "storage", "discover"],
+                [os.path.join(ROOT_DIR, 'usenet'), 'storage', 'discover'],
                 capture_output=True,
                 text=True
             )
@@ -203,7 +206,7 @@ class UsenetMCPServer:
         
         try:
             result = subprocess.run(
-                ["/home/joe/usenet/usenet", "hardware", "detect"],
+                [os.path.join(ROOT_DIR, 'usenet'), 'hardware', 'detect'],
                 capture_output=True,
                 text=True
             )
