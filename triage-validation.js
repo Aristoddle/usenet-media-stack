@@ -1,5 +1,9 @@
 // Quick triage validation of remaining services
 const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
+
+const RESULT_FILE = path.join(__dirname, 'triage-results.json');
 
 const remainingServices = [
     { name: 'bazarr', url: 'http://localhost:6767', desc: 'Subtitle Automation' },
@@ -52,7 +56,6 @@ async function main() {
     console.log(`\n📊 TRIAGE RESULTS: ${working}/${total} additional services working`);
     
     // Save for analysis
-    require('fs').writeFileSync('/home/joe/usenet/triage-results.json', JSON.stringify(results, null, 2));
+    fs.writeFileSync(RESULT_FILE, JSON.stringify(results, null, 2));
 }
-
 main().catch(console.error);

@@ -1,6 +1,11 @@
 // Comprehensive documentation capture for 7 confirmed working services
 const { chromium } = require('playwright');
 const fs = require('fs');
+const path = require('path');
+
+const ROOT_DIR = __dirname;
+const IMAGE_DIR = path.join(ROOT_DIR, 'docs', 'public', 'images', 'services');
+const REGISTRY_PATH = path.join(ROOT_DIR, 'docs', 'service-registry.json');
 
 const workingServices = [
     { 
@@ -61,17 +66,19 @@ async function captureService(service) {
         const title = await page.title();
         const url = page.url();
         
+        await fs.promises.mkdir(IMAGE_DIR, { recursive: true });
+
         // Take full page screenshot
-        await page.screenshot({ 
-            path: `/home/joe/usenet/docs/public/images/services/${service.name}.png`,
+        await page.screenshot({
+            path: path.join(IMAGE_DIR, `${service.name}.png`),
             fullPage: true,
             clip: { x: 0, y: 0, width: 1200, height: 800 } // Standard size for docs
         });
         
         // Take mobile screenshot
         await page.setViewportSize({ width: 375, height: 667 });
-        await page.screenshot({ 
-            path: `/home/joe/usenet/docs/public/images/services/${service.name}-mobile.png`,
+        await page.screenshot({
+            path: path.join(IMAGE_DIR, `${service.name}-mobile.png`),
             fullPage: false
         });
         
@@ -100,7 +107,7 @@ async function main() {
     console.log('Creating comprehensive service documentation...\n');
     
     // Create directories
-    await fs.promises.mkdir('/home/joe/usenet/docs/public/images/services', { recursive: true });
+    await fs.promises.mkdir(IMAGE_DIR, { recursive: true });
     
     const results = [];
     
@@ -133,12 +140,11 @@ async function main() {
     };
     
     await fs.promises.writeFile(
-        '/home/joe/usenet/docs/service-registry.json', 
+        REGISTRY_PATH,
         JSON.stringify(serviceRegistry, null, 2)
     );
     
     console.log(`💾 Service registry saved to: docs/service-registry.json`);
     console.log('\n🎯 Ready for documentation site integration!');
 }
-
 main().catch(console.error);

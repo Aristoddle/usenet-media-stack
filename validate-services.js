@@ -1,5 +1,11 @@
 // Service validation with Playwright
 const { chromium } = require('playwright');
+const path = require('path');
+const fs = require('fs');
+
+const ROOT_DIR = __dirname;
+const SCREENSHOT_DIR = path.join(ROOT_DIR, 'validation-screenshots');
+const RESULTS_PATH = path.join(ROOT_DIR, 'validation-results.json');
 
 const services = [
     { name: 'jellyfin', url: 'http://localhost:8096', desc: 'Media Server' },
@@ -23,8 +29,9 @@ async function validateService(service) {
         await page.goto(service.url, { waitUntil: 'networkidle', timeout: 10000 });
         
         // Take screenshot
-        await page.screenshot({ 
-            path: `/home/joe/usenet/validation-screenshots/${service.name}.png`,
+        await fs.promises.mkdir(SCREENSHOT_DIR, { recursive: true });
+        await page.screenshot({
+            path: path.join(SCREENSHOT_DIR, `${service.name}.png`),
             fullPage: false
         });
         
@@ -76,14 +83,13 @@ async function main() {
     console.log(`⚠️  Errors: ${errors}`);
     console.log(`❌ Failed: ${failed}`);
     console.log(`📸 Screenshots saved to: validation-screenshots/`);
-    
+
     // Save results to JSON
-    require('fs').writeFileSync(
-        '/home/joe/usenet/validation-results.json', 
+    fs.writeFileSync(
+        RESULTS_PATH,
         JSON.stringify(results, null, 2)
     );
     
     console.log(`💾 Results saved to: validation-results.json`);
 }
-
 main().catch(console.error);
