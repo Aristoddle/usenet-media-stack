@@ -33,7 +33,7 @@
     "@headlessui/vue": "^1.7.23",
     "@tresjs/core": "^3.6.0",
     "@types/d3": "^7.4.3",
-    "@vueflow/core": "^1.26.0",
+    "@vue-flow/core": "^1.26.0",
     "@vueuse/core": "^10.11.1",
     "chart.js": "^4.4.9",
     "d3": "^7.9.0",
