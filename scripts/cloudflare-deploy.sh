@@ -8,11 +8,17 @@
 set -euo pipefail
 
 # Your Cloudflare credentials
-CF_API_TOKEN="00dn9TadjjAavQ6CSGVQZ7idnmziICSMowU9Nu-P"
+# Prefer the CF_API_TOKEN environment variable for security
+CF_API_TOKEN="${CF_API_TOKEN:-}"
 CF_ACCOUNT_ID="ecc5914225b19722d5af73dac2c69d5b"
 CF_ZONE_ID="058b48e6df75ab442c8c424d5d700b74"
 PROJECT_NAME="beppesarrstack-net"
 DOMAIN="beppesarrstack.net"
+
+if [[ -z "$CF_API_TOKEN" ]]; then
+    log_error "CF_API_TOKEN not set. Export it before running."
+    exit 1
+fi
 
 # Colors
 GREEN='\033[0;32m'
