@@ -147,5 +147,4 @@ main() {
 
 # Run if script is executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi
+    main "$@"fi
