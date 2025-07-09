@@ -126,7 +126,7 @@ async function main() {
     console.log('\n📊 DOCUMENTATION COMPLETE');
     console.log('='.repeat(50));
     console.log(`✅ Successfully documented: ${workingCount}/${totalCount} services`);
-    console.log(`📸 Screenshots saved to: docs/public/images/services/`);
+    console.log(`📸 Screenshots saved to: ${IMAGE_DIR}/`);
     
     // Create service registry
     const serviceRegistry = {
@@ -144,7 +144,6 @@ async function main() {
         JSON.stringify(serviceRegistry, null, 2)
     );
     
-    console.log(`💾 Service registry saved to: docs/service-registry.json`);
+    console.log(`💾 Service registry saved to: ${REGISTRY_PATH}`);
     console.log('\n🎯 Ready for documentation site integration!');
-}
-main().catch(console.error);
+}main().catch(console.error);
