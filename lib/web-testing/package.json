@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node test-runner.js",
     "test-web": "node test-runner.js --suite=web",
-    "test-apis": "node test-runner.js --suite=apis",
+    "test-api": "node test-runner.js --suite=api",
     "test-all": "node test-runner.js --suite=all",
     "install-browsers": "npx playwright install chromium"
   },
@@ -14,6 +14,4 @@
     "playwright": "^1.40.0"
   },
   "devDependencies": {},
-  "author": "Usenet Media Stack",
-  "license": "MIT"
-}
+  "author": "Usenet Media Stack",  "license": "MIT"}

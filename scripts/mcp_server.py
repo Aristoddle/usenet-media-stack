@@ -9,6 +9,10 @@ import sys
 import asyncio
 from typing import Dict, Any, List
 import logging
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 
 # MCP server implementation
 class UsenetMCPServer:
@@ -137,8 +141,8 @@ class UsenetMCPServer:
             api_key = "ensk-proj-X66QlUj UWzWuG-EQdDQZsPv8G6WogtBmFc_PwdzQTHYkp-NHDrP7-eRFfLZW6VJW_nemJP7YCoT3BlbkFJlrmnNyDop2mkwtogG3SNTky-W69b5xrG1dIIeafcPGObovSJfh3o8Rm2A7HqiCIGac_ScsZAUA"
             
             cmd = [
-                sys.executable, 
-                "/home/joe/usenet/scripts/generate_images.py",
+                sys.executable,
+                os.path.join(REPO_ROOT, 'scripts', 'generate_images.py'),
                 api_key
             ]
             
@@ -160,7 +164,7 @@ class UsenetMCPServer:
             # Check Docker services
             result = subprocess.run(
                 ["docker", "compose", "ps", "--format", "json"],
-                cwd="/home/joe/usenet",
+                cwd=REPO_ROOT,
                 capture_output=True,
                 text=True
             )
@@ -184,7 +188,7 @@ class UsenetMCPServer:
         
         try:
             result = subprocess.run(
-                ["/home/joe/usenet/usenet", "storage", "discover"],
+                [os.path.join(REPO_ROOT, 'usenet'), 'storage', 'discover'],
                 capture_output=True,
                 text=True
             )
@@ -203,7 +207,7 @@ class UsenetMCPServer:
         
         try:
             result = subprocess.run(
-                ["/home/joe/usenet/usenet", "hardware", "detect"],
+                [os.path.join(REPO_ROOT, 'usenet'), 'hardware', 'detect'],
                 capture_output=True,
                 text=True
             )
@@ -246,5 +250,4 @@ async def main():
     except KeyboardInterrupt:
         logger.info("🛑 Server shutting down")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+if __name__ == "__main__":    asyncio.run(main())
