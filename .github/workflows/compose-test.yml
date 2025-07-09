@@ -1,0 +1,47 @@
+name: Docker Compose Validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  compose-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      - name: Start stack
+        run: docker compose up -d
+
+      - name: Validate services
+        run: node validate-services.js
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-screenshots
+          path: validation-screenshots
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-results
+          path: validation-results.json
+
+      - name: Stop stack
+        if: always()
+        run: docker compose down
