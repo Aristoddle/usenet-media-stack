@@ -442,7 +442,7 @@ run_api_tests() {
     if [[ -f "$web_test_dir/test-runner.js" ]]; then
         cd "$web_test_dir"
         
-        if npm run test-apis > "$TEST_LOGS_DIR/api-tests.log" 2>&1; then
+        if npm run test-api > "$TEST_LOGS_DIR/api-tests.log" 2>&1; then
             success "✅ API endpoint tests completed"
         else
             error "❌ API endpoint tests failed"

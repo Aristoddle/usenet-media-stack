@@ -1,5 +1,12 @@
 // Quick triage validation of remaining services
 const { chromium } = require('playwright');
+const fs = require('fs');
+const path = require('path');
+
+const RESULT_DIR = path.join(__dirname, 'triage-results');
+const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+const RESULT_FILE = path.join(RESULT_DIR, `triage-results-${timestamp}.json`);
+const LATEST_FILE = path.join(__dirname, 'triage-results.json');
 
 const remainingServices = [
     { name: 'bazarr', url: 'http://localhost:6767', desc: 'Subtitle Automation' },
@@ -52,7 +59,7 @@ async function main() {
     console.log(`\n📊 TRIAGE RESULTS: ${working}/${total} additional services working`);
     
     // Save for analysis
-    require('fs').writeFileSync('/home/joe/usenet/triage-results.json', JSON.stringify(results, null, 2));
-}
-
-main().catch(console.error);
+    await fs.promises.mkdir(RESULT_DIR, { recursive: true });
+    fs.writeFileSync(RESULT_FILE, JSON.stringify(results, null, 2));
+    fs.writeFileSync(LATEST_FILE, JSON.stringify(results, null, 2));
+}main().catch(console.error);
