@@ -23,6 +23,9 @@ export default defineConfig({
     ['meta', { name: 'keywords', content: 'media automation, docker, jellyfin, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
   ],
 
+  // Avoid build failures due to localhost links in docs
+  ignoreDeadLinks: 'localhostLinks',
+
   themeConfig: {
     logo: '/logo.svg',
     
@@ -148,5 +151,4 @@ export default defineConfig({
     define: {
       __VUE_OPTIONS_API__: false
     }
-  }
-})
+  }})
