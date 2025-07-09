@@ -90,5 +90,4 @@ async function main() {
         JSON.stringify(results, null, 2)
     );
     
-    console.log(`💾 Results saved to: ${RESULTS_PATH}`);
-}main().catch(console.error);
+    console.log(`💾 Results saved to: ${RESULTS_PATH}`);main().catch(console.error);

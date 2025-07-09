@@ -145,5 +145,4 @@ async function main() {
     );
     
     console.log(`💾 Service registry saved to: ${REGISTRY_PATH}`);
-    console.log('\n🎯 Ready for documentation site integration!');
-}main().catch(console.error);
+    console.log('\n🎯 Ready for documentation site integration!');main().catch(console.error);
