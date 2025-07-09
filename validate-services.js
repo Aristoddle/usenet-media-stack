@@ -82,7 +82,7 @@ async function main() {
     console.log(`✅ Working: ${working}`);
     console.log(`⚠️  Errors: ${errors}`);
     console.log(`❌ Failed: ${failed}`);
-    console.log(`📸 Screenshots saved to: validation-screenshots/`);
+    console.log(`📸 Screenshots saved to: ${SCREENSHOT_DIR}`);
 
     // Save results to JSON
     fs.writeFileSync(
@@ -90,6 +90,5 @@ async function main() {
         JSON.stringify(results, null, 2)
     );
     
-    console.log(`💾 Results saved to: validation-results.json`);
-}
-main().catch(console.error);
+    console.log(`💾 Results saved to: ${RESULTS_PATH}`);
+}main().catch(console.error);

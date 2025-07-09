@@ -11,7 +11,8 @@ from typing import Dict, Any, List
 import logging
 import os
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 
 # MCP server implementation
 class UsenetMCPServer:
@@ -141,7 +142,7 @@ class UsenetMCPServer:
             
             cmd = [
                 sys.executable,
-                os.path.join(ROOT_DIR, 'scripts', 'generate_images.py'),
+                os.path.join(REPO_ROOT, 'scripts', 'generate_images.py'),
                 api_key
             ]
             
@@ -163,7 +164,7 @@ class UsenetMCPServer:
             # Check Docker services
             result = subprocess.run(
                 ["docker", "compose", "ps", "--format", "json"],
-                cwd=ROOT_DIR,
+                cwd=REPO_ROOT,
                 capture_output=True,
                 text=True
             )
@@ -187,7 +188,7 @@ class UsenetMCPServer:
         
         try:
             result = subprocess.run(
-                [os.path.join(ROOT_DIR, 'usenet'), 'storage', 'discover'],
+                [os.path.join(REPO_ROOT, 'usenet'), 'storage', 'discover'],
                 capture_output=True,
                 text=True
             )
@@ -206,7 +207,7 @@ class UsenetMCPServer:
         
         try:
             result = subprocess.run(
-                [os.path.join(ROOT_DIR, 'usenet'), 'hardware', 'detect'],
+                [os.path.join(REPO_ROOT, 'usenet'), 'hardware', 'detect'],
                 capture_output=True,
                 text=True
             )
