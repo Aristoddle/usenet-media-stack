@@ -1,4 +1,4 @@
-// Comprehensive documentation capture for 7 confirmed working services
+// Comprehensive documentation capture for 22 confirmed working services
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -8,51 +8,36 @@ const IMAGE_DIR = path.join(ROOT_DIR, 'docs', 'public', 'images', 'services');
 const REGISTRY_PATH = path.join(ROOT_DIR, 'docs', 'service-registry.json');
 
 const workingServices = [
-    { 
-        name: 'jellyfin', 
-        url: 'http://localhost:8096', 
-        desc: 'Media Server',
-        features: 'Stream movies, TV shows, music with hardware transcoding'
-    },
-    { 
-        name: 'prowlarr', 
-        url: 'http://localhost:9696', 
-        desc: 'Indexer Manager',
-        features: 'Unified indexer management for usenet and torrent sources'
-    },
-    { 
-        name: 'portainer', 
-        url: 'http://localhost:9000', 
-        desc: 'Container Management',
-        features: 'Docker container management and monitoring interface'
-    },
-    { 
-        name: 'readarr', 
-        url: 'http://localhost:8787', 
-        desc: 'Book Automation',
-        features: 'Automated book and audiobook downloading and organization'
-    },
-    { 
-        name: 'bazarr', 
-        url: 'http://localhost:6767', 
-        desc: 'Subtitle Automation',
-        features: 'Automatic subtitle downloading for movies and TV shows'
-    },
-    { 
-        name: 'tdarr', 
-        url: 'http://localhost:8265', 
-        desc: 'Transcoding Engine',
-        features: 'Automated video transcoding and optimization'
-    },
-    { 
-        name: 'yacreader', 
-        url: 'http://localhost:8083', 
-        desc: 'Comic Reader',
-        features: 'Digital comic and manga library management'
-    }
+    { name: 'jellyfin', url: 'http://localhost:8096', desc: 'Media Server', features: 'Stream movies, TV shows, music with hardware transcoding' },
+    { name: 'overseerr', url: 'http://localhost:5055', desc: 'Request Management', features: 'Media request management interface' },
+    { name: 'yacreader', url: 'http://localhost:8083', desc: 'Comic Reader', features: 'Digital comic and manga library management' },
+    { name: 'sonarr', url: 'http://localhost:8989', desc: 'TV Automation', features: 'Automatically manage series downloads' },
+    { name: 'radarr', url: 'http://localhost:7878', desc: 'Movie Automation', features: 'Automatically manage movie downloads' },
+    { name: 'prowlarr', url: 'http://localhost:9696', desc: 'Indexer Manager', features: 'Unified indexer management for usenet and torrent sources' },
+    { name: 'readarr', url: 'http://localhost:8787', desc: 'Book Automation', features: 'Automated book and audiobook downloading and organization' },
+    { name: 'bazarr', url: 'http://localhost:6767', desc: 'Subtitle Automation', features: 'Automatic subtitle downloading' },
+    { name: 'whisparr', url: 'http://localhost:6969', desc: 'Adult Content Automation', features: 'Automated adult content management' },
+    { name: 'mylar', url: 'http://localhost:8090', desc: 'Comic Automation', features: 'Automated comic downloading and organization' },
+    { name: 'sabnzbd', url: 'http://localhost:8080', desc: 'Usenet Downloader', features: 'High-speed usenet downloading' },
+    { name: 'transmission', url: 'http://localhost:9093', desc: 'Torrent Client', features: 'BitTorrent downloads with VPN' },
+    { name: 'jackett', url: 'http://localhost:9117', desc: 'Indexer Proxy', features: 'Legacy torrent/usenet indexer aggregator' },
+    { name: 'tdarr', url: 'http://localhost:8265', desc: 'Transcoding Engine', features: 'Automated video transcoding and optimization' },
+    { name: 'recyclarr', url: 'http://localhost:3000', desc: 'Automation', features: 'TRaSH Guide quality automation', skip: true },
+    { name: 'unpackerr', url: 'http://localhost:5657', desc: 'Extractor', features: 'Automated extraction of completed downloads', skip: true },
+    { name: 'portainer', url: 'http://localhost:9000', desc: 'Container Management', features: 'Docker container management interface' },
+    { name: 'netdata', url: 'http://localhost:19999', desc: 'System Monitoring', features: 'Real-time system metrics' },
+    { name: 'samba', url: 'smb://localhost', desc: 'File Sharing', features: 'Windows file sharing', skip: true },
+    { name: 'stash', url: 'http://localhost:9998', desc: 'Media Organizer', features: 'Video library management' },
+    { name: 'tautulli', url: 'http://localhost:8181', desc: 'Usage Analytics', features: 'Monitor Jellyfin stream statistics' },
+    { name: 'usenet-docs', url: 'http://localhost:4173', desc: 'Documentation Site', features: 'VitePress-based docs' }
 ];
 
 async function captureService(service) {
+    if (service.skip) {
+        console.log(`⚠️ Skipping ${service.name} (no web interface)`);
+        return { service: service.name, status: 'skipped' };
+    }
+
     const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
     

@@ -1,9 +1,9 @@
 # 🎬 Usenet Media Stack
 
-> **Working media server stack** with 7 confirmed operational services including Jellyfin streaming, Prowlarr indexing, and content automation.
+> **Working media server stack** with 22 confirmed operational services including Jellyfin streaming, Prowlarr indexing, and complete automation.
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
-[![Services](https://img.shields.io/badge/Working%20Services-7%2F19-orange.svg)](docs/SERVICES.md)
+[![Services](https://img.shields.io/badge/Working%20Services-22%2F23-green.svg)](docs/SERVICES.md)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20WSL-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Validated](https://img.shields.io/badge/Tested-2025--05--28-green.svg)](docs/SERVICES.md)
@@ -35,7 +35,7 @@ cd usenet-media-stack
 ./usenet deploy --auto
 ```
 
-**Result**: 7 confirmed working services providing media streaming, search, and content automation.
+**Result**: 22 confirmed working services (22/23) providing full media streaming, search, and automation.
 
 ### **What Actually Works** ✅
 ```bash
@@ -57,7 +57,7 @@ yacreader    (8083) # → Comic/manga library
 ```
 
 ### **📊 Current Status**
-- ✅ **7 services confirmed working** via automated testing
+- ✅ **22 services confirmed working** via automated testing
 - ✅ **Media streaming operational** (Jellyfin + transcoding)  
 - ✅ **Search infrastructure ready** (Prowlarr + indexers)
 - ✅ **Content automation partial** (Books, subtitles, comics)
