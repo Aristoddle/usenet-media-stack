@@ -385,23 +385,6 @@ services:
       - /home/joe/usenet/config/bazarr:/config
       # Same storage mounts as Sonarr/Radarr for subtitle access
       - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
     ports:
       - "6767:6767"
     restart: unless-stopped
@@ -755,14 +738,6 @@ services:
       - /home/joe/usenet/config/stash/blobs:/blobs
       - /home/joe/usenet/config/stash/generated:/generated
       # Multi-drive adult storage mounts (same pattern as other services)
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/tv:/tv:rw
       - /home/joe/usenet/media/tv:/tv:rw
     ports:
       - "9998:9999"
