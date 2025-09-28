@@ -35,7 +35,7 @@ jobs:
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ecc5914225b19722d5af73dac2c69d5b
           projectName: beppesarrstack-net
           directory: docs/.vitepress/dist
@@ -45,5 +45,4 @@ jobs:
       - name: Create deployment status
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          echo "🚀 Site deployed successfully to https://beppesarrstack.net"
-          echo "Build completed at $(date)"
+          echo "🚀 Site deployed successfully to https://beppesarrstack.net"          echo "Build completed at $(date)"
