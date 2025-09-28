@@ -22,7 +22,6 @@ export default defineConfig({
     ['meta', { name: 'twitter:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
     ['meta', { name: 'keywords', content: 'media automation, docker, jellyfin, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
   ],
-
   themeConfig: {
     logo: '/logo.svg',
     
@@ -31,19 +30,15 @@ export default defineConfig({
       { text: 'CLI Reference', link: '/cli/' },
       { text: 'Architecture', link: '/architecture/' },
       { text: 'Advanced', link: '/advanced/' },
-      { text: '📊 Visualizations', link: '/visualizations' },
-      { text: '📚 Free Media', link: '/free-media' },
       { 
         text: 'Links',
         items: [
           { text: 'GitHub', link: 'https://github.com/Aristoddle/usenet-media-stack' },
           { text: 'Issues', link: 'https://github.com/Aristoddle/usenet-media-stack/issues' },
-          { text: 'Request Credentials', link: 'mailto:j3lanzone@gmail.com?subject=Credentials%20Access%20Request&body=Hi%20Joe,%0A%0AI%20need%20access%20to:%0A%0A-%20Specific%20services:%0A-%20My%20background:%0A-%20How%20we%20know%20each%20other:%0A%0AThanks!' },
-          { text: 'Roadmap', link: '/roadmap' }
+          { text: '📧 Request Credentials', link: 'mailto:j3lanzone@gmail.com?subject=Credentials%20Access%20Request&body=Hi%20Joe,%0A%0AI%20need%20access%20to:%0A%0A-%20Specific%20services:%0A-%20My%20background:%0A-%20How%20we%20know%20each%20other:%0A%0AThanks!' }
         ]
       }
     ],
-
     sidebar: {
       '/getting-started/': [
         {
@@ -101,25 +96,20 @@ export default defineConfig({
         }
       ]
     },
-
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Aristoddle/usenet-media-stack' }
     ],
-
     footer: {
       message: 'Built with ❤️ following Bell Labs standards. Dedicated to Stan Eisenstat.',
       copyright: 'Copyright © 2025 Joseph Lanzone. MIT Licensed.'
     },
-
     search: {
       provider: 'local'
     },
-
     editLink: {
       pattern: 'https://github.com/Aristoddle/usenet-media-stack/edit/main/docs/:path',
       text: 'Edit this page on GitHub'
     },
-
     lastUpdated: {
       text: 'Updated at',
       formatOptions: {
@@ -128,14 +118,12 @@ export default defineConfig({
       }
     }
   },
-
   markdown: {
     lineNumbers: true,
     config: (md) => {
       // Add any markdown-it plugins here
     }
   },
-
   vue: {
     template: {
       compilerOptions: {
@@ -143,10 +131,14 @@ export default defineConfig({
       }
     }
   },
-
   vite: {
     define: {
       __VUE_OPTIONS_API__: false
     }
-  }
+  },
+  ignoreDeadLinks: [
+    // Allow localhost links for service documentation
+    /^http:\/\/localhost/,
+    /^https:\/\/localhost/
+  ]
 })
