@@ -9,48 +9,47 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      o: bind
+      o: bind,Z
       device: ${CONFIG_ROOT:-/home/deck/usenet/config}/sabnzbd
 
   transmission_config:
     driver: local
     driver_opts:
       type: none
-      o: bind
+      o: bind,Z
       device: ${CONFIG_ROOT:-/home/deck/usenet/config}/transmission
 
   sonarr_config:
     driver: local
     driver_opts:
       type: none
-      o: bind
+      o: bind,Z
       device: ${CONFIG_ROOT:-/home/deck/usenet/config}/sonarr
 
   radarr_config:
     driver: local
     driver_opts:
       type: none
-      o: bind
+      o: bind,Z
       device: ${CONFIG_ROOT:-/home/deck/usenet/config}/radarr
 
   bazarr_config:
     driver: local
     driver_opts:
       type: none
-      o: bind
+      o: bind,Z
       device: ${CONFIG_ROOT:-/home/deck/usenet/config}/bazarr
 
   prowlarr_config:
     driver: local
     driver_opts:
       type: none
-      o: bind
+      o: bind,Z
       device: ${CONFIG_ROOT:-/home/deck/usenet/config}/prowlarr
 
   downloads_volume:
     driver: local
     driver_opts:
       type: none
-      o: bind
+      o: bind,Z
       device: ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}
-
