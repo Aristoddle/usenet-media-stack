@@ -1,6 +1,7 @@
 # Environment and credentials
 .env
 .env.*
+!.env.example
 *.env
 credentials.txt
 usenet-credentials.txt
