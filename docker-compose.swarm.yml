@@ -133,6 +133,12 @@ services:
         delay: 10s
         max_attempts: 3
 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # ================================
   # Transmission - BitTorrent Client  
   # Placement: VPN-capable nodes with good networking
@@ -181,6 +187,12 @@ services:
         condition: unless-stopped
         delay: 10s
         max_attempts: 3
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ================================
   # Sonarr - TV Show Management
@@ -232,6 +244,12 @@ services:
         delay: 10s
         max_attempts: 3
 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # ================================
   # Radarr - Movie Management
   # Placement: Medium-performance nodes
@@ -282,6 +300,12 @@ services:
         delay: 10s
         max_attempts: 3
 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7878"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # ================================
   # Prowlarr - Indexer Management
   # Placement: Any node with network access
@@ -330,6 +354,12 @@ services:
         delay: 10s
         max_attempts: 3
 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9696"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # ================================
   # Jellyfin - Media Server
   # Placement: High/medium performance nodes with GPU access
@@ -375,6 +405,12 @@ services:
         condition: unless-stopped
         delay: 10s
         max_attempts: 3
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ================================
   # Tdarr - Transcoding Engine

@@ -37,49 +37,49 @@ volumes:
     driver_opts:
       type: bind
       o: bind
-      device: /home/joe/usenet/config/sabnzbd
+      device: ${CONFIG_ROOT:-/home/deck/usenet/config}/sabnzbd
   
   transmission_config:
     driver: local
     driver_opts:
       type: bind
       o: bind
-      device: /home/joe/usenet/config/transmission
+      device: ${CONFIG_ROOT:-/home/deck/usenet/config}/transmission
   
   sonarr_config:
     driver: local
     driver_opts:
       type: bind
       o: bind
-      device: /home/joe/usenet/config/sonarr
+      device: ${CONFIG_ROOT:-/home/deck/usenet/config}/sonarr
       
   radarr_config:
     driver: local
     driver_opts:
       type: bind
       o: bind
-      device: /home/joe/usenet/config/radarr
+      device: ${CONFIG_ROOT:-/home/deck/usenet/config}/radarr
       
   bazarr_config:
     driver: local
     driver_opts:
       type: bind
       o: bind
-      device: /home/joe/usenet/config/bazarr
+      device: ${CONFIG_ROOT:-/home/deck/usenet/config}/bazarr
       
   prowlarr_config:
     driver: local
     driver_opts:
       type: bind
       o: bind
-      device: /home/joe/usenet/config/prowlarr
+      device: ${CONFIG_ROOT:-/home/deck/usenet/config}/prowlarr
   
   downloads_volume:
     driver: local
     driver_opts:
       type: bind
       o: bind
-      device: /home/joe/usenet/downloads
+      device: ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}
       
   portainer_data:
     driver: local
@@ -127,7 +127,7 @@ services:
     volumes:
       - transmission_config:/config
       - downloads_volume:/downloads
-      - /home/joe/usenet/downloads/watch:/watch
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}/watch:/watch
     ports:
       - "9092:9091"
       - "51413:51413"
@@ -225,8 +225,8 @@ services:
       - TZ=Etc/UTC
       - JELLYFIN_PublishedServerUrl=http://localhost:8096
     volumes:
-      - /home/joe/usenet/config/jellyfin:/config
-      - /home/joe/usenet/media:/media
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/jellyfin:/config
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media
       # JBOD media access
       - /media/joe/Fast_8TB_1:/tv/fast1:ro
       - /media/joe/Fast_8TB_2:/tv/fast2:ro

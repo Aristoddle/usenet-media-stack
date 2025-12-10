@@ -84,12 +84,12 @@ services:
       -w "WORKGROUP"
       -n
     volumes:
-      - /home/joe/usenet/media:/media:rw
-      - /home/joe/usenet/downloads:/downloads:rw
-      - /home/joe/usenet/config:/config:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media:rw
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads:rw
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}:/config:rw
       # Mount media directories (working local setup)
-      - /home/joe/usenet/media/tv:/tv:rw
-      - /home/joe/usenet/media/movies:/movies:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies:rw
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -130,9 +130,9 @@ services:
       - SYS_ADMIN
     privileged: true
     volumes:
-      - /home/joe/usenet/media:/media:rw
-      - /home/joe/usenet/downloads:/downloads:rw
-      - /home/joe/usenet/config:/config:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media:rw
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads:rw
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}:/config:rw
     environment:
       - SHARED_DIRECTORY=/media
       - SHARED_DIRECTORY_2=/downloads
@@ -229,8 +229,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/sabnzbd:/config
-      - /home/joe/usenet/downloads:/downloads
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/sabnzbd:/config
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -269,9 +269,9 @@ services:
       - TZ=Etc/UTC
       - TRANSMISSION_WEB_HOME=/transmission-web-control/
     volumes:
-      - /home/joe/usenet/config/transmission:/config
-      - /home/joe/usenet/downloads:/downloads
-      - /home/joe/usenet/downloads/watch:/watch
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/transmission:/config
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}/watch:/watch
     ports:
       - "9093:9091"
       - "51413:51413"
@@ -306,10 +306,10 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/sonarr:/config
-      - /home/joe/usenet/downloads:/downloads
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/sonarr:/config
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
       # Media storage mount  
-      - /home/joe/usenet/media/tv:/tv:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -344,10 +344,10 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/radarr:/config
-      - /home/joe/usenet/downloads:/downloads
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/radarr:/config
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
       # Media storage mount
-      - /home/joe/usenet/media/movies:/movies:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies:rw
     ports:
       - "7878:7878"
     restart: unless-stopped
@@ -382,9 +382,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/bazarr:/config
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/bazarr:/config
       # Same storage mounts as Sonarr/Radarr for subtitle access
-      - /home/joe/usenet/media/tv:/tv:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
     ports:
       - "6767:6767"
     restart: unless-stopped
@@ -419,7 +419,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/prowlarr:/config
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/prowlarr:/config
     ports:
       - "9696:9696"
     restart: unless-stopped
@@ -451,10 +451,10 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/whisparr:/config
-      - /home/joe/usenet/downloads:/downloads
-      - /home/joe/usenet/media/movies:/movies
-      - /home/joe/usenet/media/tv:/tv
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/whisparr:/config
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv
     ports:
       - "6969:6969"
     restart: unless-stopped
@@ -483,9 +483,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/readarr:/config
-      - /home/joe/usenet/downloads:/downloads
-      - /home/joe/usenet/media/books:/books
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/readarr:/config
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/books:/books
     ports:
       - "8787:8787"
     restart: unless-stopped
@@ -511,9 +511,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/mylar:/config
-      - /home/joe/usenet/downloads:/downloads
-      - /home/joe/usenet/media/comics:/comics
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/mylar:/config
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/comics:/comics
     ports:
       - "8090:8090"
     restart: unless-stopped
@@ -539,8 +539,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/yacreader:/config
-      - /home/joe/usenet/media/comics:/comics
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/yacreader:/config
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/comics:/comics
     ports:
       - "8083:8080"
     restart: unless-stopped
@@ -567,12 +567,12 @@ services:
       - TZ=Etc/UTC
       - JELLYFIN_PublishedServerUrl=http://localhost:8096
     volumes:
-      - /home/joe/usenet/config/jellyfin:/config
-      - /home/joe/usenet/media:/media
-      - /home/joe/usenet/media/movies:/movies
-      - /home/joe/usenet/media/tv:/tv
-      - /home/joe/usenet/media/music:/music
-      - /home/joe/usenet/media/books:/books
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/jellyfin:/config
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/music:/music
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/books:/books
     ports:
       - "8096:8096"
     restart: unless-stopped
@@ -598,7 +598,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/overseerr:/config
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/overseerr:/config
     ports:
       - "5055:5055"
     restart: unless-stopped
@@ -624,7 +624,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /home/joe/usenet/config/recyclarr:/config
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/recyclarr:/config
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -657,13 +657,13 @@ services:
       # - NVIDIA_VISIBLE_DEVICES=all
       # - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
     volumes:
-      - /home/joe/usenet/config/tdarr/server:/app/server
-      - /home/joe/usenet/config/tdarr/configs:/app/configs
-      - /home/joe/usenet/config/tdarr/logs:/app/logs
-      - /home/joe/usenet/media:/media
-      - /home/joe/usenet/media/movies:/movies
-      - /home/joe/usenet/media/tv:/tv
-      - /home/joe/usenet/downloads/tdarr_transcode:/temp
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/tdarr/server:/app/server
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/tdarr/configs:/app/configs
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/tdarr/logs:/app/logs
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}/tdarr_transcode:/temp
     ports:
       - "8265:8265"  # Web UI
       - "8266:8266"  # Server port
@@ -691,7 +691,7 @@ services:
     container_name: usenet-docs
     hostname: docs
     volumes:
-      - /home/joe/usenet/docs/.vitepress/dist:/usr/share/nginx/html:ro
+      - ${STACK_ROOT:-/home/deck/usenet}/docs/.vitepress/dist:/usr/share/nginx/html:ro
     ports:
       - "4173:80"
     restart: unless-stopped
@@ -731,14 +731,14 @@ services:
       - STASH_PORT=9999
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /home/joe/usenet/config/stash:/root/.stash
-      - /home/joe/usenet/media/adult:/data
-      - /home/joe/usenet/config/stash/metadata:/metadata
-      - /home/joe/usenet/config/stash/cache:/cache
-      - /home/joe/usenet/config/stash/blobs:/blobs
-      - /home/joe/usenet/config/stash/generated:/generated
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash:/root/.stash
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/adult:/data
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/metadata:/metadata
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/cache:/cache
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/blobs:/blobs
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/generated:/generated
       # Multi-drive adult storage mounts (same pattern as other services)
-      - /home/joe/usenet/media/tv:/tv:rw
+      - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
     ports:
       - "9998:9999"
     restart: unless-stopped
