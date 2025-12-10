@@ -76,6 +76,27 @@ volumes:
       type: nfs
       o: addr=${NFS_SERVER},nolock,soft,rw
       device: ":${NFS_PATH}/config/prowlarr"
+
+  bazarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/bazarr"
+
+  overseerr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/overseerr"
+
+  media_volume:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/media"
       
   downloads_volume:
     driver: local
@@ -361,6 +382,55 @@ services:
       retries: 3
 
   # ================================
+  # Bazarr - Subtitle Automation
+  # Placement: Medium-performance nodes with storage access
+  # ================================
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    hostname: bazarr
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+    volumes:
+      - bazarr_config:/config
+      - downloads_volume:/downloads
+      - media_volume:/media
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.performance != low
+          - node.labels.storage == true
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
+        - traefik.http.routers.bazarr.entrypoints=websecure
+        - traefik.http.routers.bazarr.tls.certresolver=letsencrypt
+        - traefik.http.services.bazarr.loadbalancer.server.port=6767
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6767"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ================================
   # Jellyfin - Media Server
   # Placement: High/medium performance nodes with GPU access
   # Works great on Steam Deck when it's not gaming!
@@ -457,3 +527,59 @@ services:
         condition: unless-stopped
         delay: 10s
         max_attempts: 3
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8265"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ================================
+  # Overseerr - Requests Frontend
+  # Placement: storage-enabled node
+  # ================================
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    hostname: overseerr
+    networks:
+      - media_network
+      - traefik-public
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-UTC}
+    volumes:
+      - overseerr_config:/config
+      - downloads_volume:/downloads
+      - media_volume:/media
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+        preferences:
+          - spread: node.labels.region
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.overseerr.rule=Host(`overseerr.${DOMAIN}`)
+        - traefik.http.routers.overseerr.entrypoints=websecure
+        - traefik.http.routers.overseerr.tls.certresolver=letsencrypt
+        - traefik.http.services.overseerr.loadbalancer.server.port=5055
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+      restart_policy:
+        condition: unless-stopped
+        delay: 10s
+        max_attempts: 3
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5055"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
