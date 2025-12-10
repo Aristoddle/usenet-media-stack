@@ -37,6 +37,8 @@ cd usenet-media-stack
 
 **Running on a single storage host with Docker Swarm?** See `docs/SWARM_QUICKSTART.md` for a ready-made bind-mount override and labels to get a swarm up today while keeping room for Pi workers later.
 
+Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick matrix (single host, Swarm with bind or NFS, VPN/tunnel variants) and required Docker/SELinux prerequisites.
+
 **Result**: 22 confirmed working services (22/23) providing full media streaming, search, and automation.
 
 ### **What Actually Works** ✅

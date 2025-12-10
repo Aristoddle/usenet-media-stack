@@ -108,7 +108,7 @@ services:
     volumes:
       - transmission_config:/config
       - downloads_volume:/downloads
-      - /home/joe/usenet/downloads/watch:/watch
+      - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}/watch:/watch
       
     # IMPORTANT: No direct port mappings - access via VPN container
     # Port 9091 is accessible via mullvad-vpn container IP
