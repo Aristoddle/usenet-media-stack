@@ -302,6 +302,8 @@ services:
       mode: replicated
       replicas: 1
       placement:
+        constraints:
+          - node.labels.storage == true
         preferences:
           - spread: node.labels.region
       labels:
@@ -398,6 +400,7 @@ services:
         constraints:
           # Steam Deck has excellent transcoding capabilities
           - node.labels.performance != low
+          - node.labels.storage == true
         preferences:
           - spread: node.labels.performance
       labels:
