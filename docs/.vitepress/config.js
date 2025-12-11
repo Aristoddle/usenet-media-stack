@@ -40,6 +40,8 @@ export default defineConfig({
       { text: 'Ops Runbook', link: '/ops-runbook' },
       { text: 'Secrets', link: '/secrets' },
       { text: 'Usenet Primer', link: '/usenet-primer' },
+      { text: 'Usenet Onboarding', link: '/usenet-onboarding' },
+      { text: 'FAQ', link: '/faq' },
       { 
         text: 'Links',
         items: [
@@ -100,6 +102,7 @@ export default defineConfig({
             { text: 'Performance Tuning', link: '/advanced/performance' },
             { text: 'Backup Strategies', link: '/advanced/backup-strategies' },
             { text: 'Hot-Swap Workflows', link: '/advanced/hot-swap' },
+            { text: 'Usenet Onboarding', link: '/usenet-onboarding' },
             { text: 'API Integration', link: '/advanced/api-integration' },
             { text: 'Troubleshooting', link: '/advanced/troubleshooting' }
           ]
