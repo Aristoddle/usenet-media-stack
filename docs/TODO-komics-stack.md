@@ -36,6 +36,15 @@
 
 See `docker-compose.reading.yml` for ready-to-launch definitions (Calibre, Calibre-Web, Audiobookshelf) with ports shifted to avoid Komga collisions.
 
+### Documentation improvements (queued)
+- Add nav links for Reading Stack and Komics TODO in `docs/.vitepress/config.js`.
+- Add OPDS/reading-stack cards to `docs/free-media.md`.
+- Add runtime matrix + OneDrive comics callouts in `docs/getting-started/installation.md` and `docs/getting-started/first-deployment.md`.
+- Add GVFS/rsync note to `docs/advanced/hot-swap.md`.
+- Add Storage/Paths table in `docs/architecture/storage.md` (or new section) for comics/ebooks/audiobooks/configs.
+- Add Operations Runbook (`docs/ops-runbook.md`) covering healthchecks, rsync, reboot checklist.
+- Add Secrets/env page for `.env.local` (indexer/API keys).
+
 ## Nice-to-haves
 - Create a systemd user timer for nightly rsync from OneDrive → Comics once GVFS stability is confirmed.
 - Add Panels/OPDS instructions to docs after Komga library is indexed: Panels URL `http://<host>:8081/opds/v1.2`.
