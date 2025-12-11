@@ -35,6 +35,10 @@ export default defineConfig({
       { text: 'Advanced', link: '/advanced/' },
       { text: '📊 Visualizations', link: '/visualizations' },
       { text: '📚 Free Media', link: '/free-media' },
+      { text: 'Reading Stack', link: '/reading-stack' },
+      { text: 'Komics TODO', link: '/TODO-komics-stack' },
+      { text: 'Ops Runbook', link: '/ops-runbook' },
+      { text: 'Secrets', link: '/secrets' },
       { 
         text: 'Links',
         items: [

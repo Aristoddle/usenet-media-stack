@@ -1,41 +1,44 @@
 # Installation
 
+## Runtime matrix (pick the row that matches your host)
+| Host | Container runtime | Status today | What to do |
+|------|-------------------|--------------|------------|
+| Bazzite (immutable, SteamOS/Deck) | **Podman rootless** (default) | Already available | Use Podman now; keep host clean. |
+| Bazzite (needs Swarm/Compose v2) | Docker (moby-engine) | **Staged** but inactive until reboot | After other transfers finish: reboot, `sudo systemctl enable --now docker && sudo usermod -aG docker $USER && newgrp docker`. |
+| Generic Linux | Docker + Compose v2 | Install via distro packages or Docker CE | Ensure `docker compose version` works. |
+| Minimal / no daemon | Podman rootless | Use `podman compose` equivalents | Some compose v2 features may differ. |
+
+**Don’t reboot yet** if long rsync/transfers are running (e.g., comics sync). Finish those first.
+
 ## Prerequisites
+- 8–16 GB RAM (more helps indexing/transcoding)
+- Storage mounted and writable (see paths below)
+- For Docker: working `docker compose version`
+- For Podman: `podman --version` and `podman info --debug`
 
-- Linux system (Ubuntu 20.04+ recommended)
-- Docker and Docker Compose
-- 16GB+ RAM (32GB recommended)
-- GPU (optional but recommended for transcoding)
+## Paths (used by the stack)
+- Media root: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive`
+  - Comics: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Comics`
+  - Ebooks: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books`
+  - Audiobooks: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks`
+  - Configs: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/*Config`
+- OneDrive source (GVFS): `/run/user/1000/gvfs/onedrive:host=gmail.com,user=J3lanzone/Bundles_b896e2bb7ca3447691823a44c4ad6ad7/Books/Comics/`
 
-## Quick Installation
-
+## Clone and configure
 ```bash
-# Download and run installer
-curl -fsSL https://raw.githubusercontent.com/user/usenet-media-stack/main/install.sh | bash
-```
-
-## Manual Installation
-
-```bash
-# Clone repository
-git clone https://github.com/user/usenet-media-stack
+git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your credentials
-
-# Deploy stack
-./usenet setup
+cp .env.example .env.local   # fill in your API keys (Prowlarr/NZBs, etc.)
 ```
 
-## Verification
+## First bring-up (after choosing runtime)
+- **Podman (Bazzite, now):** `podman compose -f docker-compose.reading.yml up -d` (optional reading stack); Komga already running via Podman command you started.
+- **Docker (post-reboot):** `docker compose up -d` for the main stack, and `docker compose -f docker-compose.reading.yml up -d` for reading services.
 
-```bash
-# Check all services
-./usenet status
+## Verify
+- Komga: `http://localhost:8081` (after comics sync, add library `/comics`).
+- Reading stack (after Docker): Calibre `:18080/18081`, Calibre-Web `:18083`, Audiobookshelf `:13378`.
 
-# View web interfaces
-echo "Jellyfin: https://jellyfin.beppesarrstack.net"
-echo "Sonarr: https://sonarr.beppesarrstack.net"
-```
+## Notes on OneDrive comics sync
+- Active user service: `rsync-comics.service` (systemd-run). Monitor: `journalctl --user -u rsync-comics -f`.
+- Do **not** reboot until that job and other transfers finish.
