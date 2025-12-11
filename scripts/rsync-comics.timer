@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily OneDrive comics sync
+
+[Timer]
+OnCalendar=03:30
+Persistent=true
+RandomizedDelaySec=5m
+Unit=rsync-comics.service
+
+[Install]
+WantedBy=timers.target

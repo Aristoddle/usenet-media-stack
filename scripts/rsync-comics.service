@@ -1,0 +1,13 @@
+[Unit]
+Description=Sync OneDrive Comics to local library
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+ExecStart=/usr/bin/rsync -avh --delete --info=progress2 \
+  "/run/user/1000/gvfs/onedrive:host=gmail.com,user=J3lanzone/Bundles_b896e2bb7ca3447691823a44c4ad6ad7/Books/Comics/" \
+  "/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Comics/"
