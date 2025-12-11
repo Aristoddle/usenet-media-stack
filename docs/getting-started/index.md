@@ -33,3 +33,5 @@ docker compose up -d         # after Docker is installed
 - [Installation Guide](./installation)
 - [First Deployment](./first-deployment)
 - [Reading Stack](/reading-stack)
+- [Usenet Primer](/usenet-primer)
+- [Usenet Onboarding](/usenet-onboarding)
