@@ -60,6 +60,7 @@ Need help finding specific content, setting up tools, or accessing premium resou
 - **[YACReader](https://www.yacreader.com/)** - Professional comic reading and library management
 - **[Calibre](https://calibre-ebook.com/)** - E-book management with comic support
 - **[ComicRack](https://www.comicscape.co.uk/ComicRack/)** - Windows comic book reader and organizer
+- **[Vimm's Lair](https://vimm.net/)** - Preservation-focused classic console manuals/ROM info (reference)
 
 ### **Community Resources**
 - **[/r/manga](https://reddit.com/r/manga)** - Manga discussions and recommendations

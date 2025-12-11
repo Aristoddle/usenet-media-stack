@@ -39,6 +39,7 @@ export default defineConfig({
       { text: 'Komics TODO', link: '/TODO-komics-stack' },
       { text: 'Ops Runbook', link: '/ops-runbook' },
       { text: 'Secrets', link: '/secrets' },
+      { text: 'Usenet Primer', link: '/usenet-primer' },
       { 
         text: 'Links',
         items: [
