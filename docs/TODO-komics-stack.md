@@ -7,7 +7,7 @@
 - Docker Engine is staged but inactive until reboot; only Podman available right now.
 
 ## Immediate tasks (no reboot required)
-- Let `rsync-comics` finish; monitor with `journalctl --user -u rsync-comics -f`.
+- Let `rsync-comics` finish; monitor with `journalctl --user -u rsync-comics -f`. Hold all reboots until this and other active transfers in other terminals are done.
 - After sync completes, in Komga create a library pointing to `/comics` (container mount) and let it index.
 - Review `config.yml` skeleton for Kometa at `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/KometaConfig/config.yml` and fill Plex token/URL if you plan to run Kometa.
 
@@ -27,8 +27,12 @@
       - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/KometaConfig:/config
     restart: unless-stopped
   ```
-- Note: Kometa is designed for Plex (and Jellyfin beta); it cannot manage Komga directly. Use only if Plex/Jellyfin is in the stack.
-- Restore/keep healthchecks and storage constraints in compose (Bazarr/Overseerr/Jellyfin/Tdarr) when bringing the stack up.
+- Note: Kometa is designed for Plex (and Jellyfin beta); it cannot manage Komga directly. We are not planning Jellyfin; Kometa is optional for Plex-only use.
+- Restore/keep healthchecks and storage constraints in compose (Bazarr/Overseerr/Tdarr) when bringing the stack up.
+
+### Additional services to add after reboot
+- Calibre (core DB/metadata/conversion) and Calibre-Web (light web UI) for ebooks; mount to the data disk.
+- Audiobookshelf for audiobooks/podcasts; point it at `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks` (create after initial sync). No Jellyfin/Kavita planned per current preferences.
 
 ## Nice-to-haves
 - Create a systemd user timer for nightly rsync from OneDrive → Comics once GVFS stability is confirmed.
