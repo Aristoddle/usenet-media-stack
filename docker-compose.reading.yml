@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      # Optional: change to true to run the desktop GUI over noVNC
+      - GUAC_USER=reader
+      - GUAC_PASS=changeme
+    volumes:
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/CalibreConfig:/config
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books:/books
+    ports:
+      - "18080:8080"  # calibre content server (avoid collision with Komga)
+      - "18081:8081"  # noVNC (GUI)
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - DOCKER_MODS=linuxserver/calibre-web:calibre
+    volumes:
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/CalibreConfig:/config
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books:/books
+    ports:
+      - "18083:8083"  # Calibre-Web UI
+    depends_on:
+      - calibre
+    restart: unless-stopped
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks:/audiobooks
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Podcasts:/podcasts
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/AudiobookshelfConfig:/config
+      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/AudiobookshelfConfig/metadata:/metadata
+    ports:
+      - "13378:80"   # Audiobookshelf web
+    restart: unless-stopped
+
+networks:
+  default:
+    name: reading_net

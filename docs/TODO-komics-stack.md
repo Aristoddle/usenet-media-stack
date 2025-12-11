@@ -34,6 +34,8 @@
 - Calibre (core DB/metadata/conversion) and Calibre-Web (light web UI) for ebooks; mount to the data disk.
 - Audiobookshelf for audiobooks/podcasts; point it at `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks` (create after initial sync). No Jellyfin/Kavita planned per current preferences.
 
+See `docker-compose.reading.yml` for ready-to-launch definitions (Calibre, Calibre-Web, Audiobookshelf) with ports shifted to avoid Komga collisions.
+
 ## Nice-to-haves
 - Create a systemd user timer for nightly rsync from OneDrive → Comics once GVFS stability is confirmed.
 - Add Panels/OPDS instructions to docs after Komga library is indexed: Panels URL `http://<host>:8081/opds/v1.2`.
