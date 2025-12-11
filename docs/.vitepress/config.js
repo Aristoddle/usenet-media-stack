@@ -22,6 +22,9 @@ export default defineConfig({
     ['meta', { name: 'twitter:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
     ['meta', { name: 'keywords', content: 'media automation, docker, jellyfin, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
   ],
+  // Allow localhost links during build; real links still validated
+  ignoreDeadLinks: 'localhostLinks',
+
   themeConfig: {
     logo: '/logo.svg',
     
@@ -30,6 +33,8 @@ export default defineConfig({
       { text: 'CLI Reference', link: '/cli/' },
       { text: 'Architecture', link: '/architecture/' },
       { text: 'Advanced', link: '/advanced/' },
+      { text: '📊 Visualizations', link: '/visualizations' },
+      { text: '📚 Free Media', link: '/free-media' },
       { 
         text: 'Links',
         items: [
@@ -135,10 +140,5 @@ export default defineConfig({
     define: {
       __VUE_OPTIONS_API__: false
     }
-  },
-  ignoreDeadLinks: [
-    // Allow localhost links for service documentation
-    /^http:\/\/localhost/,
-    /^https:\/\/localhost/
-  ]
+  }
 })
