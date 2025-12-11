@@ -6,6 +6,12 @@ This is the most comprehensive free media resource collection on the internet. W
 
 ## 🚀 **Quick Access Portals**
 
+### 🗂️ **Self-Hosted Libraries (your stack)**
+- **Komga (Comics/OPDS)**: `http://<host>:8081` • OPDS: `http://<host>:8081/opds/v1.2`
+- **Calibre-Web (Ebooks/OPDS)**: `http://<host>:18083` • OPDS: `http://<host>:18083/opds`
+- **Audiobookshelf (Audiobooks/Podcasts)**: `http://<host>:13378`
+- Bring-up file: `docker-compose.reading.yml` (Calibre, Calibre-Web, Audiobookshelf). See [Reading Stack](/reading-stack).
+
 ### 📧 **Get Personal Support from Joe**
 Need help finding specific content, setting up tools, or accessing premium resources? I'm here to help:
 

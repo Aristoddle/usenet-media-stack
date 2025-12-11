@@ -8,14 +8,18 @@ Try our commands directly in this interactive terminal simulator:
 
 <CLISimulator />
 
-## Quick Start
+## Quick Start (generic Docker host)
 
 ```bash
-# Clone and deploy
-git clone https://github.com/user/usenet-media-stack
+git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
-./usenet setup
+cp .env.example .env.local   # fill provider/API keys
+docker compose up -d         # after Docker is installed
 ```
+
+## Bazzite / Podman-first
+- Use Komga on Podman (already running) while transfers finish.
+- After reboot (when ready): enable Docker, then `docker compose up -d` plus optional `-f docker-compose.reading.yml` for Calibre/Audiobookshelf.
 
 ## What You Get
 
@@ -27,5 +31,5 @@ cd usenet-media-stack
 ## Next Steps
 
 - [Installation Guide](./installation)
-- [Hardware Optimization](../hardware/)
-- [Storage Configuration](../storage/)
+- [First Deployment](./first-deployment)
+- [Reading Stack](/reading-stack)
