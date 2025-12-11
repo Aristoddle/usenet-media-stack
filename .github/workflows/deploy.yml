@@ -35,7 +35,8 @@ jobs:
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # Accept either legacy CLOUDFLARE_API_TOKEN or new CF_API_TOKEN
+          apiToken: ${{ secrets.CF_API_TOKEN != '' && secrets.CF_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ecc5914225b19722d5af73dac2c69d5b
           projectName: beppesarrstack-net
           directory: docs/.vitepress/dist
