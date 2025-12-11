@@ -44,6 +44,7 @@ See `docker-compose.reading.yml` for ready-to-launch definitions (Calibre, Calib
 - Add Storage/Paths table in `docs/architecture/storage.md` (or new section) for comics/ebooks/audiobooks/configs.
 - Add Operations Runbook (`docs/ops-runbook.md`) covering healthchecks, rsync, reboot checklist.
 - Add Secrets/env page for `.env.local` (indexer/API keys).
+- Add nightly rsync timer templates (done): see `scripts/rsync-comics.service` and `.timer`; enable after current transfers.
 
 ## Nice-to-haves
 - Create a systemd user timer for nightly rsync from OneDrive → Comics once GVFS stability is confirmed.

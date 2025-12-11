@@ -4,6 +4,7 @@
 - `podman ps` or `docker ps` (post-reboot) to confirm containers are up.
 - Komga up: `curl -I http://localhost:8081`.
 - Comics sync status: `journalctl --user -u rsync-comics -f` (stop when idle).
+ - Nightly sync (optional): copy `scripts/rsync-comics.service` and `.timer` to `~/.config/systemd/user/`, then `systemctl --user enable --now rsync-comics.timer` once current transfers are done.
 
 ## Reboot checklist (only after transfers finish)
 1) Reboot to apply staged rpm-ostree layer (Docker).
@@ -34,6 +35,7 @@
 - Restart a single service (Docker): `docker compose restart <service>`.
 - Tail logs (Docker): `docker compose logs -f <service>`; (Podman): `podman logs -f <container>`.
 - Re-run comics sync manually: use the systemd-run command in `docs/advanced/hot-swap.md`; avoid reboots while it runs.
+- Nightly comics sync: after current rsync completes, enable the `rsync-comics.timer` (see Daily/quick checks above).
 - Backup configs: tar or restic/borg the `*Config` directories (they’re already on OneDrive for versioning).
 
 ## Incident shortcuts

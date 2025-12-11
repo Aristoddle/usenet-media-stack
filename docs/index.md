@@ -146,6 +146,8 @@ cd usenet-media-stack
 
 **Reading stack add-ons** (optional, Docker required post-reboot): Komga (8081), Calibre (18080/18081), Calibre-Web (18083), Audiobookshelf (13378). Compose file: `docker-compose.reading.yml`.
 
+**Friends' favorites (free culture quicklinks)**: [Anna's Archive](https://annas-archive.org/), [EmuGen Wiki](https://emulation.gametechwiki.com/), [FMHY](https://fmhy.pages.dev/).
+
 **Performance**:
 - AMD Ryzen 7 7840HS + Radeon 780M Graphics
 - 4K HEVC → 1080p: 2.3 FPS CPU → 67 FPS GPU (29x improvement)
