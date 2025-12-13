@@ -10,6 +10,9 @@ Last updated: 2025-12-13
 - Paths are non-portable in places (`/run/media/deck/...`, `.env.example`). Need portable defaults (`/srv/usenet/...` or `$HOME/.local/share/...`).
 - Website is stale (roadmap Jan 2025); published site doesn’t match repo docs.
 - **Security incident:** Cloudflare API token is committed in docs/scripts → treat as compromised and rotate/scrub from history; add secret scanning.
+- Rootful assumption: several services are privileged / low ports (Samba 139/445, NFS 111/2049) and docker.sock consumers (Portainer, Netdata), so full stack requires rootful Docker.
+- Bazzite seed host has staged rpm-ostree layering (Docker/compose/ulauncher); reboot activates it.
+- Komga currently runs under Podman with a volume-bound config; plan is to migrate to bind mounts (see vnext plan).
 
 ## High-Priority Actions
 1) **Security:** Rotate/revoke Cloudflare token; remove from repo/history (git filter-repo/BFG); add secret scanning (gitleaks + GH secret scanning/pre-commit); remove plaintext secrets from docs/scripts.
@@ -20,6 +23,9 @@ Last updated: 2025-12-13
    - Swarm = legacy/experimental; k3s = future target for selected workloads.
 4) **Paths/portability:** Fix `.env.example` and onboarding docs to use portable defaults; strip personal paths.
 5) **Docs site:** Fix CI/secrets and redeploy so live site matches repo; flag/remove stale pages.
+- Compose/Swarm split: either separate files or clear overlays; don’t pretend one file serves both (Swarm ignores unsupported fields).
+- Add ADRs (runtime/orchestration; storage/scaling) so decisions stop churning.
+- Update GitHub Actions secrets (CF token) and ensure no plaintext secrets remain in DEPLOYMENT.md, `scripts/deploy-live.sh`, `scripts/cloudflare-deploy.sh`.
 
 ## Files to Read First
 - `AGENTS.md` (truthful state, priorities)
@@ -34,6 +40,7 @@ Last updated: 2025-12-13
 ## Decisions to Formalize (ADRs suggested)
 - ADR-0001 Runtime & Orchestration Strategy: Docker default; Podman scoped; Swarm legacy; k3s future.
 - ADR-0002 Storage & Scaling Model: seed node owns storage/control; workers for Tdarr/background jobs; “add compute” means worker capacity, not “Plex cluster.”
+- ADR-0003 Secrets & Deploy Hygiene: no plaintext tokens in repo; secrets via GH Actions/env; secret scanning required.
 
 ## Guidance on Podman/Quadlet
 - `podman generate systemd` is deprecated; if keeping Podman for any services, prefer Quadlet or a thin systemd unit running `podman compose up -d`.
@@ -51,6 +58,7 @@ Last updated: 2025-12-13
 - Activate staged Docker/ulauncher layers by rebooting.
 - Enable Docker: `sudo systemctl enable --now docker && sudo usermod -aG docker $USER && newgrp docker`.
 - Then continue with security cleanup and docs alignment.
+- If stopping services pre-reboot: `systemctl --user stop container-komga.service container-komf.service`.
 
 ## What Not to Promise
 - No “Plex/Jellyfin cluster” scaling; extra nodes are for worker-able workloads (e.g., Tdarr) and resilience, not multi-node Plex.
