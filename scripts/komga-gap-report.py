@@ -65,21 +65,46 @@ def fetch_books(series_id: str):
     return data.get("content", [])
 
 
+# Heuristics to keep numbers sane: chapter/volume IDs rarely exceed a few hundred.
+VOL_CH_MAX = 2000
+FALLBACK_MAX = 400  # when no ch/vol keyword is present
+YEAR_LOWER, YEAR_UPPER = 1900, 2100
+
 vol_re = re.compile(r"(?:^|[^A-Za-z0-9])(v|vol|volume)\s*0*(\d+)", re.IGNORECASE)
 ch_re = re.compile(r"(?:^|[^A-Za-z0-9])(ch|chapter)\s*0*(\d+)", re.IGNORECASE)
 num_re = re.compile(r"(?:^|[^A-Za-z0-9])0*(\d+)(?![0-9])")
 
 
 def extract_numbers(name: str) -> List[int]:
-    nums = []
-    for rx in (vol_re, ch_re, num_re):
+    """
+    Extract plausible volume/chapter numbers from a filename.
+    Priority: vol/volume -> ch/chapter -> generic numbers.
+    Filters out year-like numbers and absurdly large ranges.
+    """
+    # Pass 1: explicit vol/ch
+    for rx, limit in ((vol_re, VOL_CH_MAX), (ch_re, VOL_CH_MAX)):
+        hits: List[int] = []
         for m in rx.finditer(name):
             try:
-                nums.append(int(m.group(2 if rx != num_re else 1)))
+                n = int(m.group(2))
+                if 0 < n <= limit:
+                    hits.append(n)
             except Exception:
                 continue
-        if nums:
-            break  # prefer vol/ch patterns first
+        if hits:
+            return sorted(set(hits))
+
+    # Pass 2: bare numbers, but avoid years and huge values
+    nums: List[int] = []
+    for m in num_re.finditer(name):
+        try:
+            n = int(m.group(1))
+        except Exception:
+            continue
+        if YEAR_LOWER <= n <= YEAR_UPPER:
+            continue
+        if 0 < n <= FALLBACK_MAX:
+            nums.append(n)
     return sorted(set(nums))
 
 
@@ -114,8 +139,12 @@ def main():
     print(f"Series scanned: {len(series_list)}")
     print(f"Series with gaps: {len(report)}\n")
     for item in report:
+        gaps = item["gaps"]
+        missing_display = ", ".join(map(str, gaps[:200]))
+        if len(gaps) > 200:
+            missing_display += f", … (+{len(gaps)-200} more)"
         print(f"## {item['series']}")
-        print(f"Missing: {', '.join(map(str, item['gaps']))}\n")
+        print(f"Missing: {missing_display}\n")
 
 
 if __name__ == "__main__":
