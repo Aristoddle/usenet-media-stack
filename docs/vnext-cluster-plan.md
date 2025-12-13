@@ -1,20 +1,27 @@
 # vNext Cluster Plan (PC + Laptops + 6–8 RPi5)
 
+## Assumptions / Non-goals / Invariants
+- Content lives outside the stack; the repo must rehydrate “tools, not data” on any host.
+- State must be explicit (bind mounts), backed up, and reversible before deletion.
+- Boot must converge without babysitting: services wait for mounts, restart safely.
+- Security posture may differ by runtime: rootless acceptable for single-host; rootful required for Swarm/k8s nodes.
+
 ## TL;DR
-- Keep today’s compose setup (Komga/Komf + Arr stack) running on Podman/Docker with bind-mounted configs.
+- Keep today’s compose setup (Komga/Komf + Arr stack) on Podman/Docker with bind-mounted configs.
 - Post-reboot, enable Docker daemon for Swarm/K8s experiments.
-- Long-term: prefer **k3s** (lightweight Kubernetes) with the beefy PC as control-plane, RPis as workers, laptops as tainted/ephemeral nodes. [k3s docs](https://docs.k3s.io/)
+- Long-term: prefer **k3s** (lightweight Kubernetes) with PC control-plane, RPis as workers, laptops tainted/ephemeral. [k3s docs](https://docs.k3s.io/)
 
 ## Why k3s over Swarm (for this hardware mix)
-- Multi-arch & edge-focused: ARM binaries and small footprint; tested on RPis. [k3s docs](https://docs.k3s.io/) · [k3s GitHub](https://github.com/k3s-io/k3s)
-- Resource efficiency on small nodes (RPi-class): k3s benchmarks show lower control-plane overhead than full K8s. [Phoronix k3s edge tests](https://www.phoronix.com/review/k3s-edge-kubernetes)
-- Ecosystem depth (ingress, cert-manager, GitOps) vs. Swarm’s slower velocity.
-- Swarm still supported (Mirantis committed through 2030) but **rootless Swarm is unsupported** (overlay networking). [Mirantis LTS](https://www.mirantis.com/blog/mirantis-guarantees-long-term-support-for-swarm/) · [Rootless Swarm limitation](https://stackoverflow.com/questions/59712502/is-it-possible-to-use-docker-swarm-with-rootless-docker)
+- Multi-arch & edge-focused: single binary, minimal deps, ARM builds. [k3s docs](https://docs.k3s.io/) · [k3s GitHub](https://github.com/k3s-io/k3s)
+- Small control-plane footprint: k3s is positioned for edge/IoT; typical RAM use is markedly lower than full k8s. (Vendor positioning; measure on your hosts.)
+- Ecosystem depth (ingress, cert-manager, GitOps) and active velocity vs. Swarm’s slower cadence.
+- Swarm still supported (Mirantis committed through 2030) but **rootless Swarm is unsupported** because overlay networking is unavailable in rootless Docker. [Mirantis LTS](https://www.mirantis.com/blog/mirantis-guarantees-long-term-support-for-swarm/) · [Docker rootless limitations](https://docs.docker.com/engine/security/rootless/#known-limitations)
 
 ## Near-term steps (before cluster work)
 1) Make Komga/Komf runtime-agnostic: bind-mount `/config` and `/tmp`; drive paths via `.env` and `docker-compose.komga.yml`.
 2) Keep compose as single source of truth; run with `podman compose` today, `docker compose` after reboot.
 3) Post-reboot: enable Docker service + docker group; optional: keep Podman for dev/testing.
+4) Stop generating single-container systemd units; prefer Quadlet or a user service that runs `podman compose up -d`. [Podman systemd deprecation](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)
 
 ## Medium-term (k3s bootstrap)
 1) Install k3s on the PC (single control-plane).  
@@ -26,7 +33,8 @@
 
 ## Swarm fallback (if you choose it)
 - Keep compose v3.9 files; add `deploy` blocks and placement constraints.
-- Run Swarm only in rootful Docker (rootless Swarm unsupported). [Rootless Swarm limitation](https://stackoverflow.com/questions/59712502/is-it-possible-to-use-docker-swarm-with-rootless-docker)
+- Run Swarm only in rootful Docker (rootless Swarm unsupported). [Docker rootless limitations](https://docs.docker.com/engine/security/rootless/#known-limitations)
+- If using bind mounts, paths must exist on every node where tasks may land; otherwise pin tasks with placement constraints or use shared storage. [Swarm bind-mount requirement](https://docs.docker.com/engine/swarm/services/#bind-mounts)
 
 ## Risks / Mitigations
 - Path drift (new disk/NVMe): use `.env` for paths; avoid hardcoded systemd units.
@@ -39,3 +47,10 @@
 - Export current Komga Podman volume → host config dir; update compose/systemd to bind mounts.  
 - Add `.env.example` with COMICS_ROOT/KOMGA_CONFIG/KOMGA_TMP defaults.  
 - Draft k3s install/runbook (PC control-plane, RPi workers).  
+
+## Komga config migration (plan only; do post-reboot)
+- Stop service; backup Podman config volume (export or tar).
+- Copy/export volume into a host path (e.g., `/srv/komga/config`, `/srv/komga/tmp`); set SELinux labels (`:Z`).
+- Update `docker-compose.komga.yml` + `.env` to use bind mounts; use compose (Podman or Docker) to recreate.
+- Verify: login with existing user; libraries present; Komf can reach Komga; scan succeeds; thumbnails intact.
+- Keep old volume until verified; only then remove it.
