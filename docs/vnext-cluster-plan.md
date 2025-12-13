@@ -3,13 +3,13 @@
 ## TL;DR
 - Keep today’s compose setup (Komga/Komf + Arr stack) running on Podman/Docker with bind-mounted configs.
 - Post-reboot, enable Docker daemon for Swarm/K8s experiments.
-- Long-term: prefer **k3s** (lightweight Kubernetes) with the beefy PC as control-plane, RPis as workers, laptops as tainted/ephemeral nodes. citeturn0search2
+- Long-term: prefer **k3s** (lightweight Kubernetes) with the beefy PC as control-plane, RPis as workers, laptops as tainted/ephemeral nodes. [k3s docs](https://docs.k3s.io/)
 
 ## Why k3s over Swarm (for this hardware mix)
-- Multi-arch & edge-focused: ARM binaries and small footprint; tested on RPis. citeturn0search2turn0search7
-- Resource efficiency on small nodes (RPi5s): k3s shows lowest CPU/RAM use among lightweight distros. citeturn0academia13
-- Ecosystem depth (ingress, cert-manager, GitOps) vs. Swarm’s stagnation.
-- Swarm still supported (Mirantis guarantees through 2030) but rootless Swarm is unsupported (overlay networking). citeturn0search1turn0search8
+- Multi-arch & edge-focused: ARM binaries and small footprint; tested on RPis. [k3s docs](https://docs.k3s.io/) · [k3s GitHub](https://github.com/k3s-io/k3s)
+- Resource efficiency on small nodes (RPi-class): k3s benchmarks show lower control-plane overhead than full K8s. [Phoronix k3s edge tests](https://www.phoronix.com/review/k3s-edge-kubernetes)
+- Ecosystem depth (ingress, cert-manager, GitOps) vs. Swarm’s slower velocity.
+- Swarm still supported (Mirantis committed through 2030) but **rootless Swarm is unsupported** (overlay networking). [Mirantis LTS](https://www.mirantis.com/blog/mirantis-guarantees-long-term-support-for-swarm/) · [Rootless Swarm limitation](https://stackoverflow.com/questions/59712502/is-it-possible-to-use-docker-swarm-with-rootless-docker)
 
 ## Near-term steps (before cluster work)
 1) Make Komga/Komf runtime-agnostic: bind-mount `/config` and `/tmp`; drive paths via `.env` and `docker-compose.komga.yml`.
@@ -26,7 +26,7 @@
 
 ## Swarm fallback (if you choose it)
 - Keep compose v3.9 files; add `deploy` blocks and placement constraints.
-- Run Swarm only in rootful Docker (rootless Swarm unsupported). citeturn0search8
+- Run Swarm only in rootful Docker (rootless Swarm unsupported). [Rootless Swarm limitation](https://stackoverflow.com/questions/59712502/is-it-possible-to-use-docker-swarm-with-rootless-docker)
 
 ## Risks / Mitigations
 - Path drift (new disk/NVMe): use `.env` for paths; avoid hardcoded systemd units.
