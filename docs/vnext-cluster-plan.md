@@ -22,7 +22,7 @@
 2) Keep compose as single source of truth; run with `podman compose` today, `docker compose` after reboot.
 3) Post-reboot: enable Docker service + docker group; optional: keep Podman for dev/testing.
 4) Stop generating single-container systemd units; prefer Quadlet or a user service that runs `podman compose up -d`. [Podman systemd deprecation](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)
-5) Compose implementation: standardize on **podman compose** (v4+) and **docker compose v2**. Avoid the legacy `podman-compose` shim and avoid compose features known to differ (e.g., experimental `secrets` drivers); stick to v3.9 services/volumes/env/binds which both runtimes support. [Red Hat compose guidance](https://www.redhat.com/en/blog/podman-compose-docker-compose)
+5) Compose implementation: standardize on **podman compose** (v4+) with the Docker Compose V2 provider installed (`docker compose` in PATH) and **docker compose v2** on Docker hosts. Avoid the legacy `podman-compose` shim and avoid compose features known to differ (e.g., experimental `secrets` drivers); stick to v3.9 services/volumes/env/binds which both runtimes support. [Red Hat compose guidance](https://www.redhat.com/en/blog/podman-compose-docker-compose) · [podman-compose provider note](https://docs.podman.io/en/v5.6.2/markdown/podman-compose.1.html)
 
 ## Medium-term (k3s bootstrap)
 1) Install k3s on the PC (single control-plane).  
@@ -36,6 +36,7 @@
 - Keep compose v3.9 files; add `deploy` blocks and placement constraints.
 - Run Swarm only in rootful Docker (rootless Swarm unsupported). [Docker rootless limitations](https://docs.docker.com/engine/security/rootless/#known-limitations)
 - If using bind mounts, paths must exist on every node where tasks may land; otherwise pin tasks with placement constraints or use shared storage. [Swarm bind-mount requirement](https://docs.docker.com/engine/swarm/services/#bind-mounts)
+- Note: `docker stack deploy` uses the legacy Compose v3 subset; avoid Compose-spec-only features or maintain a swarm-specific override file. [Docker stack deploy](https://docs.docker.com/engine/swarm/stack-deploy/)
 
 ## Risks / Mitigations
 - Path drift (new disk/NVMe): use `.env` for paths; avoid hardcoded systemd units.
@@ -51,18 +52,20 @@
 
 ## Komga config migration (plan only; do post-reboot)
 - Stop service: `systemctl --user stop container-komga.service` (or `podman stop komga`).
-- Backup old volume: `podman run --rm -v 66fc4f39c44bbac76e994d6bfe2985ed844b74a217a2388b52fd159c5af8c4f6:/from -v /srv/komga/backup:/backup alpine sh -c "cd /from && tar cf /backup/komga-config.tar ."`
-- Migrate to bind mounts: `mkdir -p /srv/komga/config /srv/komga/tmp` then `podman run --rm -v 66fc4f...:/from -v /srv/komga/config:/to alpine sh -c "cd /from && tar cf - . | (cd /to && tar xf -)"` (repeat for `/tmp` if needed). On SELinux hosts keep `:Z` in compose; on non-SELinux hosts it is ignored.
-- Update `docker-compose.komga.yml` + `.env` to use bind mounts (`COMICS_ROOT`, `KOMGA_CONFIG=/srv/komga/config`, `KOMGA_TMP=/srv/komga/tmp`); recreate with compose (Podman or Docker).
+- Discover volume name: `podman volume ls` and note the Komga config volume; inspect if needed: `podman volume inspect <VOL>`.
+- Backup old volume (create backup dir first): `mkdir -p /srv/komga/backup` (or a user-writable path) then `podman run --rm -v <VOL>:/from -v /srv/komga/backup:/backup alpine sh -c "cd /from && tar cf /backup/komga-config.tar ."`
+- Ensure bind paths writable in rootless mode: either use a user-owned path (e.g., `$HOME/.local/share/komga/config` and `/tmp/komga`) or `sudo mkdir -p /srv/komga/{config,tmp,backup} && sudo chown -R $(id -u):$(id -g) /srv/komga`.
+- Migrate to bind mounts: `podman run --rm -v <VOL>:/from -v /srv/komga/config:/to alpine sh -c "cd /from && tar cf - . | (cd /to && tar xf -)"` (repeat for `/tmp` if needed). On SELinux hosts keep `:Z` in compose; on non-SELinux hosts it is ignored.
+- Update `docker-compose.komga.yml` + `.env` to use bind mounts (`COMICS_ROOT`, `KOMGA_CONFIG=/srv/komga/config`, `KOMGA_TMP=/srv/komga/tmp` or `$HOME/.local/share/...`); recreate with compose (Podman or Docker).
 - Verify: login with existing user; libraries present; Komf reaches Komga; scan succeeds; thumbnails intact; check logs for errors.
 - Rollback (if needed): stop service, recreate container pointing back to the saved Podman volume or untar the backup into a fresh bind; keep the original volume until stable for several days.
 
 ## Mount gating and boot determinism
-- Use a compose-based systemd (or Quadlet) user unit with `RequiresMountsFor=${COMICS_ROOT%/*}` plus an `ExecStartPre` loop that waits for the mount (e.g., 30x5s). If the mount is missing, the unit should fail fast and systemd will retry; once the mount appears, `systemctl --user restart container-komga` succeeds without data loss.
+- Use a compose-based systemd (or Quadlet) user unit with **literal absolute paths** in `RequiresMountsFor=/path/to/mount` (no shell expansion in units) plus an `ExecStartPre` loop that waits for the mount (e.g., 30x5s). If the mount is missing, the unit should fail fast and systemd will retry; once the mount appears, `systemctl --user restart container-komga` succeeds without data loss. If templating is needed, generate the unit from `.env`.
 - For Swarm/K8s, ensure shared storage or placement constraints prevent scheduling on nodes without the bind path.
 
 ## SELinux portability
-- Default to `:Z` on bind mounts; on non-SELinux hosts it is ignored by Docker/Podman. If a host enforces SELinux and the path is shared, use `:z` only when multiple containers share the same content; otherwise keep `:Z`. Document overrides in `.env.example` or a compose override for SELinux vs non-SELinux hosts.
+- Default to `:Z` on bind mounts; on non-SELinux hosts it is ignored by Docker/Podman. If a host enforces SELinux and the path is shared, use `:z` only when multiple containers share the same content; otherwise keep `:Z`. Avoid applying :Z/:z to broad/shared host paths to prevent unwanted relabeling. Document overrides in `.env.example` or a compose override for SELinux vs non-SELinux hosts.
 
 ## Runtime note for k3s
 - In k3s the container runtime is containerd; Docker/Podman are for build/push and single-host runs. Build multi-arch images with `docker buildx` and push to GHCR; k3s pulls the right arch automatically.
