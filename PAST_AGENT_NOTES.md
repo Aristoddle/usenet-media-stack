@@ -13,6 +13,7 @@ Last updated: 2025-12-13
 - Rootful assumption: several services are privileged / low ports (Samba 139/445, NFS 111/2049) and docker.sock consumers (Portainer, Netdata), so full stack requires rootful Docker.
 - Bazzite seed host has staged rpm-ostree layering (Docker/compose/ulauncher); reboot activates it.
 - Komga currently runs under Podman with a volume-bound config; plan is to migrate to bind mounts (see vnext plan).
+- CF token appears in multiple places (e.g., `docs/DEPLOYMENT.md`, `scripts/deploy-live.sh`, `scripts/cloudflare-deploy.sh`); scrub all and rotate before further work.
 
 ## High-Priority Actions
 1) **Security:** Rotate/revoke Cloudflare token; remove from repo/history (git filter-repo/BFG); add secret scanning (gitleaks + GH secret scanning/pre-commit); remove plaintext secrets from docs/scripts.
