@@ -22,6 +22,7 @@
 2) Keep compose as single source of truth; run with `podman compose` today, `docker compose` after reboot.
 3) Post-reboot: enable Docker service + docker group; optional: keep Podman for dev/testing.
 4) Stop generating single-container systemd units; prefer Quadlet or a user service that runs `podman compose up -d`. [Podman systemd deprecation](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)
+5) Compose implementation: standardize on **podman compose** (v4+) and **docker compose v2**. Avoid the legacy `podman-compose` shim and avoid compose features known to differ (e.g., experimental `secrets` drivers); stick to v3.9 services/volumes/env/binds which both runtimes support. [Red Hat compose guidance](https://www.redhat.com/en/blog/podman-compose-docker-compose)
 
 ## Medium-term (k3s bootstrap)
 1) Install k3s on the PC (single control-plane).  
@@ -49,8 +50,29 @@
 - Draft k3s install/runbook (PC control-plane, RPi workers).  
 
 ## Komga config migration (plan only; do post-reboot)
-- Stop service; backup Podman config volume (export or tar).
-- Copy/export volume into a host path (e.g., `/srv/komga/config`, `/srv/komga/tmp`); set SELinux labels (`:Z`).
-- Update `docker-compose.komga.yml` + `.env` to use bind mounts; use compose (Podman or Docker) to recreate.
-- Verify: login with existing user; libraries present; Komf can reach Komga; scan succeeds; thumbnails intact.
-- Keep old volume until verified; only then remove it.
+- Stop service: `systemctl --user stop container-komga.service` (or `podman stop komga`).
+- Backup old volume: `podman run --rm -v 66fc4f39c44bbac76e994d6bfe2985ed844b74a217a2388b52fd159c5af8c4f6:/from -v /srv/komga/backup:/backup alpine sh -c "cd /from && tar cf /backup/komga-config.tar ."`
+- Migrate to bind mounts: `mkdir -p /srv/komga/config /srv/komga/tmp` then `podman run --rm -v 66fc4f...:/from -v /srv/komga/config:/to alpine sh -c "cd /from && tar cf - . | (cd /to && tar xf -)"` (repeat for `/tmp` if needed). On SELinux hosts keep `:Z` in compose; on non-SELinux hosts it is ignored.
+- Update `docker-compose.komga.yml` + `.env` to use bind mounts (`COMICS_ROOT`, `KOMGA_CONFIG=/srv/komga/config`, `KOMGA_TMP=/srv/komga/tmp`); recreate with compose (Podman or Docker).
+- Verify: login with existing user; libraries present; Komf reaches Komga; scan succeeds; thumbnails intact; check logs for errors.
+- Rollback (if needed): stop service, recreate container pointing back to the saved Podman volume or untar the backup into a fresh bind; keep the original volume until stable for several days.
+
+## Mount gating and boot determinism
+- Use a compose-based systemd (or Quadlet) user unit with `RequiresMountsFor=${COMICS_ROOT%/*}` plus an `ExecStartPre` loop that waits for the mount (e.g., 30x5s). If the mount is missing, the unit should fail fast and systemd will retry; once the mount appears, `systemctl --user restart container-komga` succeeds without data loss.
+- For Swarm/K8s, ensure shared storage or placement constraints prevent scheduling on nodes without the bind path.
+
+## SELinux portability
+- Default to `:Z` on bind mounts; on non-SELinux hosts it is ignored by Docker/Podman. If a host enforces SELinux and the path is shared, use `:z` only when multiple containers share the same content; otherwise keep `:Z`. Document overrides in `.env.example` or a compose override for SELinux vs non-SELinux hosts.
+
+## Runtime note for k3s
+- In k3s the container runtime is containerd; Docker/Podman are for build/push and single-host runs. Build multi-arch images with `docker buildx` and push to GHCR; k3s pulls the right arch automatically.
+
+## Compose portability (Podman vs Docker)
+- Tested path: `podman compose` (v4+) and `docker compose v2`.
+- Avoid: legacy `podman-compose` python tool; compose features outside v3.9 core (e.g., experimental secrets drivers, swarm-only networking assumptions) when running on Podman.
+
+## Definition of Done (post-reboot)
+- Fresh clone + `.env` → `docker compose -f docker-compose.komga.yml up -d` (or `podman compose ...`) succeeds.
+- Komga/Komf survive reboot with mounts present; if mounts absent, services do not corrupt state and recover automatically once mounts return.
+- Migration validated: existing user login works, libraries present, scan succeeds, Komf enrichment works, thumbnails intact.
+- Backup/restore tested once (using the tar backup) on a throwaway path.
