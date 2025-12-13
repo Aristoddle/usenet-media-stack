@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  komga:
+    image: ghcr.io/gotson/komga:1.13.0
+    container_name: komga
+    environment:
+      - JAVA_OPTS=-Xms4g -Xmx8g
+      # Spring-style 6‑field cron; hourly scan to keep metadata fresh
+      - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
+      # Allow Komf UI (default 8085) to make CORS calls into Komga
+      - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
+    volumes:
+      # Comics library (read-only)
+      - ${COMICS_ROOT:-/srv/comics}:/comics:ro
+      # Persistent config/db
+      - ${KOMGA_CONFIG:-./config/komga}:/config
+      # Temp dir (thumbnail extraction)
+      - ${KOMGA_TMP:-/tmp/komga}:/tmp
+    ports:
+      - "${KOMGA_PORT:-8081}:25600"
+    restart: unless-stopped
+
+  komf:
+    image: docker.io/sndxr/komf:latest
+    container_name: komf
+    environment:
+      # Point Komf at Komga; override if running remotely
+      - KOMGA_BASE_URI=http://komga:25600
+    volumes:
+      - ${KOMF_CONFIG:-./config/komf}:/config:ro
+    depends_on:
+      - komga
+    ports:
+      - "${KOMF_PORT:-8085}:8085"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: komga_net
