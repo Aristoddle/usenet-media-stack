@@ -32,8 +32,8 @@ cp .env.example .env.local   # fill in your API keys (Prowlarr/NZBs, etc.)
 ```
 
 ## First bring-up (after choosing runtime)
-- **Podman (Bazzite, now):** `podman compose -f docker-compose.reading.yml up -d` (optional reading stack); Komga already running via Podman command you started.
-- **Docker (post-reboot):** `docker compose up -d` for the main stack, and `docker compose -f docker-compose.reading.yml up -d` for reading services.
+- **Podman (Bazzite, now):** Comics only: `podman compose -f docker-compose.komga.yml up -d` (Komga+Komf). Other reading services: `podman compose -f docker-compose.reading.yml up -d` post-reboot if desired.
+- **Docker (post-reboot):** `docker compose -f docker-compose.komga.yml up -d` (comics), plus `docker compose -f docker-compose.reading.yml up -d` (Calibre/Audiobookshelf), then `docker compose up -d` for the main stack.
 
 ## Verify
 - Komga: `http://localhost:8081` (after comics sync, add library `/comics`).

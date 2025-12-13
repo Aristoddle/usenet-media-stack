@@ -3,6 +3,7 @@
 ## Daily/quick checks
 - `podman ps` or `docker ps` (post-reboot) to confirm containers are up.
 - Komga up: `curl -I http://localhost:8081`.
+- Komf up: `curl -I http://localhost:8085`.
 - Comics sync status: `journalctl --user -u rsync-comics -f` (stop when idle).
  - Nightly sync (optional): copy `scripts/rsync-comics.service` and `.timer` to `~/.config/systemd/user/`, then `systemctl --user enable --now rsync-comics.timer` once current transfers are done.
 
@@ -11,8 +12,9 @@
 2) Enable Docker daemon: `sudo systemctl enable --now docker`.
 3) Add user to docker group: `sudo usermod -aG docker $USER && newgrp docker`.
 4) Start stacks:
-   - Main: `docker compose up -d`
+   - Comics: `docker compose -f docker-compose.komga.yml up -d` (or `podman compose ...`)
    - Reading stack: `docker compose -f docker-compose.reading.yml up -d`
+   - Main: `docker compose up -d`
 
 ## Healthchecks to keep/restore
 - Bazarr, Overseerr, Jellyfin, Tdarr, Prowlarr: http healthchecks (`curl -f http://localhost:<port>` with 30s interval, 10s timeout, 3 retries) in compose.
