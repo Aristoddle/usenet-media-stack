@@ -1,65 +1,75 @@
 # Past Agent Notes (Context for New Agents)
+Last updated: 2025-12-16
 
-Last updated: 2025-12-13
+## Current Truth (from AGENTS.md, still valid)
+- Supported full stack runtime: **rootful Docker Engine + Docker Compose v2**.
+- Podman: **not supported for the full stack**; only allowable for scoped/light services if explicitly documented.
+- Validated services to date: **7/23 working** → see `docs/SERVICES.md`. README/ badges claiming 22/23 are outdated.
+- Swarm: legacy/experimental (compose v3 subset via `docker stack deploy`). k3s is future path, not implemented.
+- Paths: many docs and `.env.example` use machine-specific paths (e.g., `/run/media/deck/...`, `/home/deck/...`). Need portable defaults (`/srv/usenet/...` or `$HOME/.local/share/...`).
+- Website: published site is stale (Roadmap last updated Jan 2025) and does not match repo docs.
+- Security: Cloudflare API token committed in docs/scripts → treat as compromised; must be rotated, scrubbed from history, and secret scanning added.
 
-## Current Truth
-- Runtime (full stack): **rootful Docker Engine + Docker Compose v2** is the supported path.
-- Podman: **not supported for the full stack** (privileged/low ports, docker.sock consumers, Swarm assumptions). Allow only for scoped/light services if explicitly documented.
-- Validated services: **7/23 working** (see `docs/SERVICES.md`). README claims of “22/23” are outdated and must be aligned.
-- Swarm: legacy/experimental cluster mode already in repo; uses legacy Compose v3 subset. k3s is the desired future, not implemented yet.
-- Paths are non-portable in places (`/run/media/deck/...`, `.env.example`). Need portable defaults (`/srv/usenet/...` or `$HOME/.local/share/...`).
-- Website is stale (roadmap Jan 2025); published site doesn’t match repo docs.
-- **Security incident:** Cloudflare API token is committed in docs/scripts → treat as compromised and rotate/scrub from history; add secret scanning.
-- Rootful assumption: several services are privileged / low ports (Samba 139/445, NFS 111/2049) and docker.sock consumers (Portainer, Netdata), so full stack requires rootful Docker.
-- Bazzite seed host has staged rpm-ostree layering (Docker/compose/ulauncher); reboot activates it.
-- Komga currently runs under Podman with a volume-bound config; plan is to migrate to bind mounts (see vnext plan).
-- CF token appears in multiple places (e.g., `docs/DEPLOYMENT.md`, `scripts/deploy-live.sh`, `scripts/cloudflare-deploy.sh`); scrub all and rotate before further work.
+## Live System Snapshot (2025-12-16, rootful Docker)
+- `docker compose` project: `usenet-media-stack` (sources: `docker-compose.yml` + `docker-compose.override.yml`).
+- Services up (24m): jellyfin, prowlarr, portainer, sonarr, radarr, overseerr, bazarr, whisparr, sabnzbd, tdarr, transmission, komga, komf, mylar, stash, calibre, audiobookshelf, netdata (healthy), samba (healthy), recyclarr.
+- Failing/unhealthy: 
+  - `nfs-server` restarting: kernel module `nfs` missing on host (needs `modprobe nfs` or host support).
+  - `usenet-docs` unhealthy: nginx serving empty `/usr/share/nginx/html` → 403; likely missing built docs volume or wrong working dir.
+- Komga: starts cleanly on 25600 (published 8081). Komf: up on 8085. No errors seen in tails.
+- Sonarr/Radarr: running but warn “No available indexers” (Prowlarr not wired/configured).
+- Ports published on host (selected): Jellyfin 8096, Prowlarr 9696, Sonarr 8989, Radarr 7878, Bazarr 6767, Overseerr 5055, Tdarr 8265-8266, Komga 8081->25600, Komf 8085, Portainer 9000, Netdata 19999, Sabnzbd 8080, Transmission 9093.
 
-## High-Priority Actions
-1) **Security:** Rotate/revoke Cloudflare token; remove from repo/history (git filter-repo/BFG); add secret scanning (gitleaks + GH secret scanning/pre-commit); remove plaintext secrets from docs/scripts.
-2) **Single source of truth for service status:** Align README/badges to `docs/SERVICES.md` (7/23).
-3) **Runtime support policy:** Document tiers in COMPATIBILITY/README/AGENTS:
+## High-Priority Actions (unchanged, still top of queue)
+1) **Security:** Rotate/revoke Cloudflare token; scrub from repo/history; add secret scanning (gitleaks + GH secret scanning/pre-commit); remove plaintext tokens from docs/scripts.
+2) **Single source of truth:** Align README badges and copy to `docs/SERVICES.md` (7/23). Remove “22/23” and stale test badges.
+3) **Runtime support policy:** Document tiering in README/COMPATIBILITY/AGENTS.
    - Tier 1: Docker Engine + Compose v2 (full stack).
-   - Tier 2 (scoped): Podman only for reading/Komga stack if explicitly supported.
-   - Swarm = legacy/experimental; k3s = future target for selected workloads.
-4) **Paths/portability:** Fix `.env.example` and onboarding docs to use portable defaults; strip personal paths.
-5) **Docs site:** Fix CI/secrets and redeploy so live site matches repo; flag/remove stale pages.
-- Compose/Swarm split: either separate files or clear overlays; don’t pretend one file serves both (Swarm ignores unsupported fields).
-- Add ADRs (runtime/orchestration; storage/scaling) so decisions stop churning.
-- Update GitHub Actions secrets (CF token) and ensure no plaintext secrets remain in DEPLOYMENT.md, `scripts/deploy-live.sh`, `scripts/cloudflare-deploy.sh`.
+   - Tier 2 (scoped): Podman only for explicitly supported subset (e.g., reading/Komga).
+   - Swarm: legacy/experimental; k3s: future target.
+4) **Paths/portability:** Update `.env.example` and onboarding docs to portable defaults; remove personal paths.
+5) **Docs site:** Fix CI/secrets and redeploy so live site matches repo; flag stale pages.
+
+## Additional Immediate Fixes from Live Snapshot
+- Fix `nfs-server` container: load host `nfs` kernel module or disable/remove service if not needed on this host.
+- Fix `usenet-docs` container: mount built docs into nginx root or point to correct dist path; rebuild docs if missing.
+- Wire indexers: configure Prowlarr and hook Sonarr/Radarr to clear “No available indexers” warnings.
+
+## Security Incidents / Secret Locations (must scrub)
+- Cloudflare API token present in: `DEPLOYMENT.md`, `scripts/deploy-live.sh`, `scripts/cloudflare-deploy.sh`.
+- Usenet/indexer credentials exposed in `CREDENTIALS_INVENTORY.md`.
+- `docs/SECURITY.md` already flags hardcoded credentials; repo must remain private until cleaned.
 
 ## Files to Read First
-- `AGENTS.md` (truthful state, priorities)
-- `docs/vnext-cluster-plan.md` (orchestration/storage plan, mount gating, SELinux, migration checklist, DoD)
-- `docs/SERVICES.md` (authoritative service status: 7/23)
-- `docs/DEPLOYMENT.md` and deploy scripts (contain CF token → must be cleaned)
-- Compose files: `docker-compose.yml`, `docker-compose.swarm.yml`, `docker-compose.komga.yml`
-- `.env.example` (fix paths)
-- `COMPATIBILITY.md` (align with support tiers)
-- `.github/workflows` (docs deploy; add secret scanning)
+- `AGENTS.md` (truth state & priorities).
+- `docs/SERVICES.md` (authoritative service status 7/23).
+- `docs/vnext-cluster-plan.md` (orchestration/storage plan, mount gating, SELinux notes).
+- `docs/COMPATIBILITY.md` (runtime matrix).
+- `.env.example` (needs portable paths).
+- Compose files: `docker-compose.yml`, `docker-compose.override.yml`, `docker-compose.swarm*.yml`, `docker-compose.komga.yml`.
+- Deploy docs & scripts containing tokens: `DEPLOYMENT.md`, `scripts/deploy-live.sh`, `scripts/cloudflare-deploy.sh`.
 
-## Decisions to Formalize (ADRs suggested)
+## ADRs to Add (still pending)
 - ADR-0001 Runtime & Orchestration Strategy: Docker default; Podman scoped; Swarm legacy; k3s future.
-- ADR-0002 Storage & Scaling Model: seed node owns storage/control; workers for Tdarr/background jobs; “add compute” means worker capacity, not “Plex cluster.”
-- ADR-0003 Secrets & Deploy Hygiene: no plaintext tokens in repo; secrets via GH Actions/env; secret scanning required.
+- ADR-0002 Storage & Scaling Model: seed node owns storage/control; workers for Tdarr/background; “add compute” = worker capacity, not Plex cluster.
+- ADR-0003 Secrets & Deploy Hygiene: no plaintext tokens; CI uses secrets; secret scanning required.
 
-## Guidance on Podman/Quadlet
-- `podman generate systemd` is deprecated; if keeping Podman for any services, prefer Quadlet or a thin systemd unit running `podman compose up -d`.
-- Rootless Swarm is unsupported (overlay networking not available in rootless Docker); Swarm requires rootful Docker.
+## Podman / Quadlet Guidance
+- Avoid `podman generate systemd`; prefer Quadlet or a thin unit running `podman compose up -d` if Podman is retained for scoped services.
+- Rootless Swarm unsupported (overlay networking absent). Keep Swarm/k3s rootful.
 
-## Compose/Swarm Notes
-- Swarm uses legacy Compose v3 subset via `docker stack deploy`; unsupported fields are ignored. Consider separate `compose.swarm.yml` or overlays.
-- Keep Compose v3.9 core features (services/volumes/env/binds); avoid runtime-specific features if aiming for Podman subset.
+## Compose / Swarm Notes
+- Swarm uses legacy Compose v3 subset (`docker stack deploy`); unsupported fields ignored. Maintain separate swarm-specific files or overlays.
+- Keep to v3.9 core (services/volumes/env/binds) for Podman portability where needed.
 
-## Migration/State Notes
-- Komga/reading stack: plan to migrate config from Podman volume to bind mounts; add mount gating; keep rollback path and backups.
-- Bind mounts should use absolute paths, portable defaults, and SELinux labels (`:Z`) only on dedicated dirs.
+## Migration / State Notes (Komga/Reading stack)
+- Plan remains to migrate Komga/Komf configs from volume to bind mounts with portable paths and mount gating; keep backups/rollback path.
+- Use absolute paths with SELinux labels `:Z` on dedicated dirs when needed.
 
 ## Post-Reboot Checklist (Bazzite seed)
-- Activate staged Docker/ulauncher layers by rebooting.
-- Enable Docker: `sudo systemctl enable --now docker && sudo usermod -aG docker $USER && newgrp docker`.
-- Then continue with security cleanup and docs alignment.
-- If stopping services pre-reboot: `systemctl --user stop container-komga.service container-komf.service`.
+- Ensure Docker service enabled; user in `docker` group.
+- Continue security cleanup and docs alignment after reboot.
+- If stopping Podman user services pre-reboot: `systemctl --user stop container-komga.service container-komf.service`.
 
 ## What Not to Promise
-- No “Plex/Jellyfin cluster” scaling; extra nodes are for worker-able workloads (e.g., Tdarr) and resilience, not multi-node Plex.
+- No “Plex/Jellyfin cluster” scaling; extra nodes are for worker-able workloads (Tdarr, background jobs) and resilience, not multi-node Plex.

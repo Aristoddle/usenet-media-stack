@@ -73,6 +73,13 @@ volumes:
       o: bind
       device: ${PWD}/downloads
 
+# Default logging for added services
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "50m"
+    max-file: "3"
+
 # Service overrides for single-node deployment
 services:
   # Remove Swarm-specific deployment configurations
@@ -120,3 +127,7 @@ services:
           cpus: '0.25'
           memory: 256M
     restart: unless-stopped
+
+  # Disable Jellyfin in single-node/default runs (Plex is primary)
+  jellyfin:
+    profiles: ["disabled"]

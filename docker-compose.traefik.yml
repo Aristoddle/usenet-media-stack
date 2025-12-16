@@ -1,0 +1,42 @@
+version: "3.9"
+
+networks:
+  edge:
+    name: edge
+    driver: bridge
+
+services:
+  traefik:
+    image: traefik:v3.4
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --log.level=INFO
+      - --api.dashboard=true
+      - --api.insecure=true # LAN only; disable later
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.directory=/etc/traefik/file-config
+      - --providers.file.watch=true
+      - --ping=true
+      # ACME resolver is defined but unused until routers set tls.certresolver
+      - --certificatesresolvers.cloudflare.acme.dnschallenge=true
+      - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.cloudflare.acme.email=j3lanzone@gmail.com
+      - --certificatesresolvers.cloudflare.acme.storage=/etc/traefik/acme.json
+    ports:
+      - 80:80
+      - 443:443
+      - 8082:8080  # dashboard
+    networks:
+      - edge
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/home/deck/traefik/file-config:/etc/traefik/file-config:ro
+      - /var/home/deck/traefik/acme.json:/etc/traefik/acme.json
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

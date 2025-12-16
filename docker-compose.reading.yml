@@ -12,12 +12,17 @@ services:
       - GUAC_USER=reader
       - GUAC_PASS=changeme
     volumes:
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/CalibreConfig:/config
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books:/books
+      - /mnt/fast8tb/Cloud/OneDrive/CalibreConfig:/config
+      - /mnt/fast8tb/Cloud/OneDrive/Books:/books
     ports:
       - "18080:8080"  # calibre content server (avoid collision with Komga)
       - "18081:8081"  # noVNC (GUI)
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre.rule=Host(`calibre.lan`)"
+      - "traefik.http.routers.calibre.entrypoints=web"
+      - "traefik.http.services.calibre.loadbalancer.server.port=8080"
 
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
@@ -28,13 +33,18 @@ services:
       - TZ=Etc/UTC
       - DOCKER_MODS=linuxserver/calibre-web:calibre
     volumes:
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/CalibreConfig:/config
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books:/books
+      - /mnt/fast8tb/Cloud/OneDrive/CalibreConfig:/config
+      - /mnt/fast8tb/Cloud/OneDrive/Books:/books
     ports:
       - "18083:8083"  # Calibre-Web UI
     depends_on:
       - calibre
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibreweb.rule=Host(`calweb.lan`)"
+      - "traefik.http.routers.calibreweb.entrypoints=web"
+      - "traefik.http.services.calibreweb.loadbalancer.server.port=8083"
 
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
@@ -42,13 +52,24 @@ services:
     environment:
       - TZ=Etc/UTC
     volumes:
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks:/audiobooks
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Podcasts:/podcasts
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/AudiobookshelfConfig:/config
-      - /run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/AudiobookshelfConfig/metadata:/metadata
+      - /mnt/fast8tb/Cloud/OneDrive/Audiobooks:/audiobooks
+      - /mnt/fast8tb/Cloud/OneDrive/Podcasts:/podcasts
+      - /mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig:/config
+      - /mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig/metadata:/metadata
     ports:
       - "13378:80"   # Audiobookshelf web
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.audiobooks.rule=Host(`audio.lan`)"
+      - "traefik.http.routers.audiobooks.entrypoints=web"
+      - "traefik.http.services.audiobooks.loadbalancer.server.port=80"
+
+networks:
+  default:
+    name: reading_net
+  edge:
+    external: true
 
 networks:
   default:
