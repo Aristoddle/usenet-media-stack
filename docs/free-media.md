@@ -12,12 +12,12 @@ This is the most comprehensive free media resource collection on the internet. W
 - **Audiobookshelf (Audiobooks/Podcasts)**: `http://<host>:13378`
 - Bring-up file: `docker-compose.reading.yml` (Calibre, Calibre-Web, Audiobookshelf). See [Reading Stack](/reading-stack).
 
-### 📧 **Get Personal Support from Joe**
-Need help finding specific content, setting up tools, or accessing premium resources? I'm here to help:
+### 📧 **Need a hand?**
+If something’s broken, please file an issue on GitHub. If you need setup help or can’t locate a book/paper you already have rights to read (e.g., offline/backup copy), reach out here:
 
-<a href="mailto:j3lanzone@gmail.com?subject=Media%20Resource%20Support%20Request&body=Hi%20Joe,%0A%0AI%20need%20help%20with:%0A%0A-%20What%20I'm%20looking%20for:%0A-%20My%20technical%20setup:%0A-%20Specific%20help%20needed:%0A%0APlease%20include%20any%20relevant%20details%20about%20your%20request.%0A%0AThanks!" style="display: inline-block; padding: 12px 24px; background: #3eaf7c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 8px 4px;">💬 **Request Personal Support**</a>
-
-<a href="mailto:j3lanzone@gmail.com?subject=Plex%20Server%20Access%20Request&body=Hi%20Joe,%0A%0AI'd%20like%20access%20to%20your%20personal%20Plex%20server:%0A%0A-%20My%20name:%0A-%20Email%20for%20Plex%20invite:%0A-%20How%20we%20know%20each%20other:%0A-%20What%20content%20you're%20most%20interested%20in:%0A%0AThanks!" style="display: inline-block; padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 8px 4px;">🎬 **Request Plex Access**</a>
+- Open an issue: [GitHub issues](https://github.com/Aristoddle/usenet-media-stack/issues)
+- Email support: <a href="mailto:j3lanzone@gmail.com?subject=Help%20with%20media%20stack&body=Hi%20Joe,%0A%0AWhat%20I%20need%20help%20with:%0A-%20Bug/issue%20or%20request:%0A-%20My%20setup%20(OS,%20Docker%20version,%20device):%0A-%20What%20I%20already%20tried:%0A%0AThanks!" style="display: inline-block; padding: 12px 24px; background: #3eaf7c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 8px 4px;">💬 **Ask for help**</a>
+- Plex access (if applicable): <a href="mailto:j3lanzone@gmail.com?subject=Plex%20Server%20Access%20Request&body=Hi%20Joe,%0A%0AI'd%20like%20access%20to%20your%20personal%20Plex%20server:%0A%0A-%20My%20name:%0A-%20Email%20for%20Plex%20invite:%0A-%20How%20we%20know%20each%20other:%0A-%20What%20content%20you're%20most%20interested%20in:%0A%0AThanks!" style="display: inline-block; padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 8px 4px;">🎬 **Request Plex Access**</a>
 
 ---
 
