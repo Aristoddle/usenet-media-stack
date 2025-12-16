@@ -688,7 +688,7 @@ services:
     container_name: usenet-docs
     hostname: docs
     volumes:
-    - ${STACK_ROOT:-/home/deck/usenet}/docs/.vitepress/dist:/usr/share/nginx/html:ro,Z
+    - ${STACK_ROOT:-.}/docs/.vitepress/dist:/usr/share/nginx/html:ro,Z
     ports:
     - "4173:80"
     restart: unless-stopped

@@ -1,8 +1,9 @@
 SHELL := /bin/bash
 
-COMPOSE := docker compose -f docker-compose.yml
+COMPOSE_FILES := docker-compose.yml docker-compose.override.yml docker-compose.traefik.yml docker-compose.vpn-mullvad.yml
+COMPOSE := docker compose $(foreach f,$(COMPOSE_FILES),-f $(f))
 
-.PHONY: up down restart logs ps health
+.PHONY: up down restart logs ps health docs-build
 
 up:
 	$(COMPOSE) up -d
@@ -20,6 +21,8 @@ ps:
 	$(COMPOSE) ps
 
 health:
-	@echo "Ports:" && ss -tln | grep -E '(:8081|:8085)' || true
-	@echo "Containers:" && $(COMPOSE) ps
-	@echo "Disk:" && df -h | head -n 5
+	npm test --silent
+
+docs-build:
+	npm --prefix docs install
+	npm --prefix docs run docs:build
