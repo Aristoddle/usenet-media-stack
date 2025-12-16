@@ -1,0 +1,36 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${MULLVAD_WG_PRIVATE_KEY:?set in your env}
+      - WIREGUARD_ADDRESSES=${MULLVAD_WG_ADDRESSES:?set in your env}
+      - MULLVAD_ACCOUNT=${MULLVAD_ACCOUNT:-} # optional; used only when refreshing keys manually
+      - SERVER_COUNTRIES=${MULLVAD_COUNTRY:-USA}
+      - SERVER_CITIES=${MULLVAD_CITY:-New York NY}
+      # Optional: uncomment to pin to a specific hostname, e.g. us-nyc-001
+      # - SERVER_HOSTNAMES=${MULLVAD_HOSTNAME:-}
+      - DNS_SERVER=on
+      - FIREWALL=on
+    ports:
+      - "9093:9091"          # Transmission UI via gluetun (matches old host port)
+      - "51413:51413"        # Transmission TCP
+      - "51413:51413/udp"    # Transmission UDP
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "1.1.1.1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  transmission:
+    network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    ports: []  # ports exposed via gluetun above
+    environment:
+      - TRANSMISSION_RPC_BIND_ADDRESS=0.0.0.0
