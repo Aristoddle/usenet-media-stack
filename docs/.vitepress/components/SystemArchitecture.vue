@@ -264,7 +264,7 @@ const serviceDetails = {
   tdarr: { name: 'Tdarr', description: 'Automated transcoding with GPU acceleration - Currently not running due to port conflicts', port: '8265', type: 'Processing', status: 'stopped' },
   yacreader: { name: 'YACReader', description: 'Comic/manga server and reader - OPERATIONAL ✅', port: '8083', type: 'Media Server', status: 'running' },
   sabnzbd: { name: 'SABnzbd', description: 'High-speed Usenet downloader - Currently not running due to port conflicts', port: '8080', type: 'Download Client', status: 'stopped' },
-  transmission: { name: 'Transmission', description: 'P2P liberation network - OPERATIONAL ✅', port: '9093', type: 'Download Client', status: 'running' },
+  transmission: { name: 'Transmission', description: 'P2P liberation network - OPERATIONAL ✅', port: '9091', type: 'Download Client', status: 'running' },
   portainer: { name: 'Portainer', description: 'Docker container management', port: '9000', type: 'Management' },
   netdata: { name: 'Netdata', description: 'Real-time system monitoring', port: '19999', type: 'Monitoring' },
   cloudflare: { name: 'Cloudflare Tunnel', description: 'Secure remote access with zero exposed ports', port: '443', type: 'Network' },

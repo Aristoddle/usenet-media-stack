@@ -253,7 +253,7 @@ test_web_interfaces_legacy() {
         
         # Downloads & Processing
         [sabnzbd]="8080"
-        [transmission]="9093"
+        [transmission]="9091"
         [tdarr]="8265"
         
         # Infrastructure & Management
@@ -304,7 +304,7 @@ test_web_interfaces_sequential() {
         
         # Downloads & Processing
         [sabnzbd]="8080"
-        [transmission]="9093"
+        [transmission]="9091"
         [tdarr]="8265"
         
         # Infrastructure & Management
@@ -360,7 +360,7 @@ test_web_interfaces_parallel() {
         
         # Downloads & Processing
         [sabnzbd]="8080"
-        [transmission]="9093"
+        [transmission]="9091"
         [tdarr]="8265"
         
         # Infrastructure & Management

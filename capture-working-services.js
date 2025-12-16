@@ -19,7 +19,7 @@ const workingServices = [
     { name: 'whisparr', url: 'http://localhost:6969', desc: 'Adult Content Automation', features: 'Automated adult content management' },
     { name: 'mylar', url: 'http://localhost:8090', desc: 'Comic Automation', features: 'Automated comic downloading and organization' },
     { name: 'sabnzbd', url: 'http://localhost:8080', desc: 'Usenet Downloader', features: 'High-speed usenet downloading' },
-    { name: 'transmission', url: 'http://localhost:9093', desc: 'Torrent Client', features: 'BitTorrent downloads with VPN' },
+    { name: 'transmission', url: 'http://localhost:9091', desc: 'Torrent Client', features: 'BitTorrent downloads with VPN' },
     { name: 'jackett', url: 'http://localhost:9117', desc: 'Indexer Proxy', features: 'Legacy torrent/usenet indexer aggregator' },
     { name: 'tdarr', url: 'http://localhost:8265', desc: 'Transcoding Engine', features: 'Automated video transcoding and optimization' },
     { name: 'recyclarr', url: 'http://localhost:3000', desc: 'Automation', features: 'TRaSH Guide quality automation', skip: true },

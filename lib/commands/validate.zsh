@@ -581,7 +581,7 @@ validate_port_conflicts() {
         "8787:Readarr"
         "8989:Sonarr"
         "9000:Portainer"
-        "9093:Transmission Web"
+        "9091:Transmission Web"
         "9696:Prowlarr"
         "9998:Stash"
         "19999:Netdata"

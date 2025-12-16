@@ -85,7 +85,7 @@ def main():
         results["sabnzbd"] = {"status": status, "body": body[:500]}
 
     # Transmission over VPN: expect 409 (missing session id) or 200
-    t_status, t_body = get_json("http://localhost:9093/transmission/rpc")
+    t_status, t_body = get_json("http://localhost:9091/transmission/rpc")
     results["transmission"] = {"status": t_status, "body": t_body[:200]}
 
     print(json.dumps(results, indent=2))

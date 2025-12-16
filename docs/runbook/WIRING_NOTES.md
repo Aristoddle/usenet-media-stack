@@ -41,7 +41,7 @@
 ## Transmission + Mullvad VPN (torrents only)
 - gluetun + transmission override `docker-compose.vpn-mullvad.yml` (uses Mullvad WireGuard, city default `New York NY`, country `USA`).
 - Env vars required (not committed): `MULLVAD_WG_PRIVATE_KEY`, `MULLVAD_WG_ADDRESSES` (IPv4 only, e.g. `10.x.x.x/32`), `MULLVAD_ACCOUNT` (optional, for key refresh).
-- Ports: host `9093` → Transmission UI (`/transmission/`), host `51413` TCP/UDP.
+- Ports: host `9091` → Transmission UI (`/transmission/`), host `51413` TCP/UDP.
 - Sonarr download client: Transmission host `gluetun`, port `9091`, urlBase `/transmission/`, category `tv-sonarr`, removeCompleted true.
 - Radarr download client: Transmission host `gluetun`, port `9091`, urlBase `/transmission/`, category `radarr`, removeCompleted true.
 - Torrent seeding policy: default Transmission (seed ratio 1.0, time 1440m) still in container config; tune after VPN proved stable.

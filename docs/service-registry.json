@@ -17,7 +17,7 @@
     {"service":"whisparr","title":"Whisparr","url":"http://localhost:6969","desc":"Adult Content Automation","features":"Automated adult content management","status":"documented"},
     {"service":"mylar","title":"Mylar","url":"http://localhost:8090","desc":"Comic Automation","features":"Automated comic downloading and organization","status":"documented"},
     {"service":"sabnzbd","title":"SABnzbd","url":"http://localhost:8080","desc":"Usenet Downloader","features":"High-speed usenet downloading","status":"documented"},
-    {"service":"transmission","title":"Transmission","url":"http://localhost:9093","desc":"Torrent Client","features":"BitTorrent downloads with VPN","status":"documented"},
+    {"service":"transmission","title":"Transmission","url":"http://localhost:9091","desc":"Torrent Client","features":"BitTorrent downloads with VPN","status":"documented"},
     {"service":"jackett","title":"Jackett","url":"http://localhost:9117","desc":"Indexer Proxy","features":"Legacy torrent/usenet indexer aggregator","status":"documented"},
     {"service":"tdarr","title":"Tdarr","url":"http://localhost:8265","desc":"Transcoding Engine","features":"Automated video transcoding and optimization","status":"documented"},
     {"service":"recyclarr","title":"Recyclarr","url":"http://localhost:3000","desc":"Automation","features":"TRaSH Guide quality automation","status":"documented"},

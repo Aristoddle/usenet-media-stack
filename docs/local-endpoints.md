@@ -9,7 +9,7 @@
 - Lidarr: [http://localhost:8686](http://localhost:8686)
 - Whisparr: [http://localhost:6969](http://localhost:6969)
 - SABnzbd: [http://localhost:8080](http://localhost:8080)
-- Transmission (via gluetun VPN): [http://localhost:9093](http://localhost:9093) (UI proxied through gluetun)
+- Transmission (via gluetun VPN): [http://localhost:9091](http://localhost:9091) (UI proxied through gluetun)
 
 ## Comics / books
 - Mylar: [http://localhost:8090](http://localhost:8090)

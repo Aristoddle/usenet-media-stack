@@ -34,7 +34,7 @@
 - **Solution**: System restart or privileged cleanup of orphaned processes
 
 ### **Service Deployment**
-- **Working**: prowlarr (9696), transmission (9093)
+- **Working**: prowlarr (9696), transmission (9091)
 - **Blocked**: jellyfin, overseerr, sonarr, radarr, sabnzbd
 - **Resolution**: Port cleanup → restart affected services
 

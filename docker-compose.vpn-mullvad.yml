@@ -17,7 +17,7 @@ services:
       - DNS_SERVER=on
       - FIREWALL=on
     ports:
-      - "9093:9091"          # Transmission UI via gluetun (matches old host port)
+      - "9091:9091"          # Transmission UI via gluetun (Transmission default)
       - "51413:51413"        # Transmission TCP
       - "51413:51413/udp"    # Transmission UDP
     healthcheck:
