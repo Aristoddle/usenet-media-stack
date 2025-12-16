@@ -520,7 +520,7 @@ services:
     volumes:
     - ${CONFIG_ROOT:-/home/deck/usenet/config}/mylar:/config
     - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/comics:/comics
+    - ${MEDIA_ROOT:-/home/deck/usenet/media}/comics:/comics:rw,Z
     ports:
     - "8090:8090"
     restart: unless-stopped
