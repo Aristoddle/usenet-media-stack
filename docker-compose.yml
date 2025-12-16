@@ -90,12 +90,12 @@ services:
       -w "WORKGROUP"
       -n
     volumes:
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media:rw
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads:rw
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}:/config:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
       # Mount media directories (working local setup)
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -137,9 +137,9 @@ services:
     - SYS_ADMIN
     privileged: true
     volumes:
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media:rw
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads:rw
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}:/config:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
     environment:
     - SHARED_DIRECTORY=/media
     - SHARED_DIRECTORY_2=/downloads
@@ -246,8 +246,8 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/sabnzbd:/config
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sabnzbd:/config
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
     ports:
     - "8080:8080"
     restart: unless-stopped
@@ -288,9 +288,9 @@ services:
     - TZ=Etc/UTC
     - TRANSMISSION_WEB_HOME=/transmission-web-control/
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/transmission:/config
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}/watch:/watch
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/transmission:/config
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}/watch:/watch
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -324,10 +324,10 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/sonarr:/config
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sonarr:/config
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
       # Media storage mount  
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
     ports:
     - "8989:8989"
     restart: unless-stopped
@@ -365,10 +365,10 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/radarr:/config
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/radarr:/config
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
       # Media storage mount
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
     ports:
     - "7878:7878"
     restart: unless-stopped
@@ -406,9 +406,9 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/bazarr:/config
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/bazarr:/config
       # Same storage mounts as Sonarr/Radarr for subtitle access
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
     ports:
     - "6767:6767"
     restart: unless-stopped
@@ -446,7 +446,7 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/prowlarr:/config
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/prowlarr:/config
     ports:
     - "9696:9696"
     restart: unless-stopped
@@ -481,10 +481,10 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/whisparr:/config
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/whisparr:/config
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
     ports:
     - "6969:6969"
     restart: unless-stopped
@@ -516,8 +516,8 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/lidarr:/config
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/lidarr:/config
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
     - ${MUSIC_ROOT:-/var/mnt/fast8tb/Local/media/music}:/music:rw
     ports:
     - "8686:8686"
@@ -549,8 +549,8 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/mylar:/config
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/mylar:/config
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
     - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,Z
     ports:
     - "8090:8090"
@@ -583,12 +583,12 @@ services:
     - TZ=Etc/UTC
     - JELLYFIN_PublishedServerUrl=http://localhost:8096
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/jellyfin:/config
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/music:/music
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/books:/books
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/jellyfin:/config
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/music:/music
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/books:/books
     ports:
     - "8096:8096"
     restart: unless-stopped
@@ -617,7 +617,7 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/overseerr:/config
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/overseerr:/config
     ports:
     - "5055:5055"
     restart: unless-stopped
@@ -646,7 +646,7 @@ services:
     - PGID=1000
     - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/recyclarr:/config
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/recyclarr:/config
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -682,13 +682,13 @@ services:
       # - NVIDIA_VISIBLE_DEVICES=all
       # - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
     volumes:
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/tdarr/server:/app/server
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/tdarr/configs:/app/configs
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/tdarr/logs:/app/logs
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/movies:/movies
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv
-    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}/tdarr_transcode:/temp
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/server:/app/server
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/configs:/app/configs
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/logs:/app/logs
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
+    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}/tdarr_transcode:/temp
     ports:
     - "8265:8265"    # Web UI
     - "8266:8266"    # Server port
@@ -762,14 +762,14 @@ services:
     - STASH_PORT=9999
     volumes:
     - /etc/localtime:/etc/localtime:ro
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash:/root/.stash:Z
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/adult:/data
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/metadata:/metadata:Z
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/cache:/cache:Z
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/blobs:/blobs:Z
-    - ${CONFIG_ROOT:-/home/deck/usenet/config}/stash/generated:/generated:Z
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash:/root/.stash:Z
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/adult:/data
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/metadata:/metadata:Z
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/cache:/cache:Z
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/blobs:/blobs:Z
+    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/generated:/generated:Z
       # Multi-drive adult storage mounts (same pattern as other services)
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/tv:/tv:rw
+    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
     ports:
     - "9998:9999"
     restart: unless-stopped
@@ -805,7 +805,7 @@ services:
     - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
     volumes:
     - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,Z
-    - /home/deck/usenet/config/komga:/config:Z
+    - /var/mnt/fast8tb/config/komga:/config:Z
     ports:
     - "8081:25600"
     restart: unless-stopped
