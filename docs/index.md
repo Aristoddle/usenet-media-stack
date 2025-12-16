@@ -15,6 +15,25 @@ hero:
     - theme: alt
       text: Service Status (7/23)
       link: /SERVICES/
+features:
+  - icon: ⚙️
+    title: Core automation
+    details: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr with SABnzbd + Transmission (gluetun/Mullvad).
+  - icon: 📚
+    title: Comics & books
+    details: Komga + Komf (RW) + Mylar; temp path /mnt/fast8tb/Cloud/OneDrive/Comics until mirror completes.
+  - icon: 📊
+    title: Ops & visibility
+    details: Overseerr, Bazarr, Portainer, Netdata. Clickable localhost URLs on the endpoints page.
+  - icon: 🚀
+    title: Deploy pipeline
+    details: GitHub Actions → Cloudflare Pages fixed; site auto-redeploys on push.
+  - icon: 🌐
+    title: Networking
+    details: Traefik present; host rules/TLS pending. Loopback-only today.
+  - icon: 🔒
+    title: Secrets hygiene
+    details: CF token rotated; history scrub + gitleaks/pre-commit still needed. .env stays in 1Password.
 ---
 
 ## Live status (Dec 16, 2025)
