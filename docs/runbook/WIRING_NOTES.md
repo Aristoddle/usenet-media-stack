@@ -13,6 +13,12 @@
 - Prowlarr/Sonarr/Radarr: read from `CONFIG_ROOT/<app>/config.xml` → `<ApiKey>`.
 - SABnzbd: read from `CONFIG_ROOT/sabnzbd/sabnzbd.ini` → `api_key`.
 
+## API docs / curl refs
+- Prowlarr API: https://wiki.servarr.com/prowlarr/api
+- Sonarr API: https://wiki.servarr.com/sonarr/api
+- Radarr API: https://wiki.servarr.com/radarr/api
+- Pattern: `curl -H "X-Api-Key: $KEY" http://localhost:<port>/api/v3/system/status`
+
 ## Prowlarr wiring
 - Indexers added (Newznab): NZBgeek, NZBFinder, NZB.su, NZBPlanet; Torrents: Nyaa (public).
 - Apps:
