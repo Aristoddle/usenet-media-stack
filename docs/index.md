@@ -1,9 +1,9 @@
 ---
 layout: page
-title: "Usenet Media Stack — current state (Dec 16, 2025)"
+title: "BeppeSarr Stack — current state (Dec 16, 2025)"
 ---
 
-# Usenet Media Stack
+# BeppeSarr Stack
 
 > Truthful status page for the local homelab stack. Docker Engine + Compose v2 only; Podman/Swarm are experimental. Target machine: Bazzite seed node with /var/mnt/fast8tb storage.
 

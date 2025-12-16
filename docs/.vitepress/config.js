@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'Usenet Media Stack',
-  description: 'Professional Usenet-powered media automation with hot-swappable storage, GPU acceleration, and intelligent deployment. Plus curated free content resources.',
+  title: 'BeppeSarr Stack',
+  description: 'BeppeSarr: opinionated Usenet+torrent homelab stack with hot-swappable storage, GPU assist, and honest docs.',
   
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
@@ -10,15 +10,15 @@ export default defineConfig({
     ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'Usenet Media Stack' }],
-    ['meta', { property: 'og:description', content: 'Professional-grade hot-swappable JBOD media automation with Monty as your guide' }],
+    ['meta', { property: 'og:title', content: 'BeppeSarr Stack' }],
+    ['meta', { property: 'og:description', content: 'Opinionated Usenet+torrent homelab stack with hot-swap storage and GPU assist' }],
     ['meta', { property: 'og:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
     ['meta', { property: 'og:image:width', content: '1200' }],
     ['meta', { property: 'og:image:height', content: '630' }],
     ['meta', { property: 'og:url', content: 'https://beppesarrstack.net' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    ['meta', { name: 'twitter:title', content: 'Usenet Media Stack' }],
-    ['meta', { name: 'twitter:description', content: 'Professional media automation with hot-swappable storage. Guided by Monty.' }],
+    ['meta', { name: 'twitter:title', content: 'BeppeSarr Stack' }],
+    ['meta', { name: 'twitter:description', content: 'Opinionated Usenet+torrent homelab stack with hot-swap storage and GPU assist.' }],
     ['meta', { name: 'twitter:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
     ['meta', { name: 'keywords', content: 'media automation, docker, jellyfin, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
   ],
