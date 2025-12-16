@@ -29,28 +29,45 @@ export default defineConfig({
     logo: '/logo.svg',
     
     nav: [
-      { text: 'Guide', link: '/getting-started/' },
-      { text: 'CLI Reference', link: '/cli/' },
-      { text: 'Architecture', link: '/architecture/' },
-      { text: 'Advanced', link: '/advanced/' },
-      { text: '📊 Visualizations', link: '/visualizations' },
-      { text: '📚 Free Media', link: '/free-media' },
-      { text: 'Reading Stack', link: '/reading-stack' },
-      { text: 'Komics TODO', link: '/TODO-komics-stack' },
-      { text: 'Ops Runbook', link: '/ops-runbook' },
-      { text: 'Local Endpoints', link: '/local-endpoints' },
-      { text: 'Secrets', link: '/secrets' },
-      { text: 'Usenet Primer', link: '/usenet-primer' },
-      { text: 'Usenet Onboarding', link: '/usenet-onboarding' },
-      { text: 'FAQ', link: '/faq' },
-      { 
-        text: 'Links',
+      { text: 'Home', link: '/' },
+      {
+        text: 'Guides',
         items: [
-          { text: 'GitHub', link: 'https://github.com/Aristoddle/usenet-media-stack' },
-          { text: 'Issues', link: 'https://github.com/Aristoddle/usenet-media-stack/issues' },
-          { text: '📧 Request Credentials', link: 'mailto:j3lanzone@gmail.com?subject=Credentials%20Access%20Request&body=Hi%20Joe,%0A%0AI%20need%20access%20to:%0A%0A-%20Specific%20services:%0A-%20My%20background:%0A-%20How%20we%20know%20each%20other:%0A%0AThanks!' }
+          { text: 'Quickstart', link: '/getting-started/' },
+          { text: 'Ops Runbook', link: '/ops-runbook' },
+          { text: 'Usenet Primer', link: '/usenet-primer' },
+          { text: 'Usenet Onboarding', link: '/usenet-onboarding' },
+          { text: 'Reading Stack', link: '/reading-stack' },
+          { text: 'Komics TODO', link: '/TODO-komics-stack' },
+          { text: 'FAQ', link: '/faq' }
         ]
-      }
+      },
+      {
+        text: 'Reference',
+        items: [
+          { text: 'CLI Reference', link: '/cli/' },
+          { text: 'Architecture', link: '/architecture/' },
+          { text: 'Advanced', link: '/advanced/' },
+          { text: 'Service Status', link: '/SERVICES/' },
+          { text: 'Local Endpoints', link: '/local-endpoints' },
+          { text: 'Visualizations', link: '/visualizations' }
+        ]
+      },
+      {
+        text: 'Resources',
+        items: [
+          { text: 'Free Media', link: '/free-media' },
+          { text: 'Secrets', link: '/secrets' }
+        ]
+      },
+      {
+        text: 'Support',
+        items: [
+          { text: 'Open an Issue', link: 'https://github.com/Aristoddle/usenet-media-stack/issues' },
+          { text: 'Email Joe', link: 'mailto:j3lanzone@gmail.com?subject=Help%20with%20media%20stack' }
+        ]
+      },
+      { text: 'GitHub', link: 'https://github.com/Aristoddle/usenet-media-stack' }
     ],
     sidebar: {
       '/getting-started/': [
