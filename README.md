@@ -1,19 +1,19 @@
-# 🎬 Usenet Media Stack
+# 🎬 Beppe's Arr Stack
 
-> Current, tested snapshot (Dec 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Overseerr + tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata. Jellyfin is optional/disabled; Plex is primary for streaming.
+> Current, tested snapshot (Dec 16, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata. Jellyfin is optional/disabled; Plex is primary for streaming. Torrent client is Transmission behind Mullvad/gluetun on host port 9091; services are loopback-only (Traefik routes pending).
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![Services](https://img.shields.io/badge/Working%20Services-live%20snapshot-green.svg)](docs/SERVICES.md)
 [![Platform](https://img.shields.io/badge/Platform-Linux-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Validated](https://img.shields.io/badge/Tested-2025--05--28-green.svg)](docs/SERVICES.md)
+[![Validated](https://img.shields.io/badge/Tested-2025--12--16-green.svg)](docs/SERVICES.md)
 
-**Real functionality over aspirational claims. Tested and validated working services.**
+**Real functionality over aspirational claims. Tested and validated working services on the Bazzite seed node.**
 
-> **State of the stack (Dec 2025)**  
-> - rclone copy in progress (OneDrive Books/Comics) — path changes deferred until it finishes  
-> - Traefik running on 80/443 (routes pending; dashboard 8082)  
-> - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
+> **State of the stack (Dec 16, 2025)**  
+> - rclone copy in progress (`onedrive_personal:Books/Comics → /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`) — do not move/rename comics paths until it finishes  
+> - Traefik not yet wired; all services are reachable on localhost only; Transmission exposed on host 9091 via gluetun  
+> - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
 > - Jellyfin disabled (Plex is primary)
 
 ## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)**
