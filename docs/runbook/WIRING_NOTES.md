@@ -6,6 +6,7 @@
 - Prowlarr: `http://prowlarr:9696`
 - Sonarr: `http://sonarr:8989`
 - Radarr: `http://radarr:7878`
+- Whisparr: `http://whisparr:6969`
 - SABnzbd: `http://sabnzbd:8080`
 - Traefik: `:80/:443` (dashboard `:8082`) — routes pending labels/DOMAIN.
 
@@ -24,6 +25,7 @@
 - Apps:
   - Sonarr: baseUrl `http://sonarr:8989`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories TV (5000/5070).
   - Radarr: baseUrl `http://radarr:7878`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories Movies (2000).
+  - Whisparr: baseUrl `http://whisparr:6969`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories XXX (6000). API key auto-read from container config.
 - Notes: Tests via `/api/v1/indexer/{id}/test` require redirect flag and valid appProfileId; current indexers created with `redirect=true`, `appProfileId=1`, `priority=25`.
 
 ## SABnzbd wiring
