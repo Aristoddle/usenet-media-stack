@@ -21,16 +21,16 @@
 - Service constraints: keep storage/performance labels where used (Swarm).
 
 ## Storage & paths (host)
-- Media root: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive`
-- Comics: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Comics`
-- Ebooks: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books`
-- Audiobooks: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks`
-- Configs: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/*Config`
+- Media root: `/mnt/fast8tb/Cloud/OneDrive`
+- Comics: `/mnt/fast8tb/Cloud/OneDrive/Comics`
+- Ebooks: `/mnt/fast8tb/Cloud/OneDrive/Books`
+- Audiobooks: `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`
+- Configs: `/mnt/fast8tb/Cloud/OneDrive/*Config`
 - OneDrive comics source (GVFS): `/run/user/1000/gvfs/onedrive:host=gmail.com,user=J3lanzone/Bundles_b896e2bb7ca3447691823a44c4ad6ad7/Books/Comics/`
 
 ## Secrets & env
 - `.env.local` (gitignored): Prowlarr/NZB/Usenet provider keys.
-- Kometa: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/KometaConfig/config.yml` (Plex token/URL).
+- Kometa: `/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml` (Plex token/URL).
 - Calibre/Audiobookshelf configs live under their respective `*Config` dirs on the OneDrive-backed disk.
 
 ## SOPs
@@ -42,5 +42,5 @@
 
 ## Incident shortcuts
 - Port check: `ss -tlnp | grep 8081` (Komga), `13378` (Audiobookshelf), `18083` (Calibre-Web), main stack ports as usual.
-- Disk space: `df -h /run/media/deck/Fast_8TB_Ser7`.
+- Disk space: `df -h /mnt/fast8tb`.
 - GPU check (after Docker reboot): `docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi` (if NVIDIA present).

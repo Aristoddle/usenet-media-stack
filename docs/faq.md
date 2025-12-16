@@ -7,8 +7,8 @@
 - Not while long transfers (e.g., `rsync-comics`) are running. Finish them first, then reboot to activate Docker.
 
 ## Where are my files and configs?
-- Media: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/<Movies|TV|Comics|Books|Audiobooks>`
-- Configs: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/*Config`
+- Media: `/mnt/fast8tb/Cloud/OneDrive/<Movies|TV|Comics|Books|Audiobooks>`
+- Configs: `/mnt/fast8tb/Cloud/OneDrive/*Config`
 - OneDrive comics source (GVFS): `/run/user/1000/gvfs/onedrive:.../Books/Comics/`
 
 ## How do I add comics to Komga?

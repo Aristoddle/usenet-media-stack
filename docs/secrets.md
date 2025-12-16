@@ -5,7 +5,7 @@
   - `PROWLARR_API_KEY`
   - NZB provider creds (e.g., `NZBGEK_API_KEY`, `SABNZBD_API_KEY`)
   - Domain overrides if needed (`DOMAIN`, `TZ`, etc.)
-- `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/KometaConfig/config.yml`: Plex token/URL for Kometa.
+- `/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml`: Plex token/URL for Kometa.
 - Calibre/Audiobookshelf configs live under their `*Config` dirs on OneDrive-backed disk.
 
 ## Guidance

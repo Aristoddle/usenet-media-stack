@@ -9,7 +9,7 @@
 1. **Add GitHub Secrets:**
    - Go to: https://github.com/Aristoddle/usenet-media-stack/settings/secrets/actions
    - Click "New repository secret"
-   - Add: `CLOUDFLARE_API_TOKEN` = `00dn9TadjjAavQ6CSGVQZ7idnmziICSMowU9Nu-P`
+   - Add: `CLOUDFLARE_API_TOKEN` = `<your_new_token>`
 
 2. **Push to Deploy:**
    ```bash

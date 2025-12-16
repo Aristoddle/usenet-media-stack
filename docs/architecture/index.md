@@ -107,13 +107,13 @@ Detects all your storage and lets you pick what to use:
 #### Canonical paths we use today (Bazzite host)
 | Purpose | Path (host) | Consumed by |
 |---------|-------------|-------------|
-| Comics library | `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Comics` | Komga, (optional) Kometa, Kavita/Calibre if desired |
-| Ebooks | `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books` | Calibre, Calibre-Web |
-| Audiobooks | `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks` | Audiobookshelf |
-| Podcasts | `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Podcasts` | Audiobookshelf |
-| Kometa config | `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/KometaConfig` | Kometa |
-| Calibre config | `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/CalibreConfig` | Calibre, Calibre-Web |
-| Audiobookshelf config | `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/AudiobookshelfConfig` | Audiobookshelf |
+| Comics library | `/mnt/fast8tb/Cloud/OneDrive/Comics` | Komga, (optional) Kometa, Kavita/Calibre if desired |
+| Ebooks | `/mnt/fast8tb/Cloud/OneDrive/Books` | Calibre, Calibre-Web |
+| Audiobooks | `/mnt/fast8tb/Cloud/OneDrive/Audiobooks` | Audiobookshelf |
+| Podcasts | `/mnt/fast8tb/Cloud/OneDrive/Podcasts` | Audiobookshelf |
+| Kometa config | `/mnt/fast8tb/Cloud/OneDrive/KometaConfig` | Kometa |
+| Calibre config | `/mnt/fast8tb/Cloud/OneDrive/CalibreConfig` | Calibre, Calibre-Web |
+| Audiobookshelf config | `/mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig` | Audiobookshelf |
 | OneDrive comics source (GVFS) | `/run/user/1000/gvfs/onedrive:host=gmail.com,user=J3lanzone/Bundles_b896e2bb7ca3447691823a44c4ad6ad7/Books/Comics/` | rsync-comics (source) |
 
 Keep configs on the OneDrive-backed disk so backups/versioning are automatic; media paths stay consistent across Podman and Docker.
