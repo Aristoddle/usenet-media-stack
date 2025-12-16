@@ -5,33 +5,36 @@ title: "Beppe's Arr Stack — current state (Dec 16, 2025)"
 
 # Beppe's Arr Stack
 
-> Truthful status page for the local homelab stack. Docker Engine + Compose v2 only; Podman/Swarm are experimental. Target machine: Bazzite seed node with /var/mnt/fast8tb storage.
+> Truthful status page for the local homelab stack. Docker Engine + Compose v2 only; Podman/Swarm are experimental. Target: Bazzite seed node with `/var/mnt/fast8tb` storage.
 
-## What works right now
-- Core automation: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr; SABnzbd (NZB) + Transmission behind Mullvad/gluetun (torrent).
-- Comics/books: Komga + Komf (RW) + Mylar (ComicVine key set); library pointing at `/mnt/fast8tb/Cloud/OneDrive/Comics` until the Books/Comics mirror finishes.
-- Ops/visibility: Overseerr, Bazarr, Portainer, Netdata. Local endpoints list: [Local endpoints](/local-endpoints/).
-- Docs deploy: GitHub Actions → Cloudflare Pages is healthy (deploy.yml fixed).
+::: warning Active job — **do not restart / move comics**
+rclone copy `onedrive_personal:Books/Comics → /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` is still running (PID 131980). Let it finish before restarting the stack or touching comics paths.
+:::
 
-## Known issues / in-flight work
-- rclone copy `onedrive_personal:Books/Comics → /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` is running. **Do not move files or restart the whole stack until it finishes.**
-- Paths still inconsistent; canonical targets will be `/var/mnt/fast8tb/{config,Local/downloads,Local/media,Cloud/OneDrive/Books/Comics}` once the copy is done.
-- Traefik/ingress not wired; services are loopback-only today.
-- nfs-server service disabled (missing kernel module). usenet-docs container unused (nginx 403) — pending removal/fix.
-- Secrets: Cloudflare token rotated but history scrub + gitleaks still to do. Keys live in 1Password; keep .env out of git.
+## Status at a glance
+- Core automation: Prowlarr → Sonarr / Radarr / Whisparr / Lidarr; SABnzbd (NZB) + Transmission via gluetun/Mullvad (torrent).
+- Comics/books: Komga + Komf (RW) + Mylar; temp library path `/mnt/fast8tb/Cloud/OneDrive/Comics` until mirror completes.
+- Ops/visibility: Overseerr, Bazarr, Portainer, Netdata. Clickable URLs: [Local endpoints](/local-endpoints/).
+- Docs deploy: GitHub Actions → Cloudflare Pages is healthy.
 
-## How to run locally (today)
+## Known issues / in flight
+- Paths not yet normalized; canonical targets will be `/var/mnt/fast8tb/{config,Local/downloads,Local/media,Cloud/OneDrive/Books/Comics}` after the copy.
+- Traefik not wired; services are loopback-only today.
+- nfs-server failing (kernel module missing). usenet-docs unused (nginx 403) — remove or fix.
+- Secrets: CF token rotated; history scrub + gitleaks/pre-commit still needed. Keep .env in 1Password only.
+
+## Run the stack (safe today)
 ```bash
-# prerequisites: Docker Engine + Compose v2; .env copied from .env.example and filled
+# prerequisites: Docker Engine + Compose v2; .env from .env.example
 cd /var/home/deck/Documents/Code/media-automation/usenet-media-stack
 
-# bring up the core without restarting everything else
+# Core services (no full restart)
 docker compose \
   -f docker-compose.yml \
   -f docker-compose.override.yml \
   up -d prowlarr sonarr radarr whisparr lidarr sabnzbd komga komf mylar
 
-# add VPN + Transmission when ready (needs MULLVAD_ACCOUNT in .env)
+# Add VPN + Transmission (needs MULLVAD_ACCOUNT in .env)
 docker compose \
   -f docker-compose.yml \
   -f docker-compose.override.yml \
@@ -40,10 +43,10 @@ docker compose \
 ```
 
 ## After the rclone copy completes
-- Point comics path to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` in Komga/Komf/Mylar and remove `/Comics` + `/Comics_mirror` dupes.
-- Apply Traefik labels/DOMAIN and wire HTTPS routes.
-- Run secret scrub (git filter-repo), add gitleaks/pre-commit, rotate any tokens left in history.
-- Normalize binds in compose/.env to the canonical roots and add mount-gating.
+- Point comics path to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` in Komga/Komf/Mylar; remove `/Comics` and `/Comics_mirror` dupes; rescan Komga.
+- Apply Traefik labels/DOMAIN and wire HTTPS routes (keep loopback fallback).
+- Secret scrub (git filter-repo), add gitleaks + pre-commit, rotate any lingering tokens.
+- Normalize binds in compose/.env to canonical roots and add mount-gating.
 
 ## Quick links
 - [Local endpoints](/local-endpoints/) — clickable localhost URLs for every service
