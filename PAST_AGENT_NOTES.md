@@ -34,6 +34,7 @@ Last updated: 2025-12-16
 - Fix `nfs-server` container: load host `nfs` kernel module or disable/remove service if not needed on this host.
 - Fix `usenet-docs` container: mount built docs into nginx root or point to correct dist path; rebuild docs if missing.
 - Wire indexers: configure Prowlarr and hook Sonarr/Radarr to clear “No available indexers” warnings.
+- Download clients: Transmission (VPN via gluetun:9091, urlBase `/transmission/`) added to Whisparr (category `whisparr`) and Lidarr (category `music`). Sonarr/Radarr already had SAB + Transmission; Whisparr has SAB too; Lidarr has SAB.
 
 ## Security Incidents / Secret Locations (must scrub)
 - Cloudflare API token present in: `DEPLOYMENT.md`, `scripts/deploy-live.sh`, `scripts/cloudflare-deploy.sh`.
