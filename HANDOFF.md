@@ -6,6 +6,15 @@
 - Services: Prowlarr, Sonarr, Radarr, Whisparr, Lidarr, SABnzbd, Transmission (via gluetun), Komga/Komf, Mylar, Overseerr, Bazarr, Tdarr, Portainer, Netdata. Traefik container exists but routes are not wired; services are loopback-only.
 - Branding: Docs/site now “Beppe’s Arr Stack”. README and homepage reflect truthful status. Cloudflare Pages redeploys on push.
 
+## Base paths (orientation)
+- Session CWD when started: /var/home/deck/Documents/Code/media-automation/usenet-media-stack
+- Primary storage root: /var/mnt/fast8tb (symlink: /mnt/fast8tb)
+- Current comics bind for Komga/Komf: /mnt/fast8tb/Cloud/OneDrive/Comics (RW)
+- Target comics root post-copy: /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics
+- Downloads root (intended): /var/mnt/fast8tb/Local/downloads
+- Media root (intended): /var/mnt/fast8tb/Local/media
+- Config root (intended): /var/mnt/fast8tb/config
+
 ## Latest changes (already pushed)
 - Switched gluetun to Mullvad **OpenVPN** using only the Mullvad account number; host port now 9091→9091.
 - Restarted gluetun + transmission; both healthy. Transmission reachable at http://localhost:9091/transmission/.
@@ -74,4 +83,3 @@
 - Komf: rerun metadata refresh after path switch; ensure write perms.
 - Traefik labels + DNS-01 once ready.
 - Secret scanning CI (gitleaks) and git history scrub.
-
