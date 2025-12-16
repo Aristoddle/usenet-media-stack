@@ -6,12 +6,12 @@ services:
       - NET_ADMIN
     environment:
       - VPN_SERVICE_PROVIDER=mullvad
-      - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=${MULLVAD_WG_PRIVATE_KEY:?set in your env}
-      - WIREGUARD_ADDRESSES=${MULLVAD_WG_ADDRESSES:?set in your env}
-      - MULLVAD_ACCOUNT=${MULLVAD_ACCOUNT:-} # optional; used only when refreshing keys manually
-      - SERVER_COUNTRIES=${MULLVAD_COUNTRY:-USA}
-      - SERVER_CITIES=${MULLVAD_CITY:-New York NY}
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=${MULLVAD_ACCOUNT:?set in your .env}
+      - OPENVPN_PASSWORD=${MULLVAD_ACCOUNT:?set in your .env}
+      - MULLVAD_ACCOUNT=${MULLVAD_ACCOUNT:?set in your .env}
+      - SERVER_COUNTRIES=${MULLVAD_COUNTRY:-United States}
+      - SERVER_CITIES=${MULLVAD_CITY:-New York City}
       # Optional: uncomment to pin to a specific hostname, e.g. us-nyc-001
       # - SERVER_HOSTNAMES=${MULLVAD_HOSTNAME:-}
       - DNS_SERVER=on
