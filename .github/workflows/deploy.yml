@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy to Cloudflare Pages
+    permissions:
+      contents: read
+      deployments: write
     
     steps:
       - name: Checkout
