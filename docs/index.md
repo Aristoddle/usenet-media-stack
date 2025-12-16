@@ -1,9 +1,9 @@
 ---
 layout: page
-title: "Beppes Arr Stack — current state (Dec 16, 2025)"
+title: "Beppe's Arr Stack — current state (Dec 16, 2025)"
 ---
 
-# Beppes Arr Stack
+# Beppe's Arr Stack
 
 > Truthful status page for the local homelab stack. Docker Engine + Compose v2 only; Podman/Swarm are experimental. Target machine: Bazzite seed node with /var/mnt/fast8tb storage.
 
