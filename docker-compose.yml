@@ -499,6 +499,37 @@ services:
           cpus: '0.5'
           memory: 512M
 
+  # ================================
+  # Lidarr - Music Management
+  # Access at http://localhost:8686
+  # Medium Resource Usage
+  # ================================
+    logging:
+      driver: json-file
+      options: *id001
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    hostname: lidarr
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Etc/UTC
+    volumes:
+    - ${CONFIG_ROOT:-/home/deck/usenet/config}/lidarr:/config
+    - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
+    - ${MUSIC_ROOT:-/var/mnt/fast8tb/Local/media/music}:/music:rw
+    ports:
+    - "8686:8686"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
   # Readarr removed (project archived June 2025; use Calibre/Calibre-Web/Audiobookshelf)
 
   # ================================
@@ -520,7 +551,7 @@ services:
     volumes:
     - ${CONFIG_ROOT:-/home/deck/usenet/config}/mylar:/config
     - ${DOWNLOADS_ROOT:-/home/deck/usenet/downloads}:/downloads
-    - ${MEDIA_ROOT:-/home/deck/usenet/media}/comics:/comics:rw,Z
+    - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,Z
     ports:
     - "8090:8090"
     restart: unless-stopped

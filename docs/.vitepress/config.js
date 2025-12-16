@@ -38,6 +38,7 @@ export default defineConfig({
       { text: 'Reading Stack', link: '/reading-stack' },
       { text: 'Komics TODO', link: '/TODO-komics-stack' },
       { text: 'Ops Runbook', link: '/ops-runbook' },
+      { text: 'Local Endpoints', link: '/local-endpoints' },
       { text: 'Secrets', link: '/secrets' },
       { text: 'Usenet Primer', link: '/usenet-primer' },
       { text: 'Usenet Onboarding', link: '/usenet-onboarding' },

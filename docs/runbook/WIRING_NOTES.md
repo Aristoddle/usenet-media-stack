@@ -26,6 +26,8 @@
   - Sonarr: baseUrl `http://sonarr:8989`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories TV (5000/5070).
   - Radarr: baseUrl `http://radarr:7878`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories Movies (2000).
   - Whisparr: baseUrl `http://whisparr:6969`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories XXX (6000). API key auto-read from container config.
+  - Mylar: baseUrl `http://mylar:8090`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories Books/Comics (7030), apiKey set.
+  - Lidarr: baseUrl `http://lidarr:8686`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories Music (3000/3030), apiKey set.
 - Notes: Tests via `/api/v1/indexer/{id}/test` require redirect flag and valid appProfileId; current indexers created with `redirect=true`, `appProfileId=1`, `priority=25`.
 
 ## SABnzbd wiring
