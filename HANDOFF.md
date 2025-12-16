@@ -2,15 +2,15 @@
 
 ## Current snapshot
 - Repo: /var/home/deck/Documents/Code/media-automation/usenet-media-stack (branch main, clean).
-- Long-running job: rclone copy onedrive_personal:Books/Comics → /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics, PID 131980, still running. **Do not restart the whole stack or move/rename comics paths until it finishes.**
+- Comics copy complete: onedrive_personal:Books/Comics → /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics (size parity ok). Legacy dirs `Comics`/`Comics_mirror` retired.
 - Services: Prowlarr, Sonarr, Radarr, Whisparr, Lidarr, SABnzbd, Transmission (via gluetun), Komga/Komf, Mylar, Overseerr, Bazarr, Tdarr, Portainer, Netdata. Traefik container exists but routes are not wired; services are loopback-only.
 - Branding: Docs/site now “Beppe’s Arr Stack”. README and homepage reflect truthful status. Cloudflare Pages redeploys on push.
 
 ## Base paths (orientation)
 - Session CWD when started: /var/home/deck/Documents/Code/media-automation/usenet-media-stack
 - Primary storage root: /var/mnt/fast8tb (symlink: /mnt/fast8tb)
-- Current comics bind for Komga/Komf: /mnt/fast8tb/Cloud/OneDrive/Comics (RW)
-- Target comics root post-copy: /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics
+- Current comics bind for Komga/Komf: /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics (RW, canonical)
+- Legacy dirs: /var/mnt/fast8tb/Cloud/OneDrive/Comics_legacy_20251216 (retired)
 - Downloads root (intended): /var/mnt/fast8tb/Local/downloads
 - Media root (intended): /var/mnt/fast8tb/Local/media
 - Config root (intended): /var/mnt/fast8tb/config
@@ -26,14 +26,13 @@
 - SABnzbd: 8080.
 - Arrs: Sonarr 8989, Radarr 7878, Whisparr 6969, Lidarr 8686.
 - Prowlarr: 9696 (indexers: NZB.su, NZBFinder, NZBgeek, NZBPlanet, Nyaa).
-- Komga 8081 (published 25600), Komf 8085 (RW bind /mnt/fast8tb/Cloud/OneDrive/Comics), Mylar 8090.
+- Komga 8081 (published 25600), Komf 8085 (RW bind /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics), Mylar 8090.
 - Overseerr 5055, Bazarr 6767, Tdarr 8265/8266, Portainer 9000, Netdata 19999.
 - Traefik: present, not routing.
 
-## After rclone finishes (execute in order)
+## Next actions
 1) **Libraries & paths**
-   - Set comics root to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` in Komga, Komf, Mylar; rescan Komga.
-   - Remove `/var/mnt/fast8tb/Cloud/OneDrive/Comics` and `/Comics_mirror` if empty/duplicated.
+   - Ensure Komga/Komf/Mylar all point to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`; rescan Komga.
 2) **Compose/.env normalization**
    - Canonical roots:
      - CONFIG_ROOT=/var/mnt/fast8tb/config
@@ -54,7 +53,6 @@
 - nfs-server failing (missing kernel module) — disable or fix.
 - usenet-docs container serves empty root (403) — disable or mount built docs.
 - Traefik routes pending (loopback only).
-- rclone copy in progress — avoid restarts/path changes until done.
 
 ## Secrets / creds (already configured)
 - Mullvad: MULLVAD_ACCOUNT in .env (OpenVPN mode). No WireGuard keys needed now.

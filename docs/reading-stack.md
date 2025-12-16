@@ -7,7 +7,7 @@
 - **Kometa**: Optional (Plex-first metadata); config skeleton at `/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml`.
 
 ## Paths (OneDrive-backed on fast8tb mount)
-- Comics: `/mnt/fast8tb/Cloud/OneDrive/Comics`
+- Comics: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`
 - Ebooks (to create): `/mnt/fast8tb/Cloud/OneDrive/Books`
 - Audiobooks: `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`
 - Podcasts: `/mnt/fast8tb/Cloud/OneDrive/Podcasts`
@@ -16,14 +16,14 @@
 - Kometa config: `/mnt/fast8tb/Cloud/OneDrive/KometaConfig`
 
 ## Compose (post-reboot)
-- Comics: `docker compose -f docker-compose.komga.yml up -d` (Docker or Podman)
+- Comics: `docker compose -f docker-compose.komga.yml up -d`
 - Calibre/Audiobookshelf: `docker compose -f docker-compose.reading.yml up -d`
 - Ports: Komga 8081, Komf 8085, Calibre 18080/18081, Calibre-Web 18083, Audiobookshelf 13378.
 
 ## Ordering / Constraints
-1. **Do not reboot** until `rsync-comics` and other active transfers are done.
-2. After reboot: enable Docker, start reading stack compose, then (optionally) add Kometa and the main arr stack.
-3. Add Komga library once comics sync completes (path `/comics` inside container mount). Komf handles metadata after it sees Komga.
+1. Start Docker, then bring up the reading stack compose files.
+2. Komga library path: `/comics` (host `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`). Run a rescan after library is set.
+3. Komf handles metadata once Komga is reachable.
 
 ## OPDS / Clients
 - Komga OPDS: `http://<host>:8081/opds/v1.2` (Panels, Marvin, etc.)

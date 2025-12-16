@@ -107,7 +107,7 @@ Detects all your storage and lets you pick what to use:
 #### Canonical paths we use today (Bazzite host)
 | Purpose | Path (host) | Consumed by |
 |---------|-------------|-------------|
-| Comics library | `/mnt/fast8tb/Cloud/OneDrive/Comics` | Komga, (optional) Kometa, Kavita/Calibre if desired |
+| Comics library | `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` | Komga, (optional) Kometa, Kavita/Calibre if desired |
 | Ebooks | `/mnt/fast8tb/Cloud/OneDrive/Books` | Calibre, Calibre-Web |
 | Audiobooks | `/mnt/fast8tb/Cloud/OneDrive/Audiobooks` | Audiobookshelf |
 | Podcasts | `/mnt/fast8tb/Cloud/OneDrive/Podcasts` | Audiobookshelf |

@@ -1,6 +1,6 @@
 # Wiring Notes (2025-12-16)
 
-**Status:** rclone Comics copy in progress (PID 131980). Path changes deferred until copy completes.
+**Status:** rclone Comics copy complete. Comics root is `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`; legacy `/Comics` removed.
 
 ## Service endpoints (inside Docker network)
 - Prowlarr: `http://prowlarr:9696`
@@ -39,14 +39,14 @@
 - Threads/connections: keep within provider limits (≤30 NH, ≤20 UE, ≤10 Frugal); adjust in sabnzbd.ini or UI.
 
 ## Transmission + Mullvad VPN (torrents only)
-- gluetun + transmission override `docker-compose.vpn-mullvad.yml` (uses Mullvad WireGuard, city default `New York NY`, country `USA`).
-- Env vars required (not committed): `MULLVAD_WG_PRIVATE_KEY`, `MULLVAD_WG_ADDRESSES` (IPv4 only, e.g. `10.x.x.x/32`), `MULLVAD_ACCOUNT` (optional, for key refresh).
+- gluetun + transmission override `docker-compose.vpn-mullvad.yml` (uses Mullvad OpenVPN with account number only; default city `New York City`, country `United States`).
+- Env vars required (not committed): `MULLVAD_ACCOUNT`; optional `MULLVAD_COUNTRY`, `MULLVAD_CITY`, `MULLVAD_HOSTNAME`.
 - Ports: host `9091` → Transmission UI (`/transmission/`), host `51413` TCP/UDP.
 - Sonarr download client: Transmission host `gluetun`, port `9091`, urlBase `/transmission/`, category `tv-sonarr`, removeCompleted true.
 - Radarr download client: Transmission host `gluetun`, port `9091`, urlBase `/transmission/`, category `radarr`, removeCompleted true.
 - Torrent seeding policy: default Transmission (seed ratio 1.0, time 1440m) still in container config; tune after VPN proved stable.
 - Note: removed `/gluetun` volume to avoid permission issues; gluetun stores transient data in container FS. Downloads directories `/home/deck/usenet/downloads/{complete,incomplete,watch}` now exist and are owned by UID 1000.
-- Secrets: Mullvad WG key/address/account stored in 1Password item “Mullvad” under section `VPN`; local untracked env at `~/.config/usenet-media-stack/mullvad.env` for compose overrides.
+- Secrets: Mullvad account stored in 1Password item “Mullvad”; local untracked env at `~/.config/usenet-media-stack/mullvad.env` for compose overrides.
 
 ## Traefik status
 - Container running (compose + `docker-compose.traefik.yml`), CF DNS-01 ready with token from 1Password.
@@ -55,8 +55,8 @@
 ## Validation script
 - `scripts/validate-services.py` / `scripts/validate-services.zsh`: fetches API keys from configs, hits local endpoints, exits non-zero on failure; wired to `npm test`.
 
-## Next actions after rclone completes
-- Merge `/var/mnt/fast8tb/Cloud/OneDrive/Comics` → `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`; remove `Comics_mirror`; repoint Komga/Komf (and Kavita) to single root.
+## Next actions
+- Ensure all services use `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`; legacy `/Comics` retired. Repoint Komga/Komf/Mylar and rescan Komga.
 - Normalize paths/mount-gating to `/var/mnt/fast8tb/{config,downloads,media}`; add systemd RequiresMountsFor; restart stack.
 - Add Traefik labels + DOMAIN; secure dashboard; verify TLS.
 - Run git filter-repo to purge old CF token; add gitleaks/pre-commit; rotate tokens post-scrub.

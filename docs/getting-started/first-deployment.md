@@ -25,10 +25,10 @@
      ```bash
      docker compose up -d
      ```
-   - Podman-only quick start (Komga already running): skip until Docker is enabled if you need Swarm.
+   - Podman-only quick start: not recommended; use Docker for the full stack.
 
 5) **Add libraries**
-   - Komga: add library pointing to `/comics` (maps to `/mnt/fast8tb/Cloud/OneDrive/Comics`).
+   - Komga: add library pointing to `/comics` (maps to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`).
    - Audiobookshelf: set library `/audiobooks` → `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`.
    - Calibre-Web: point to `/books` → `/mnt/fast8tb/Cloud/OneDrive/Books`.
 
@@ -37,7 +37,7 @@
    - Calibre-Web: `http://<host>:18083/opds`
 
 7) **Health & cleanup**
-   - Check containers: `docker ps` (or `podman ps`).
+   - Check containers: `docker ps`.
    - Ensure healthchecks are present for Bazarr/Overseerr/Jellyfin/Tdarr when you bring the main stack up; reapply if missing.
 
 8) **Backup configs**

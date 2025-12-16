@@ -11,7 +11,7 @@
 **Real functionality over aspirational claims. Tested and validated working services on the Bazzite seed node.**
 
 > **State of the stack (Dec 16, 2025)**  
-> - rclone copy in progress (`onedrive_personal:Books/Comics → /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`) — do not move/rename comics paths until it finishes  
+> - Comics library now at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (copy complete)  
 > - Traefik not yet wired; all services are reachable on localhost only; Transmission exposed on host 9091 via gluetun  
 > - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
 > - Jellyfin disabled (Plex is primary)
@@ -73,7 +73,7 @@ docs         (4173)        # Site
 - ✅ Automation online (Sonarr/Radarr/SAB/Prowlarr) with indexers wired
 - ✅ Requests, comics/books services healthy
 - ✅ Traefik running (routes pending)
-- 🔄 Library copy in progress; path normalization pending completion
+- 🔄 Path normalization pending (binds will move to /var/mnt/fast8tb/{config,Local/downloads,Local/media,Cloud/OneDrive/Books/Comics})
 - ⚙️ Jellyfin disabled; Plex is primary streamer
 
 **📸 [View Service Screenshots](docs/SERVICES.md)** | **🔧 [See Service Status](docs/SERVICES.md)**

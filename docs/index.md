@@ -21,7 +21,7 @@ features:
     details: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr with SABnzbd + Transmission (gluetun/Mullvad).
   - icon: 📚
     title: Comics & books
-    details: Komga + Komf (RW) + Mylar; temp path /mnt/fast8tb/Cloud/OneDrive/Comics until mirror completes.
+    details: Komga + Komf (RW) + Mylar; library path /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics.
   - icon: 📊
     title: Ops & visibility
     details: Overseerr, Bazarr, Portainer, Netdata. Clickable localhost URLs on the endpoints page.
@@ -38,12 +38,8 @@ features:
 
 ## Live status (Dec 16, 2025)
 
-::: warning Active job — **do not restart / move comics**
-rclone copy `onedrive_personal:Books/Comics → /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` is running (PID 131980). Let it finish before stack restarts or path changes.
-:::
-
 - Core: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr; SABnzbd (NZB) + Transmission via gluetun/Mullvad (torrent).
-- Comics/books: Komga + Komf (RW) + Mylar; temp path `/mnt/fast8tb/Cloud/OneDrive/Comics` until mirror completes.
+- Comics/books: Komga + Komf (RW) + Mylar; library path `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (copy complete).
 - Ops: Overseerr, Bazarr, Portainer, Netdata. Clickable URLs: [Local endpoints](/local-endpoints/).
 - Deploy: GitHub Actions → Cloudflare Pages healthy.
 - In flight: Traefik routes (loopback only today); path normalization to `/var/mnt/fast8tb/{config,Local/downloads,Local/media,Cloud/OneDrive/Books/Comics}`; secret scrub (git history + gitleaks); remove/fix nfs-server + usenet-docs.
@@ -68,9 +64,9 @@ docker compose \
   up -d gluetun transmission
 ```
 
-## After the copy finishes
+## Next steps
 
-1) Point comics root to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` in Komga/Komf/Mylar; remove `/Comics` + `/Comics_mirror`; rescan Komga.
+1) Point comics root to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` in Komga/Komf/Mylar; (legacy `/Comics` removed).
 2) Normalize binds/env to canonical roots; add mount-gating; compose up.
 3) Add Traefik host rules + DOMAIN; enable HTTPS (keep loopback fallback).
 4) Secret hygiene: git filter-repo to purge old CF token; add gitleaks + pre-commit; keep .env in 1Password.

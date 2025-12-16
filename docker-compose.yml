@@ -804,8 +804,7 @@ services:
     - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
     - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
     volumes:
-    - /mnt/fast8tb/Cloud/OneDrive/Comics:/comics:rw,Z
-    - /mnt/fast8tb/Cloud/OneDrive/Comics_mirror:/comics_mirror:ro
+    - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,Z
     - /home/deck/usenet/config/komga:/config:Z
     ports:
     - "8081:25600"

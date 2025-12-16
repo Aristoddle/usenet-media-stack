@@ -18,7 +18,7 @@
 
 ## Paths (used by the stack)
 - Media root: `/mnt/fast8tb/Cloud/OneDrive`
-  - Comics: `/mnt/fast8tb/Cloud/OneDrive/Comics`
+  - Comics: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`
   - Ebooks: `/mnt/fast8tb/Cloud/OneDrive/Books`
   - Audiobooks: `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`
   - Configs: `/mnt/fast8tb/Cloud/OneDrive/*Config`

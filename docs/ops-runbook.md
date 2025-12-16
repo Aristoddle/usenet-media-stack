@@ -1,18 +1,17 @@
 # Operations Runbook (Bazzite host)
 
 ## Daily/quick checks
-- `podman ps` or `docker ps` (post-reboot) to confirm containers are up.
+- `docker ps` to confirm containers are up.
 - Komga up: `curl -I http://localhost:8081`.
 - Komf up: `curl -I http://localhost:8085`.
-- Comics sync status: `journalctl --user -u rsync-comics -f` (stop when idle).
- - Nightly sync (optional): copy `scripts/rsync-comics.service` and `.timer` to `~/.config/systemd/user/`, then `systemctl --user enable --now rsync-comics.timer` once current transfers are done.
+- Comics mount: ensure `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` is present and writable.
 
-## Reboot checklist (only after transfers finish)
+## Reboot checklist
 1) Reboot to apply staged rpm-ostree layer (Docker).
 2) Enable Docker daemon: `sudo systemctl enable --now docker`.
 3) Add user to docker group: `sudo usermod -aG docker $USER && newgrp docker`.
 4) Start stacks:
-   - Comics: `docker compose -f docker-compose.komga.yml up -d` (or `podman compose ...`)
+   - Comics: `docker compose -f docker-compose.komga.yml up -d`
    - Reading stack: `docker compose -f docker-compose.reading.yml up -d`
    - Main: `docker compose up -d`
 
@@ -22,7 +21,7 @@
 
 ## Storage & paths (host)
 - Media root: `/mnt/fast8tb/Cloud/OneDrive`
-- Comics: `/mnt/fast8tb/Cloud/OneDrive/Comics`
+- Comics: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`
 - Ebooks: `/mnt/fast8tb/Cloud/OneDrive/Books`
 - Audiobooks: `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`
 - Configs: `/mnt/fast8tb/Cloud/OneDrive/*Config`
