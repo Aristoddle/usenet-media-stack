@@ -17,11 +17,11 @@
 - For Podman: `podman --version` and `podman info --debug`
 
 ## Paths (used by the stack)
-- Media root: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive`
-  - Comics: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Comics`
-  - Ebooks: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books`
-  - Audiobooks: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks`
-  - Configs: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/*Config`
+- Media root: `/mnt/fast8tb/Cloud/OneDrive`
+  - Comics: `/mnt/fast8tb/Cloud/OneDrive/Comics`
+  - Ebooks: `/mnt/fast8tb/Cloud/OneDrive/Books`
+  - Audiobooks: `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`
+  - Configs: `/mnt/fast8tb/Cloud/OneDrive/*Config`
 - OneDrive source (GVFS): `/run/user/1000/gvfs/onedrive:host=gmail.com,user=J3lanzone/Bundles_b896e2bb7ca3447691823a44c4ad6ad7/Books/Comics/`
 
 ## Clone and configure

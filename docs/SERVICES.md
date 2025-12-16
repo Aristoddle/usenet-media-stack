@@ -1,82 +1,34 @@
 # Working Services Documentation
 
-**Status**: 7 Confirmed Working Services (Validated 2025-05-28)
+**Status**: Live snapshot (Dec 2025) — core automation online; streaming via Plex (Jellyfin optional/disabled).
 
-This documentation reflects the **actual tested functionality** of our media stack, not aspirational claims.
+This reflects current, tested functionality on the Bazzite host.
 
 ## 🎯 Core Working Services
 
-### 📺 Media Streaming
-- **[Jellyfin](http://localhost:8096)** - Full-featured media server
-  - Stream movies, TV shows, music
-  - Hardware transcoding with AMD GPU acceleration
-  - Mobile and web clients supported
-  - ✅ **Status**: Fully operational
+### 🔍 Search & Automation
+- **[Prowlarr](http://localhost:9696)** — unified indexers (Newznab configured)
+- **[Sonarr](http://localhost:8989)** — TV automation (wired to SABnzbd)
+- **[Radarr](http://localhost:7878)** — Movie automation (wired to SABnzbd)
+- **[SABnzbd](http://localhost:8080)** — Usenet downloader (categories tv/movies set)
+- **[Overseerr](http://localhost:5055)** — Request management
 
-### 🔍 Search & Indexing  
-- **[Prowlarr](http://localhost:9696)** - Unified indexer management
-  - Manages usenet and torrent indexers
-  - API integration with automation services
-  - Centralized search across sources
-  - ✅ **Status**: Fully operational
+### 📚 Libraries
+- **[Komga](http://localhost:8081)** / **[Komf](http://localhost:8085)** — comics/PDF + metadata
+- **[Mylar](http://localhost:8090)** — comics automation
+- **[Whisparr](http://localhost:6969)** — adult/alt media
 
-### 🐳 Infrastructure Management
-- **[Portainer](http://localhost:9000)** - Container management
-  - Docker container monitoring and control
-  - Stack deployment and management
-  - Resource usage monitoring
-  - ✅ **Status**: Fully operational
+### 🛠 Processing & Management
+- **[Tdarr](http://localhost:8265)** — transcoding
+- **[Portainer](http://localhost:9000)** — container management
+- **[Netdata](http://localhost:19999)** — host metrics
+- **Docs** (http://localhost:4173) — VitePress site
+- **Traefik** — running on 80/443 (routes pending; dashboard 8082)
 
-## 📚 Content Automation (Working)
-
-### 📖 Books & Audiobooks
-- **[Readarr](http://localhost:8787)** - Book automation
-  - Automated book and audiobook downloading
-  - Library organization and metadata
-  - Integration with download clients
-  - ✅ **Status**: Fully operational
-
-### 📝 Subtitles
-- **[Bazarr](http://localhost:6767)** - Subtitle automation  
-  - Automatic subtitle downloading
-  - Multiple language support
-  - Integration with media libraries
-  - ✅ **Status**: Fully operational
-
-### 🎬 Transcoding
-- **[Tdarr](http://localhost:8265)** - Video transcoding
-  - Automated video optimization
-  - Hardware acceleration support
-  - Library scanning and processing
-  - ✅ **Status**: Fully operational
-
-### 📚 Comics & Manga
-- **[YACReader](http://localhost:8083)** - Comic library
-  - Digital comic and manga management
-  - Web-based reading interface
-  - Library organization
-  - ✅ **Status**: Fully operational
-
-## ❌ Known Issues (Non-Working Services)
-
-### Critical Failures
-- **Sonarr** (TV automation) - .NET startup errors
-- **Radarr** (Movie automation) - .NET startup errors  
-- **SABnzbd** (Downloader) - Configuration issues
-- **Overseerr** (Request management) - Setup loop
-- **Netdata** (System monitoring) - Error pages
-- **Mylar** (Comic automation) - Error pages
-
-## 🎯 Current Capabilities
-
-**What Works**:
-- ✅ **Media Streaming**: Full Jellyfin media server
-- ✅ **Search Infrastructure**: Prowlarr indexer management
-- ✅ **Book Automation**: Complete Readarr workflow
-- ✅ **Subtitle Automation**: Bazarr integration
-- ✅ **Video Processing**: Tdarr transcoding
-- ✅ **Comic Library**: YACReader management
-- ✅ **Container Management**: Full Portainer access
+## ❌ Not in scope / retired
+- Readarr (project archived Jun 2025)
+- Jellyfin (disabled; Plex is primary)
+- YACReader (superseded by Komga)
 
 **What's Missing**:
 - ❌ **TV/Movie Automation**: Sonarr/Radarr not functional

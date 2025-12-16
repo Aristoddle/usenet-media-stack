@@ -22,7 +22,7 @@ remediation steps for the most common production issues.
 ### Port Conflicts
 
 - Run `./usenet validate --fix` to kill stray docker-proxy processes.
-- Check `docker ps --format '{{.Ports}} {{.Names}}'` for unexpected binds.
+ - Check `docker ps --format '\\{\\{.Ports\\}\\} \\{\\{.Names\\}\\}'` for unexpected binds.
 - Reserve ports in `/etc/systemd/system.conf` when the OS auto-claims them.
 
 ### Storage Degradation

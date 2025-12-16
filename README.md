@@ -1,14 +1,20 @@
 # 🎬 Usenet Media Stack
 
-> **Working media server stack** with 22 confirmed operational services including Jellyfin streaming, Prowlarr indexing, and complete automation.
+> Current, tested snapshot (Dec 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Overseerr + tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata. Jellyfin is optional/disabled; Plex is primary for streaming.
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
-[![Services](https://img.shields.io/badge/Working%20Services-22%2F23-green.svg)](docs/SERVICES.md)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20WSL-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
+[![Services](https://img.shields.io/badge/Working%20Services-live%20snapshot-green.svg)](docs/SERVICES.md)
+[![Platform](https://img.shields.io/badge/Platform-Linux-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Validated](https://img.shields.io/badge/Tested-2025--05--28-green.svg)](docs/SERVICES.md)
 
 **Real functionality over aspirational claims. Tested and validated working services.**
+
+> **State of the stack (Dec 2025)**  
+> - rclone copy in progress (OneDrive Books/Comics) — path changes deferred until it finishes  
+> - Traefik running on 80/443 (routes pending; dashboard 8082)  
+> - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
+> - Jellyfin disabled (Plex is primary)
 
 ## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)**
 
@@ -39,35 +45,38 @@ cd usenet-media-stack
 
 Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick matrix (single host, Swarm with bind or NFS, VPN/tunnel variants) and required Docker/SELinux prerequisites.
 
-**Result**: 22 confirmed working services (22/23) providing full media streaming, search, and automation.
+**Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex; Jellyfin optional.
 
-### **What Actually Works** ✅
+### **What Actually Works (Dec 2025)** ✅
 ```bash
-# 🎬 Core Media Stack (Tested & Confirmed)
-jellyfin     (8096) # → Media streaming with GPU transcoding
-prowlarr     (9696) # → Indexer management for search
-portainer    (9000) # → Container management interface
+# Core automation
+prowlarr     (9696)  # indexers
+sonarr       (8989)  # TV
+radarr       (7878)  # Movies
+sabnzbd      (8080)  # Usenet DL
+overseerr    (5055)  # Requests
 
-# 📚 Content Automation (Working)  
-readarr      (8787) # → Book/audiobook automation
-bazarr       (6767) # → Subtitle automation
-tdarr        (8265) # → Video transcoding engine
-yacreader    (8083) # → Comic/manga library
+# Libraries
+komga        (8081→25600)  # Comics/PDF
+komf         (8085)        # Metadata for Komga
+mylar        (8090)        # Comics automation
+whisparr     (6969)        # Adult/alt
 
-# ❌ Known Issues
-# sonarr/radarr - .NET startup errors (core TV/movie automation)
-# overseerr - setup loop issues  
-# sabnzbd - configuration problems
+# Processing/management
+tdarr        (8265)        # Transcoding
+portainer    (9000)        # Containers
+netdata      (19999)       # Metrics
+docs         (4173)        # Site
 ```
 
-### **📊 Current Status**
-- ✅ **22 services confirmed working** via automated testing
-- ✅ **Media streaming operational** (Jellyfin + transcoding)  
-- ✅ **Search infrastructure ready** (Prowlarr + indexers)
-- ✅ **Content automation partial** (Books, subtitles, comics)
-- ❌ **TV/Movie automation blocked** (Sonarr/Radarr issues)
+**📊 Current status**
+- ✅ Automation online (Sonarr/Radarr/SAB/Prowlarr) with indexers wired
+- ✅ Requests, comics/books services healthy
+- ✅ Traefik running (routes pending)
+- 🔄 Library copy in progress; path normalization pending completion
+- ⚙️ Jellyfin disabled; Plex is primary streamer
 
-**📸 [View Service Screenshots](docs/SERVICES.md)** | **🔧 [See All Working Services](docs/SERVICES.md)**
+**📸 [View Service Screenshots](docs/SERVICES.md)** | **🔧 [See Service Status](docs/SERVICES.md)**
 
 ---
 

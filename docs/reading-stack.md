@@ -4,16 +4,16 @@
 - **Comics**: Komga + Komf via `docker-compose.komga.yml` (Komga on 8081, Komf on 8085). Point `COMICS_ROOT` at your comics library (e.g., OneDrive). Hourly scans keep metadata fresh.
 - **Ebooks**: Calibre + Calibre-Web (post-reboot when Docker is available). Compose definitions live in `docker-compose.reading.yml`.
 - **Audiobooks/Podcasts**: Audiobookshelf (same compose file).
-- **Kometa**: Optional (Plex-first metadata); config skeleton at `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/KometaConfig/config.yml`.
+- **Kometa**: Optional (Plex-first metadata); config skeleton at `/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml`.
 
-## Paths (OneDrive-backed on Fast_8TB_Ser7)
-- Comics: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Comics`
-- Ebooks (to create): `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Books`
-- Audiobooks: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Audiobooks`
-- Podcasts: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/Podcasts`
-- Calibre config: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/CalibreConfig`
-- Audiobookshelf config: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/AudiobookshelfConfig`
-- Kometa config: `/run/media/deck/Fast_8TB_Ser7/Cloud/OneDrive/KometaConfig`
+## Paths (OneDrive-backed on fast8tb mount)
+- Comics: `/mnt/fast8tb/Cloud/OneDrive/Comics`
+- Ebooks (to create): `/mnt/fast8tb/Cloud/OneDrive/Books`
+- Audiobooks: `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`
+- Podcasts: `/mnt/fast8tb/Cloud/OneDrive/Podcasts`
+- Calibre config: `/mnt/fast8tb/Cloud/OneDrive/CalibreConfig`
+- Audiobookshelf config: `/mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig`
+- Kometa config: `/mnt/fast8tb/Cloud/OneDrive/KometaConfig`
 
 ## Compose (post-reboot)
 - Comics: `docker compose -f docker-compose.komga.yml up -d` (Docker or Podman)
