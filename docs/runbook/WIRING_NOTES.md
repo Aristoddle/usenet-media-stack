@@ -28,6 +28,7 @@
   - Whisparr: baseUrl `http://whisparr:6969`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories XXX (6000). API key auto-read from container config.
   - Mylar: baseUrl `http://mylar:8090`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories Books/Comics (7030), apiKey set.
   - Lidarr: baseUrl `http://lidarr:8686`, prowlarrUrl `http://prowlarr:9696`, syncLevel `fullSync`, categories Music (3000/3030), apiKey set.
+- Komf: running RW; providers enabled (ComicVine, AniList, MangaUpdates, MangaDex) via env; Komga library `/comics` currently RW.
 - Notes: Tests via `/api/v1/indexer/{id}/test` require redirect flag and valid appProfileId; current indexers created with `redirect=true`, `appProfileId=1`, `priority=25`.
 
 ## SABnzbd wiring

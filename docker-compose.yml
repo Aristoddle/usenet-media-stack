@@ -804,7 +804,7 @@ services:
     - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
     - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
     volumes:
-    - /mnt/fast8tb/Cloud/OneDrive/Comics:/comics:ro
+    - /mnt/fast8tb/Cloud/OneDrive/Comics:/comics:rw,Z
     - /mnt/fast8tb/Cloud/OneDrive/Comics_mirror:/comics_mirror:ro
     - /home/deck/usenet/config/komga:/config:Z
     ports:
@@ -817,6 +817,13 @@ services:
     logging: *default-logging
     environment:
     - KOMGA_BASE_URI=http://komga:25600
+    - KOMF_COMICVINE_API_KEY=${KOMF_COMICVINE_API_KEY:-}
+    - KOMF_MANGAUPDATES_USERNAME=${KOMF_MANGAUPDATES_USERNAME:-}
+    - KOMF_MANGAUPDATES_PASSWORD=${KOMF_MANGAUPDATES_PASSWORD:-}
+    - KOMF_MANGADEX_CLIENT_ID=${KOMF_MANGADEX_CLIENT_ID:-}
+    - KOMF_MANGADEX_CLIENT_SECRET=${KOMF_MANGADEX_CLIENT_SECRET:-}
+    - KOMF_ANILIST_CLIENT_ID=${KOMF_ANILIST_CLIENT_ID:-}
+    - KOMF_ANILIST_CLIENT_SECRET=${KOMF_ANILIST_CLIENT_SECRET:-}
     volumes:
     - /var/home/deck/komf-config:/config:rw,z
     depends_on:
