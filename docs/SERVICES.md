@@ -1,6 +1,6 @@
 # Working Services Documentation
 
-**Status**: Live snapshot (Dec 18, 2025) — core automation online. Plex is pending claim; Audiobookshelf is not running. This is the single source of truth for working services.
+**Status**: Live snapshot (Dec 18, 2025) — core automation online. Plex is running (claim pending); Audiobookshelf is running via the reading stack. This is the single source of truth for working services.
 
 ## 🎯 Core Working Services
 
@@ -19,9 +19,11 @@
 - **Mylar** — http://localhost:8090
 - **Whisparr** — http://localhost:6969
 - **Kavita** — http://localhost:5000
+- **Suwayomi** — http://localhost:4567
+- **Audiobookshelf** — http://localhost:13378
 
 ### 🎬 Media server
-- **Plex** — http://localhost:32400 _(pending claim / not running yet)_
+- **Plex** — http://localhost:32400 _(running; claim pending)_
 
 ### 🛠 Processing & Management
 - **Tdarr** — http://localhost:8265
@@ -31,7 +33,6 @@
 
 ### ❌ Disabled / not in scope
 - Traefik routes (not wired)
-- Audiobookshelf (reading stack not running; compose paths pending normalization)
 
 ## 📸 Service Screenshots
 

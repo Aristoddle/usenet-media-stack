@@ -13,7 +13,7 @@ hero:
       text: Local Endpoints
       link: /local-endpoints/
     - theme: alt
-      text: Service Status (16/23)
+      text: Service Status (17/23)
       link: /SERVICES/
 features:
   - icon: ⚙️
@@ -21,7 +21,7 @@ features:
     details: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr with SABnzbd + Transmission; Aria2 available via RPC.
   - icon: 📚
     title: Comics & books
-    details: Komga + Komf + Mylar + Kavita; library path set by COMICS_ROOT.
+    details: Komga + Komf + Mylar + Kavita + Suwayomi; library path set by COMICS_ROOT.
   - icon: 📊
     title: Ops & visibility
     details: Overseerr, Bazarr, Portainer, Netdata. Clickable localhost URLs on the endpoints page.
@@ -39,7 +39,7 @@ features:
 ## Live status (Dec 17, 2025)
 
 - Core: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr; SABnzbd + Transmission (no VPN), Aria2 RPC.
-- Comics/books: Komga + Komf + Mylar + Kavita; library path `${COMICS_ROOT}`.
+- Comics/books: Komga + Komf + Mylar + Kavita + Suwayomi; library path `${COMICS_ROOT}`.
 - Ops: Overseerr, Bazarr, Portainer, Netdata. Clickable URLs: [Local endpoints](/local-endpoints/).
 - Deploy: GitHub Actions → Cloudflare Pages (site needs redeploy to reflect current docs).
 - In flight: Traefik routes; secret scrub (git history + gitleaks); optional nfs-server removal; verify Aria2 test in Prowlarr.

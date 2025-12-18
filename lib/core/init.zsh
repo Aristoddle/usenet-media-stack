@@ -31,11 +31,20 @@
 #   load_stack_config || die "Failed to initialize"
 #=============================================================================
 load_stack_config() {
-    # 1. Load .env file first
+    # 1. Load .env file first (safe parse; avoid command execution)
     if [[ -f "${PROJECT_ROOT}/.env" ]]; then
-        set -a  # Auto-export variables
-        source "${PROJECT_ROOT}/.env"
-        set +a
+        while IFS='=' read -r key value; do
+            # Skip comments and empty lines
+            [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+
+            # Strip surrounding quotes if present
+            value="${value%\"}"
+            value="${value#\"}"
+            value="${value%\'}"
+            value="${value#\'}"
+
+            export "$key=$value"
+        done < "${PROJECT_ROOT}/.env"
     fi
     
     # 2. Build service URLs from environment
@@ -57,43 +66,43 @@ load_stack_config() {
     
     # 3. Build provider configs from environment
     typeset -gA PROVIDERS=()
-    if [[ -n "$NEWSHOSTING_USER" ]]; then
+    if [[ -n "${NEWSHOSTING_USER:-}" && -n "${NEWSHOSTING_PASS:-}" ]]; then
         PROVIDERS[Newshosting]="${NEWSHOSTING_SERVER:-news.newshosting.com}:${NEWSHOSTING_PORT:-563}:${NEWSHOSTING_USER}:${NEWSHOSTING_PASS}:${NEWSHOSTING_CONNECTIONS:-30}"
     fi
     
-    if [[ -n "$USENETEXPRESS_USER" ]]; then
+    if [[ -n "${USENETEXPRESS_USER:-}" && -n "${USENETEXPRESS_PASS:-}" ]]; then
         PROVIDERS[UsenetExpress]="${USENETEXPRESS_SERVER:-usenetexpress.com}:${USENETEXPRESS_PORT:-563}:${USENETEXPRESS_USER}:${USENETEXPRESS_PASS}:${USENETEXPRESS_CONNECTIONS:-20}"
     fi
     
-    if [[ -n "$FRUGAL_USER" ]]; then
+    if [[ -n "${FRUGAL_USER:-}" && -n "${FRUGAL_PASS:-}" ]]; then
         PROVIDERS[Frugalusenet]="${FRUGAL_SERVER:-newswest.frugalusenet.com}:${FRUGAL_PORT:-563}:${FRUGAL_USER}:${FRUGAL_PASS}:${FRUGAL_CONNECTIONS:-10}"
     fi
     
     # 4. Build indexer configs from environment
     typeset -gA INDEXERS=()
-    [[ -n "$NZBGEEK_API" ]] && INDEXERS[NZBgeek]="$NZBGEEK_API"
-    [[ -n "$NZBFINDER_API" ]] && INDEXERS[NZBFinder]="$NZBFINDER_API"
-    [[ -n "$NZBSU_API" ]] && INDEXERS[NZBsu]="$NZBSU_API"
-    [[ -n "$NZBPLANET_API" ]] && INDEXERS[NZBPlanet]="$NZBPLANET_API"
+    [[ -n "${NZBGEEK_API:-}" ]] && INDEXERS[NZBgeek]="$NZBGEEK_API"
+    [[ -n "${NZBFINDER_API:-}" ]] && INDEXERS[NZBFinder]="$NZBFINDER_API"
+    [[ -n "${NZBSU_API:-}" ]] && INDEXERS[NZBsu]="$NZBSU_API"
+    [[ -n "${NZBPLANET_API:-}" ]] && INDEXERS[NZBPlanet]="$NZBPLANET_API"
     
     # 5. Validate required configuration
     local errors=0
     
     # Check domain
-    if [[ -z "$DOMAIN" ]]; then
+    if [[ -z "${DOMAIN:-}" ]]; then
         echo "ERROR:" "DOMAIN not set in .env"
         ((errors++))
     fi
     
     # Check essential APIs
-    if [[ -z "$NZBGEEK_API" && -z "$NZBFINDER_API" ]]; then
+    if [[ -z "${NZBGEEK_API:-}" && -z "${NZBFINDER_API:-}" ]]; then
         echo "ERROR:" "At least one indexer API key required"
         ((errors++))
     fi
     
     # Check providers
-    if [[ -z "$NEWSHOSTING_USER" ]]; then
-        echo "ERROR:" "Primary Usenet provider not configured"
+    if [[ -z "${NEWSHOSTING_USER:-}" || -z "${NEWSHOSTING_PASS:-}" ]]; then
+        echo "ERROR:" "Primary Usenet provider not configured (NEWSHOSTING_USER/PASS)"
         ((errors++))
     fi
     

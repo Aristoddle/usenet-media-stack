@@ -1,14 +1,13 @@
 # Komga + Komf Quickstart (Comics/OPDS)
 
-This project now ships a reusable compose file to stand up Komga (library + OPDS) and Komf (metadata enrichment) on any host.
+This project ships a reusable compose file to stand up Komga (library + OPDS) and Komf (metadata enrichment; UI labeled **Komelia**) on any host.
 
 ## TL;DR
 ```bash
 cp -r config/komga-example ./config/komga   # optional: seed config
 cp -r config/komf-example ./config/komf     # optional: seed config
 COMICS_ROOT=/srv/usenet/books/Comics \
-KOMGA_CONFIG=/srv/usenet/config/komga \
-KOMF_CONFIG=/srv/usenet/config/komf \
+CONFIG_ROOT=/srv/usenet/config \
 KOMGA_TMP=/srv/usenet/config/komga/tmp \
 KOMGA_PORT=8081 \
 KOMF_PORT=8085 \
@@ -17,14 +16,14 @@ docker compose -f docker-compose.komga.yml up -d
 
 Then:
 - Komga UI/OPDS: http://localhost:8081  • OPDS: http://localhost:8081/opds/v1.2
-- Komf UI: http://localhost:8085 (configure providers, point at Komga if not auto-detected)
+- Komf UI (Komelia): http://localhost:8085 (configure providers, point at Komga if not auto-detected)
 
 ## Paths & env
-- `COMICS_ROOT` (required): path to your comics library (read-only inside the container).
-- `KOMGA_CONFIG` (default `/srv/usenet/config/komga`): persists Komga DB/thumbnails.
+- `COMICS_ROOT` (required): path to your comics library (read/write inside the container for shared tooling).
+- `CONFIG_ROOT` (default `/srv/usenet/config`): base config path.
 - `KOMGA_TMP` (default `/srv/usenet/config/komga/tmp`): temp extraction dir.
 - `KOMGA_PORT` (default 8081): host port mapped to Komga’s internal 25600.
-- `KOMF_CONFIG` (default `/srv/usenet/config/komf`): Komf application.yml and DB.
+- `KOMF_CONFIG` optional override (defaults to `${CONFIG_ROOT}/komf`): Komf application.yml and DB.
 - `KOMF_PORT` (default 8085): host port for Komf UI.
 
 ## Resource profile
@@ -48,3 +47,4 @@ Then:
 
 ## Backups
 - Back up `KOMGA_CONFIG` and `KOMF_CONFIG`; your comics stay in `COMICS_ROOT`.
+- Note: Komga’s SQLite tuning may create a file named `database.sqlite?wal_autocheckpoint=1000` in `/config`; that is the active DB file to back up.

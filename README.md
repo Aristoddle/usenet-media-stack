@@ -1,6 +1,6 @@
 # 🎬 Beppe's Arr Stack
 
-> Current, tested snapshot (Dec 17, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata + Kavita. Plex is primary for streaming. Transmission/Aria2 exposed on host (no Traefik yet); services are loopback/LAN-only.
+> Current, tested snapshot (Dec 18, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Kavita + Suwayomi + Audiobookshelf + Portainer/Netdata. Plex is primary for streaming (claim pending). Transmission/Aria2 exposed on host (no Traefik yet); services are loopback/LAN-only.
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![Services](https://img.shields.io/badge/Working%20Services-see%20docs%2FSERVICES-green.svg)](docs/SERVICES.md)
@@ -13,7 +13,7 @@ Project memory/KG conventions: [`MEMORY_SPEC.md`](MEMORY_SPEC.md).
 
 > **State of the stack (Dec 18, 2025)**  
 > - Comics library now at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (copy complete)  
-> - Traefik not yet wired; all services are reachable on localhost only; Transmission exposed on host 9091 via gluetun  
+> - Traefik not yet wired; all services are reachable on localhost/LAN only; Transmission exposed on host 9091  
 > - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
 > - Plex primary (pending claim; set `PLEX_CLAIM` and bring up the Plex service)
 
@@ -53,7 +53,7 @@ Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick mat
 
 **Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex.
 
-### **What Actually Works (Dec 17, 2025)** ✅
+### **What Actually Works (Dec 18, 2025)** ✅
 ```bash
 # Core automation
 prowlarr     (9696)  # indexers
@@ -69,13 +69,15 @@ komga        (8081→25600)  # Comics/PDF
 komf         (8085)        # Metadata for Komga
 mylar        (8090)        # Comics automation
 whisparr     (6969)        # Adult/alt
+kavita       (5000)        # Reader
+suwayomi     (4567)        # Manga (Tachidesk)
+audiobookshelf (13378)     # Audiobooks/podcasts
 
 # Processing/management
 tdarr        (8265)        # Transcoding
 portainer    (9000)        # Containers
 netdata      (19999)       # Metrics
 docs         (4173)        # Site (stale)
-kavita       (5000)        # Reader
 ```
 
 **📊 Current status**

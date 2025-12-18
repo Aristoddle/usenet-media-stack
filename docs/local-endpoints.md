@@ -17,6 +17,7 @@
 - Komga: [http://localhost:8081](http://localhost:8081)
 - Komf (Komelia UI): [http://localhost:8085](http://localhost:8085)
 - Kavita: [http://localhost:5000](http://localhost:5000)
+- Suwayomi (Tachidesk): [http://localhost:4567](http://localhost:4567)
 - Audiobookshelf: [http://localhost:13378](http://localhost:13378)
 
 ## Requests / oversight

@@ -10,10 +10,12 @@
 1) Reboot to apply staged rpm-ostree layer (Docker).
 2) Enable Docker daemon: `sudo systemctl enable --now docker`.
 3) Add user to docker group: `sudo usermod -aG docker $USER && newgrp docker`.
-4) Start stacks:
-   - Comics: `docker compose -f docker-compose.komga.yml up -d`
-   - Reading stack: `docker compose -f docker-compose.reading.yml up -d`
-   - Main: `docker compose up -d`
+4) Start stacks (preferred: systemd units):
+   - Main stack: `sudo systemctl enable --now media-stack.service`
+   - Reading stack: `sudo systemctl enable --now media-reading-stack.service`
+   - Comics-only (optional): `docker compose -f docker-compose.komga.yml up -d`
+   - Note: systemd units set `COMPOSE_PROJECT_NAME=media-main` and `media-reading` to prevent `--remove-orphans`
+     from tearing down the other stack.
 
 ## Healthchecks to keep/restore
 - Bazarr, Overseerr, Plex, Tdarr, Prowlarr: http healthchecks (`curl -f http://localhost:<port>` with 30s interval, 10s timeout, 3 retries) in compose.
@@ -54,4 +56,4 @@
 - Port check: `ss -tlnp | grep 8081` (Komga), `5000` (Kavita), `13378` (Audiobookshelf), main stack ports as usual.
 - Disk space: `df -h ${MEDIA_ROOT}` (example: `/var/mnt/fast8tb/Local/media`).
 - GPU check (after Docker reboot): `docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi` (if NVIDIA present).
-- Prowlarr indexer warnings: if health shows DNS/IPv6 issues, set service `dns: [1.1.1.1, 1.0.0.1]` and disable IPv6 via sysctls in compose, then recreate the container.
+- Prowlarr indexer warnings: DNS/IPv6 tweaks are now centralized via the compose `x-network-tweaks` anchor (applied to all services). If warnings persist, recreate the affected container.

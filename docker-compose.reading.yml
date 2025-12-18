@@ -7,9 +7,9 @@ services:
     environment:
       - TZ=Etc/UTC
     volumes:
-      - ${AUDIOBOOKS_ROOT:-/srv/usenet/books/Audiobooks}:/audiobooks
-      - ${AUDIOBOOKSHELF_CONFIG:-/srv/usenet/config/audiobookshelf}:/config
-      - ${AUDIOBOOKSHELF_CONFIG:-/srv/usenet/config/audiobookshelf}/metadata:/metadata
+      - ${AUDIOBOOKS_ROOT:-/srv/usenet/books/Audiobooks}:/audiobooks:rw,Z
+      - ${AUDIOBOOKSHELF_CONFIG:-/srv/usenet/config/audiobookshelf}:/config:rw,Z
+      - ${AUDIOBOOKSHELF_CONFIG:-/srv/usenet/config/audiobookshelf}/metadata:/metadata:rw,Z
       # Optional: add /podcasts when you decide on a canonical path
       # - ${PODCASTS_ROOT:-/srv/usenet/books/Podcasts}:/podcasts
     ports:
