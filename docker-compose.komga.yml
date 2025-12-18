@@ -54,8 +54,8 @@ services:
     environment:
       - TZ=Etc/UTC
     volumes:
-      # Order matters: downloads first per Suwayomi docker docs
-      - ${COMICS_ROOT:-/srv/usenet/books/Comics}/Manga:/home/suwayomi/.local/share/Tachidesk/downloads:rw,Z
+      # Downloads go to staging folder, NOT directly into collection
+      - ${SUWAYOMI_DOWNLOADS:-/srv/usenet/downloads/suwayomi-chapters}:/home/suwayomi/.local/share/Tachidesk/downloads:rw,Z
       - ${CONFIG_ROOT:-/srv/usenet/config}/suwayomi:/home/suwayomi/.local/share/Tachidesk:rw,Z
     ports:
       - "${SUWAYOMI_PORT:-4567}:4567"
