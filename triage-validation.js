@@ -10,7 +10,6 @@ const LATEST_FILE = path.join(__dirname, 'triage-results.json');
 
 const remainingServices = [
     { name: 'bazarr', url: 'http://localhost:6767', desc: 'Subtitle Automation' },
-    { name: 'readarr', url: 'http://localhost:8787', desc: 'Book Automation' },
     { name: 'yacreader', url: 'http://localhost:8082', desc: 'Comic Reader' },
     { name: 'tdarr', url: 'http://localhost:8265', desc: 'Transcoding' },
     { name: 'mylar', url: 'http://localhost:8090', desc: 'Comic Automation' }

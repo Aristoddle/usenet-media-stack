@@ -1,109 +1,41 @@
-# Complete Home Media Automation & Network Sharing Stack
-# Version: 2.0 - Docker Swarm Ready with Integrated Samba/NFS
-#
-# This unified stack provides:
-# - Complete *arr media automation suite
-# - Integrated Samba (SMB/CIFS) file sharing
-# - NFS exports for Linux/Unix clients  
-# - Hot-swap storage support with JBOD architecture
-# - Docker Swarm compatibility for multi-device deployment
-# - Resource constraints and placement for different device types
-#
-# Services included:
-# DOWNLOADERS:  SABnzbd (8080), Transmission (9092)
-# AUTOMATION:   Sonarr (8989), Radarr (7878), Bazarr (6767), Prowlarr (9696)
-# SPECIALIZED:  Whisparr (6969), Readarr (8787), Mylar3 (8090), YACReader (8082), Stash (9999)
-# (Legacy Jackett removed - Prowlarr handles all indexing)
-# MEDIA:        Jellyfin (8096)
-# REQUESTS:     Overseerr (5055)
-# TRANSCODING:  Tdarr (8265)
-# OPTIMIZATION: Recyclarr (TRaSH Guide automation)
-# SHARING:      Samba (139,445), NFS (2049)
-  # MONITORING:   Netdata (19999), Portainer (9000)
-  # DOCUMENTATION: VitePress Docs (4173)
-#
-# JBOD Storage Architecture:
-# Fast Storage (Primary): /media/joe/Fast_8TB_[1-3], /media/joe/Fast_4TB_[1-5]
-# Archive Storage: /media/joe/Slow_4TB_[1-2], /media/joe/Slow_2TB_[1-2]
-#
-# Network Requirements:
-# - Trusted subnet: 192.168.0.0/16 (adjust for your network)
-# - Firewall: UFW rules for ports 139,445,2049,111 from trusted hosts
-#
-# Multi-Device Deployment Notes:
-# - Use Docker Swarm for orchestration across multiple devices
-# - Place storage-heavy services on devices with local storage
-# - Place CPU-intensive services on more powerful devices
-# - Use overlay networks for service communication
-#
-# Resource Classification:
-# LOW:    Bazarr, Jackett, YacReader, Samba, NFS
-# MEDIUM: Sonarr, Radarr, Prowlarr, Readarr, Mylar3, Whisparr
-# HIGH:   SABnzbd, Transmission (during active downloads)
-
-# Note: version field is deprecated in Compose v2.x and removed
-
-# NETWORKING: Use default bridge for maximum compatibility  
-# Removed custom networks to prevent subnet conflicts with Docker Desktop extensions
-# All services communicate via container names on default bridge network
-# This approach works reliably across Linux/macOS/Windows Docker environments
-
-# Logging defaults
-x-logging: &default-logging
-  driver: "json-file"
+x-logging: &id001
+  driver: json-file
   options:
-    max-size: "50m"
-    max-file: "3"
-
-# Define volumes for configuration persistence
+    max-size: 50m
+    max-file: '3'
 volumes:
-  # Only keep true Docker volumes (not bind mounts)
   portainer_data:
     driver: local
-
 services:
-  # ================================
-  # SAMBA FILE SHARING SERVICE
-  # Provides SMB/CIFS shares for Windows, macOS, Linux clients
-  # Access: \\server-ip\ShareName
-  # ================================
   samba:
     image: dperson/samba:latest
     container_name: samba
-    logging: *default-logging
+    logging: *id001
     hostname: media-server
     ports:
-    - "139:139"
-    - "445:445"
+      - 139:139
+      - 445:445
     environment:
-    - TZ=Etc/UTC
-    - USERID=1000
-    - GROUPID=1000
-    command: >
-      -u "joe;joe"  -s "Media;/media;yes;no;no;joe;joe;joe"  -s "Downloads;/downloads;yes;no;no;joe;joe;joe"
-      -s "TV;/tv;yes;no;no;joe;joe;joe"
-      -s "Movies;/movies;yes;no;no;joe;joe;joe"
-      -s "Books;/books;yes;no;no;joe;joe;joe"
-      -s "Comics;/comics;yes;no;no;joe;joe;joe"
-      -s "Config;/config;yes;no;no;joe;joe;joe"
-      -p
-      -w "WORKGROUP"
-      -n
+      - TZ=Etc/UTC
+      - USERID=1000
+      - GROUPID=1000
+    command: '-u "joe;joe"  -s "Media;/media;yes;no;no;joe;joe;joe"  -s "Downloads;/downloads;yes;no;no;joe;joe;joe" -s "TV;/tv;yes;no;no;joe;joe;joe" -s "Movies;/movies;yes;no;no;joe;joe;joe" -s "Books;/books;yes;no;no;joe;joe;joe" -s "Comics;/comics;yes;no;no;joe;joe;joe" -s "Config;/config;yes;no;no;joe;joe;joe" -p -w "WORKGROUP" -n
+
+'
     volumes:
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
-      # Mount media directories (working local setup)
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.role == manager
-        - node.labels.storage == true
+          - node.role == manager
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '0.5'
@@ -112,84 +44,66 @@ services:
           cpus: '0.25'
           memory: 256M
     healthcheck:
-      test: ["CMD", "smbclient", "-L", "localhost", "-U", "%"]
+      test:
+        - CMD
+        - smbclient
+        - -L
+        - localhost
+        - -U
+        - '%'
       interval: 30s
       timeout: 10s
       retries: 3
-
-  # ================================
-  # NFS SERVER SERVICE  
-  # Provides NFS exports for Linux/Unix clients
-  # Mount: mount -t nfs server-ip:/media/joe /mount/point
-  # ================================
   nfs-server:
     image: erichough/nfs-server:latest
-    logging: *default-logging
+    logging: *id001
     container_name: nfs-server
     hostname: nfs-server
     ports:
-    - "2049:2049"
-    - "111:111"
-    - "111:111/udp"
-    - "32765:32765"
-    - "32767:32767/udp"
+      - 2049:2049
+      - 111:111
+      - 111:111/udp
+      - 32765:32765
+      - 32767:32767/udp
     cap_add:
-    - SYS_ADMIN
+      - SYS_ADMIN
     privileged: true
     volumes:
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
     environment:
-    - SHARED_DIRECTORY=/media
-    - SHARED_DIRECTORY_2=/downloads
-    - SHARED_DIRECTORY_3=/config
-    - SYNC=true
-    - PERMITTED=192.168.0.0/16
-    - NFS_EXPORT_0=/media *(rw,sync,no_subtree_check,no_root_squash)
-    - NFS_EXPORT_1=/downloads *(rw,sync,no_subtree_check,no_root_squash)
+      - SHARED_DIRECTORY=/media
+      - SHARED_DIRECTORY_2=/downloads
+      - SHARED_DIRECTORY_3=/config
+      - SYNC=true
+      - PERMITTED=192.168.0.0/16
+      - NFS_EXPORT_0=/media *(rw,sync,no_subtree_check,no_root_squash)
+      - NFS_EXPORT_1=/downloads *(rw,sync,no_subtree_check,no_root_squash)
     restart: unless-stopped
     deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-        - node.role == manager
-        - node.labels.storage == true
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
-
-  # ================================
-  # SYSTEM MONITORING WITH NETDATA
-  # Real-time system monitoring dashboard
-  # Access at http://localhost:19999
-  # ================================
+      replicas: 0
   netdata:
     image: netdata/netdata:stable
     container_name: netdata
     hostname: netdata-media-server
     ports:
-    - "19999:19999"
+      - 19999:19999
     cap_add:
-    - SYS_PTRACE
+      - SYS_PTRACE
     security_opt:
-    - apparmor:unconfined
+      - apparmor:unconfined
     volumes:
-    - /proc:/host/proc:ro
-    - /sys:/host/sys:ro
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - /etc/passwd:/host/etc/passwd:ro
-    - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:rw
+      - /sys:/host/sys:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /etc/passwd:/host/etc/passwd:rw
+      - /etc/group:/host/etc/group:rw
     environment:
-    - DOCKER_HOST=/var/run/docker.sock
+      - DOCKER_HOST=/var/run/docker.sock
     restart: unless-stopped
     deploy:
-      mode: global  # Run on every Swarm node
+      mode: global
       resources:
         limits:
           cpus: '0.5'
@@ -197,67 +111,55 @@ services:
         reservations:
           cpus: '0.1'
           memory: 128M
-
-  # ================================
-  # PORTAINER SWARM MANAGEMENT
-  # Docker Swarm management interface  
-  # Access at http://localhost:9000
-  # ================================
     logging:
       driver: json-file
-      options: &id001
+      options: &id002
         max-size: 50m
         max-file: '3'
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
     ports:
-    - "9000:9000"
-    - "8000:8000"
+      - 9000:9000
+      - 8000:8000
     volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.role == manager
+          - node.role == manager
       resources:
         limits:
           cpus: '0.5'
           memory: 512M
-
-  # ================================
-  # SABnzbd - Usenet Downloader
-  # Access at http://localhost:8080
-  # Resource Intensive: Place on powerful nodes
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   sabnzbd:
     image: docker.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
     hostname: sabnzbd
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sabnzbd:/config
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sabnzbd:/config
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
     ports:
-    - "8080:8080"
+      - 8080:8080
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.performance == high
-        - node.labels.storage == true
+          - node.labels.performance == high
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '2.0'
@@ -266,39 +168,38 @@ services:
           cpus: '0.5'
           memory: 512M
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8080
       interval: 30s
       timeout: 10s
       retries: 3
-
-  # ================================
-  # Transmission - BitTorrent Client
-  # Access at http://localhost:9092
-  # Resource Intensive: Place on powerful nodes
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   transmission:
     image: docker.io/linuxserver/transmission:latest
     container_name: transmission
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
-    - TRANSMISSION_WEB_HOME=/transmission-web-control/
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
     - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/transmission:/config
     - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
     - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}/watch:/watch
+    ports:
+    - 9091:9091
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.performance == high
-        - node.labels.storage == true
+          - node.labels.performance == high
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '1.5'
@@ -306,37 +207,30 @@ services:
         reservations:
           cpus: '0.5'
           memory: 256M
-
-  # ================================
-  # Sonarr - TV Show Management
-  # Access at http://localhost:8989
-  # Medium Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   sonarr:
     image: docker.io/linuxserver/sonarr:latest
     container_name: sonarr
     hostname: sonarr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sonarr:/config
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-      # Media storage mount  
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sonarr:/config
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
     ports:
-    - "8989:8989"
+      - 8989:8989
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.storage == true
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '1.0'
@@ -345,39 +239,32 @@ services:
           cpus: '0.25'
           memory: 256M
     depends_on:
-    - sabnzbd
-    - transmission
-
-  # ================================
-  # Radarr - Movie Management
-  # Access at http://localhost:7878
-  # Medium Resource Usage
-  # ================================
+      - sabnzbd
+      - transmission
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   radarr:
     image: docker.io/linuxserver/radarr:latest
     container_name: radarr
     hostname: radarr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/radarr:/config
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-      # Media storage mount
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/radarr:/config
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
     ports:
-    - "7878:7878"
+      - 7878:7878
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.storage == true
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '1.0'
@@ -386,38 +273,31 @@ services:
           cpus: '0.25'
           memory: 256M
     depends_on:
-    - sabnzbd
-    - transmission
-
-  # ================================
-  # Bazarr - Subtitle Management
-  # Access at http://localhost:6767
-  # Low Resource Usage - Can run anywhere
-  # ================================
+      - sabnzbd
+      - transmission
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   bazarr:
     image: docker.io/linuxserver/bazarr:latest
     container_name: bazarr
     hostname: bazarr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/bazarr:/config
-      # Same storage mounts as Sonarr/Radarr for subtitle access
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/bazarr:/config
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
     ports:
-    - "6767:6767"
+      - 6767:6767
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.storage == true
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '0.5'
@@ -426,36 +306,38 @@ services:
           cpus: '0.1'
           memory: 128M
     depends_on:
-    - sonarr
-    - radarr
-
-  # ================================
-  # Prowlarr - Indexer Manager
-  # Access at http://localhost:9696
-  # Medium Resource Usage
-  # ================================
+      - sonarr
+      - radarr
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   prowlarr:
     image: docker.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     hostname: prowlarr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/prowlarr:/config
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/prowlarr:/config
     ports:
-    - "9696:9696"
+      - 9696:9696
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    dns_opt:
+      - use-vc
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.performance != low
+          - node.labels.performance != low
       resources:
         limits:
           cpus: '0.5'
@@ -463,64 +345,52 @@ services:
         reservations:
           cpus: '0.25'
           memory: 256M
-
-  # ================================
-  # Whisparr - Adult Content Management
-  # Access at http://localhost:6969
-  # Medium Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   whisparr:
     image: docker.io/thespad/whisparr:latest
     container_name: whisparr
     hostname: whisparr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/whisparr:/config
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/whisparr:/config
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
     ports:
-    - "6969:6969"
+      - 6969:6969
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.storage == true
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '0.5'
           memory: 512M
-
-  # ================================
-  # Lidarr - Music Management
-  # Access at http://localhost:8686
-  # Medium Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
     hostname: lidarr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/lidarr:/config
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-    - ${MUSIC_ROOT:-/var/mnt/fast8tb/Local/media/music}:/music:rw
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/lidarr:/config
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${MUSIC_ROOT:-/var/mnt/fast8tb/Local/media/music}:/music:rw
     ports:
-    - "8686:8686"
+      - 8686:8686
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -529,31 +399,23 @@ services:
         limits:
           cpus: '0.5'
           memory: 512M
-
-  # Readarr removed (project archived June 2025; use Calibre/Calibre-Web/Audiobookshelf)
-
-  # ================================
-  # Mylar3 - Comic Book Management
-  # Access at http://localhost:8090
-  # Low Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   mylar:
     image: docker.io/linuxserver/mylar3:latest
     container_name: mylar
     hostname: mylar
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/mylar:/config
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-    - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,Z
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/mylar:/config
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
     ports:
-    - "8090:8090"
+      - 8090:8090
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -562,35 +424,27 @@ services:
         limits:
           cpus: '0.5'
           memory: 512M
-
-  # YacReader removed (Komga already covers comics; keeping stack lean)
-
-  # ================================
-  # Jellyfin - Media Server
-  # Access at http://localhost:8096
-  # Medium Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   jellyfin:
     image: docker.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     hostname: jellyfin
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
-    - JELLYFIN_PublishedServerUrl=http://localhost:8096
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - JELLYFIN_PublishedServerUrl=http://localhost:8096
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/jellyfin:/config
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/music:/music
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/books:/books
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/jellyfin:/config
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/music:/music
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/books:/books
     ports:
-    - "8096:8096"
+      - 8096:8096
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -599,27 +453,21 @@ services:
         limits:
           cpus: '1.0'
           memory: 1G
-
-  # ================================
-  # Overseerr - Request Management
-  # Access at http://localhost:5055
-  # Low Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   overseerr:
     image: docker.io/linuxserver/overseerr:latest
     container_name: overseerr
     hostname: overseerr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/overseerr:/config
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/overseerr:/config
     ports:
-    - "5055:5055"
+      - 5055:5055
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -628,25 +476,19 @@ services:
         limits:
           cpus: '0.5'
           memory: 512M
-
-  # ================================
-  # Recyclarr - TRaSH Guide Automation
-  # Optimizes Sonarr/Radarr/Bazarr configurations
-  # Low Resource Usage (Cron-based)
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   recyclarr:
     image: ghcr.io/recyclarr/recyclarr:latest
     container_name: recyclarr
     hostname: recyclarr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/recyclarr:/config
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/recyclarr:/config
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -655,77 +497,60 @@ services:
         limits:
           cpus: '0.25'
           memory: 256M
-
-  # ================================
-  # Tdarr - Automated Transcoding Engine
-  # Access at http://localhost:8265
-  # High Resource Usage (GPU/CPU intensive)
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   tdarr:
     image: ghcr.io/haveagitgat/tdarr:latest
     container_name: tdarr
     hostname: tdarr
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
-    - TDARR_INSTANCE_NAME=Main
-    - serverIP=0.0.0.0
-    - serverPort=8266
-    - webUIPort=8265
-    - internalNode=true
-    - nodeID=MainNode
-      # Hardware acceleration (uncomment for your GPU)
-      # - NVIDIA_VISIBLE_DEVICES=all
-      # - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - TDARR_INSTANCE_NAME=Main
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - nodeID=MainNode
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/server:/app/server
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/configs:/app/configs
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/logs:/app/logs
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}/tdarr_transcode:/temp
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/server:/app/server
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/configs:/app/configs
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/logs:/app/logs
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}/tdarr_transcode:/temp
     ports:
-    - "8265:8265"    # Web UI
-    - "8266:8266"    # Server port
+      - 8265:8265
+      - 8266:8266
     restart: unless-stopped
-    # Uncomment for GPU support
-    # runtime: nvidia
     deploy:
       mode: replicated
       replicas: 1
       resources:
         limits:
-          cpus: '4.0'      # Allow high CPU usage for transcoding
-          memory: 4G       # Transcoding needs RAM for buffers
+          cpus: '4.0'
+          memory: 4G
         reservations:
           cpus: '1.0'
           memory: 1G
-
-  # ================================
-  # Documentation Site - VitePress Documentation
-  # Access at http://localhost:4173
-  # Low Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   docs:
     image: nginx:alpine
     container_name: usenet-docs
     hostname: docs
     volumes:
-    - ${STACK_ROOT:-.}/docs/.vitepress/dist:/usr/share/nginx/html:ro,Z
+      - ${STACK_ROOT:-.}/docs/.vitepress/dist:/usr/share/nginx/html:rw,z
     ports:
-    - "4173:80"
+      - 4173:80
     restart: unless-stopped
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 0
       resources:
         limits:
           cpus: '0.1'
@@ -734,54 +559,53 @@ services:
           cpus: '0.05'
           memory: 32M
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      test:
+        - CMD
+        - wget
+        - --quiet
+        - --tries=1
+        - --spider
+        - http://localhost:80
       interval: 30s
       timeout: 10s
       retries: 3
-
-  # ================================
-  # Stash - Adult Media Library Manager
-  # Access at http://localhost:9999
-  # Medium Resource Usage
-  # ================================
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
   stash:
     image: stashapp/stash:latest
     container_name: stash
     hostname: stash
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
-    - STASH_STASH=/data/
-    - STASH_GENERATED=/generated/
-    - STASH_METADATA=/metadata/
-    - STASH_CACHE=/cache/
-    - STASH_PORT=9999
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - STASH_STASH=/data/
+      - STASH_GENERATED=/generated/
+      - STASH_METADATA=/metadata/
+      - STASH_CACHE=/cache/
+      - STASH_PORT=9999
     volumes:
-    - /etc/localtime:/etc/localtime:ro
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash:/root/.stash:Z
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/adult:/data
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/metadata:/metadata:Z
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/cache:/cache:Z
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/blobs:/blobs:Z
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/generated:/generated:Z
-      # Multi-drive adult storage mounts (same pattern as other services)
-    - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+      - /etc/localtime:/etc/localtime:rw
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash:/root/.stash:Z
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/adult:/data
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/metadata:/metadata:Z
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/cache:/cache:Z
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/blobs:/blobs:Z
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/generated:/generated:Z
+      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
     ports:
-    - "9998:9999"
+      - 9998:9999
     restart: unless-stopped
     logging:
       driver: json-file
-      options: *id001
+      options: *id002
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
-        - node.labels.storage == true
+          - node.labels.storage == true
       resources:
         limits:
           cpus: '1.0'
@@ -789,44 +613,68 @@ services:
         reservations:
           cpus: '0.25'
           memory: 256M
-# ================================
-# KOMGA / KOMF (comics stack)
-# ================================
   komga:
     image: ghcr.io/gotson/komga:1.23.6
     container_name: komga
-    user: "1000:1000"
+    user: 1000:1000
     security_opt:
-    - label:disable
-    logging: *default-logging
+      - label:disable
+    logging: *id001
     environment:
-    - JAVA_OPTS=-Xms4g -Xmx8g -Djava.io.tmpdir=/config/tmp
-    - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
-    - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
+      - JAVA_OPTS=-Xms4g -Xmx8g -Djava.io.tmpdir=/config/tmp
+      - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
+      - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
     volumes:
-    - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,Z
-    - /var/mnt/fast8tb/config/komga:/config:Z
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics_mirror:rw,z
+      - /var/mnt/fast8tb/config/komga:/config:Z
     ports:
-    - "8081:25600"
+      - 8081:25600
     restart: unless-stopped
-
   komf:
     image: sndxr/komf:1.3.0
     container_name: komf
-    logging: *default-logging
+    logging: *id001
     environment:
-    - KOMGA_BASE_URI=http://komga:25600
-    - KOMF_COMICVINE_API_KEY=${KOMF_COMICVINE_API_KEY:-}
-    - KOMF_MANGAUPDATES_USERNAME=${KOMF_MANGAUPDATES_USERNAME:-}
-    - KOMF_MANGAUPDATES_PASSWORD=${KOMF_MANGAUPDATES_PASSWORD:-}
-    - KOMF_MANGADEX_CLIENT_ID=${KOMF_MANGADEX_CLIENT_ID:-}
-    - KOMF_MANGADEX_CLIENT_SECRET=${KOMF_MANGADEX_CLIENT_SECRET:-}
-    - KOMF_ANILIST_CLIENT_ID=${KOMF_ANILIST_CLIENT_ID:-}
-    - KOMF_ANILIST_CLIENT_SECRET=${KOMF_ANILIST_CLIENT_SECRET:-}
+      - KOMGA_BASE_URI=http://komga:25600
+      - KOMF_COMICVINE_API_KEY=${KOMF_COMICVINE_API_KEY:-}
+      - KOMF_MANGAUPDATES_USERNAME=${KOMF_MANGAUPDATES_USERNAME:-}
+      - KOMF_MANGAUPDATES_PASSWORD=${KOMF_MANGAUPDATES_PASSWORD:-}
+      - KOMF_MANGADEX_CLIENT_ID=${KOMF_MANGADEX_CLIENT_ID:-}
+      - KOMF_MANGADEX_CLIENT_SECRET=${KOMF_MANGADEX_CLIENT_SECRET:-}
+      - KOMF_ANILIST_CLIENT_ID=${KOMF_ANILIST_CLIENT_ID:-}
+      - KOMF_ANILIST_CLIENT_SECRET=${KOMF_ANILIST_CLIENT_SECRET:-}
     volumes:
-    - /var/home/deck/komf-config:/config:rw,z
+      - /var/home/deck/komf-config:/config:rw,z
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
     depends_on:
-    - komga
+      - komga
     ports:
-    - "8085:8085"
+      - 8085:8085
+    restart: unless-stopped
+  kavita:
+    image: jvmilazz0/kavita:latest
+    container_name: kavita
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/kavita:/kavita/config:rw,Z
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+  aria2:
+    build: ./aria2
+    container_name: aria2
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - ARIA2_SECRET=${ARIA2_SECRET}
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/aria2:/config
+      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+    ports:
+      - 6800:6800
     restart: unless-stopped

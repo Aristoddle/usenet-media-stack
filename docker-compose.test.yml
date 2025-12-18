@@ -31,10 +31,6 @@ services:
     ports:
       - "20696:9696"
       
-  readarr:
-    ports:
-      - "20787:8787"
-      
   whisparr:
     ports:
       - "20969:6969"

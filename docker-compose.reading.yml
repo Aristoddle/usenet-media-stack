@@ -1,61 +1,17 @@
 version: "3.9"
 
 services:
-  calibre:
-    image: lscr.io/linuxserver/calibre:latest
-    container_name: calibre
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      # Optional: change to true to run the desktop GUI over noVNC
-      - GUAC_USER=reader
-      - GUAC_PASS=changeme
-    volumes:
-      - /mnt/fast8tb/Cloud/OneDrive/CalibreConfig:/config
-      - /mnt/fast8tb/Cloud/OneDrive/Books:/books
-    ports:
-      - "18080:8080"  # calibre content server (avoid collision with Komga)
-      - "18081:8081"  # noVNC (GUI)
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.calibre.rule=Host(`calibre.lan`)"
-      - "traefik.http.routers.calibre.entrypoints=web"
-      - "traefik.http.services.calibre.loadbalancer.server.port=8080"
-
-  calibre-web:
-    image: lscr.io/linuxserver/calibre-web:latest
-    container_name: calibre-web
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - DOCKER_MODS=linuxserver/calibre-web:calibre
-    volumes:
-      - /mnt/fast8tb/Cloud/OneDrive/CalibreConfig:/config
-      - /mnt/fast8tb/Cloud/OneDrive/Books:/books
-    ports:
-      - "18083:8083"  # Calibre-Web UI
-    depends_on:
-      - calibre
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.calibreweb.rule=Host(`calweb.lan`)"
-      - "traefik.http.routers.calibreweb.entrypoints=web"
-      - "traefik.http.services.calibreweb.loadbalancer.server.port=8083"
-
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     container_name: audiobookshelf
     environment:
       - TZ=Etc/UTC
     volumes:
-      - /mnt/fast8tb/Cloud/OneDrive/Audiobooks:/audiobooks
-      - /mnt/fast8tb/Cloud/OneDrive/Podcasts:/podcasts
+      - /mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks:/audiobooks
       - /mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig:/config
       - /mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig/metadata:/metadata
+      # Optional: add /podcasts when you decide on a canonical path
+      # - /mnt/fast8tb/Cloud/OneDrive/Books/Podcasts:/podcasts
     ports:
       - "13378:80"   # Audiobookshelf web
     restart: unless-stopped
@@ -64,12 +20,6 @@ services:
       - "traefik.http.routers.audiobooks.rule=Host(`audio.lan`)"
       - "traefik.http.routers.audiobooks.entrypoints=web"
       - "traefik.http.services.audiobooks.loadbalancer.server.port=80"
-
-networks:
-  default:
-    name: reading_net
-  edge:
-    external: true
 
 networks:
   default:

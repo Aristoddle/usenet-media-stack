@@ -100,7 +100,6 @@ analyze_port_conflicts_intelligently() {
         "7878:Radarr:automation"
         "6767:Bazarr:automation"
         "9696:Prowlarr:indexer"
-        "8787:Readarr:automation"
         "8090:Mylar3:comics"
         "8082:YACReader:reader"
         "8096:Jellyfin:media"

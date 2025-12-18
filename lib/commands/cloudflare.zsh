@@ -169,7 +169,6 @@ setup_dns_records() {
         [sabnzbd]="downloads"
         [jellyfin]="watch"
         [overseerr]="requests"
-        [readarr]="books"
         [lidarr]="music"
         [bazarr]="subtitles"
         [mylar3]="comics"
@@ -253,10 +252,6 @@ ingress:
   # Requests
   - hostname: requests.$DOMAIN
     service: ${SERVICE_URLS[overseerr]}
-    
-  # Books
-  - hostname: books.$DOMAIN
-    service: ${SERVICE_URLS[readarr]}
     
   # Music
   - hostname: music.$DOMAIN

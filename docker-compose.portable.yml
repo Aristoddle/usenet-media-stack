@@ -17,7 +17,7 @@
 # Services: 19 total
 # DOWNLOADERS:  SABnzbd (8080), Transmission (9092)
 # AUTOMATION:   Sonarr (8989), Radarr (7878), Bazarr (6767), Prowlarr (9696)
-# SPECIALIZED:  Whisparr (6969), Readarr (8787), Mylar3 (8090), YACReader (8082), Stash (9999)
+# SPECIALIZED:  Whisparr (6969), Mylar3 (8090), YACReader (8082), Stash (9999)
 # MEDIA:        Jellyfin (8096)
 # REQUESTS:     Overseerr (5055)
 # TRANSCODING:  Tdarr (8265)
@@ -123,7 +123,6 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - TRANSMISSION_WEB_HOME=/transmission-web-control/
     volumes:
       - transmission_config:/config
       - downloads_volume:/downloads
@@ -228,10 +227,10 @@ services:
       - ${CONFIG_ROOT:-/home/deck/usenet/config}/jellyfin:/config
       - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media
       # JBOD media access
-      - /media/joe/Fast_8TB_1:/tv/fast1:ro
-      - /media/joe/Fast_8TB_2:/tv/fast2:ro
-      - /media/joe/Fast_4TB_1:/movies/fast1:ro
-      - /media/joe/Fast_4TB_2:/movies/fast2:ro
+      - /media/joe/Fast_8TB_1:/tv/fast1:rw,Z
+      - /media/joe/Fast_8TB_2:/tv/fast2:rw,Z
+      - /media/joe/Fast_4TB_1:/movies/fast1:rw,Z
+      - /media/joe/Fast_4TB_2:/movies/fast2:rw,Z
     ports:
       - "8096:8096"
     restart: unless-stopped
@@ -266,11 +265,11 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:rw
+      - /sys:/host/sys:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /etc/passwd:/host/etc/passwd:rw
+      - /etc/group:/host/etc/group:rw
     environment:
       - DOCKER_HOST=/var/run/docker.sock
     ports:

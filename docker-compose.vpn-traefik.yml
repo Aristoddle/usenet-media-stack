@@ -108,7 +108,7 @@ services:
         mode: host  # Transmission proxy
         
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
       - traefik-letsencrypt:/letsencrypt
       
     networks:
@@ -210,7 +210,6 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=${TZ:-UTC}
-      - TRANSMISSION_WEB_HOME=/transmission-web-control/
       
       # Security Settings
       - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true

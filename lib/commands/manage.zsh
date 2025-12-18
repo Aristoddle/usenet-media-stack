@@ -184,7 +184,6 @@ check_port_conflicts() {
         "7878:Radarr"
         "6767:Bazarr"
         "9696:Prowlarr"
-        "8787:Readarr"
         "8090:Mylar3"
         "8082:YACReader"
         "8096:Jellyfin"

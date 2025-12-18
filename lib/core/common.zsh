@@ -55,7 +55,6 @@ readonly -a ALL_SERVICES=(
     sonarr
     radarr
     lidarr
-    readarr
     mylar3
     bazarr
     jellyfin

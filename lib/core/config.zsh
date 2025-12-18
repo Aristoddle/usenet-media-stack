@@ -283,7 +283,6 @@ build_service_config() {
         [prowlarr]=9696
         [sonarr]=8989
         [radarr]=7878
-        [readarr]=8787
         [lidarr]=8686
         [bazarr]=6767
         [mylar3]=8090

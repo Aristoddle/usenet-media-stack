@@ -20,8 +20,8 @@ services:
       - DOCKER_TLS_CERTDIR=
     volumes:
       - swarm-manager-data:/var/lib/docker
-      - ./config:/config:ro
-      - ./test-stack:/stack:ro
+      - ./config:/config:rw,Z
+      - ./test-stack:/stack:rw,Z
     command: |
       sh -c "
         dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2376 &
@@ -123,8 +123,8 @@ services:
     image: docker:cli
     hostname: deploy-helper
     volumes:
-      - ./docker-compose.swarm.yml:/stack/docker-compose.yml:ro
-      - ./.env:/stack/.env:ro
+      - ./docker-compose.swarm.yml:/stack/docker-compose.yml:rw,Z
+      - ./.env:/stack/.env:rw,Z
     environment:
       - DOCKER_HOST=tcp://swarm-manager:2376
     command: |

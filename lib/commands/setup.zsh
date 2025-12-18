@@ -667,7 +667,6 @@ show_summary() {
     print "  ${COLOR_GREEN}●${COLOR_RESET} Prowlarr:  ${SERVICE_URLS[prowlarr]}  - Indexer Manager"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Sonarr:    ${SERVICE_URLS[sonarr]}  - TV Shows"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Radarr:    ${SERVICE_URLS[radarr]}  - Movies"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Readarr:   ${SERVICE_URLS[readarr]}  - Books"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Lidarr:    ${SERVICE_URLS[lidarr]}  - Music"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Bazarr:    ${SERVICE_URLS[bazarr]}  - Subtitles"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Mylar3:    ${SERVICE_URLS[mylar3]}  - Comics"

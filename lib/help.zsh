@@ -195,7 +195,6 @@ SERVICES
         sonarr          TV shows
         radarr          Movies
         lidarr          Music
-        readarr         Books
         
     Streaming
         jellyfin        Media server

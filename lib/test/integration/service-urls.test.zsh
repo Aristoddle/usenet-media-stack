@@ -28,7 +28,7 @@ test_service_urls_loads_all_services() {
     load_stack_config >/dev/null 2>&1
     
     # Test core services are defined
-    local core_services=("sabnzbd" "prowlarr" "sonarr" "radarr" "readarr" "lidarr" "bazarr" "mylar3")
+    local core_services=("sabnzbd" "prowlarr" "sonarr" "radarr" "lidarr" "bazarr" "mylar3")
     
     for service in $core_services; do
         if [[ -n "$SERVICE_URLS[$service]" ]]; then

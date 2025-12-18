@@ -195,10 +195,10 @@ services:
         mode: host
     
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-      - /var/lib/node_exporter/textfile_collector:/var/lib/node_exporter/textfile_collector:ro
+      - /proc:/host/proc:rw
+      - /sys:/host/sys:rw
+      - /:/rootfs:rw
+      - /var/lib/node_exporter/textfile_collector:/var/lib/node_exporter/textfile_collector:rw,Z
     
     deploy:
       mode: global  # Deploy on EVERY node
@@ -239,11 +239,11 @@ services:
         mode: host
     
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
+      - /:/rootfs:rw
+      - /var/run:/var/run:rw
+      - /sys:/sys:rw
+      - /var/lib/docker/:/var/lib/docker:rw
+      - /dev/disk/:/dev/disk:rw
     
     deploy:
       mode: global  # Deploy on EVERY node

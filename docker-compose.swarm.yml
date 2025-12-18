@@ -174,7 +174,6 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=${TZ:-UTC}
-      - TRANSMISSION_WEB_HOME=/transmission-web-control/
     volumes:
       - transmission_config:/config
       - downloads_volume:/downloads

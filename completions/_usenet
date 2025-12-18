@@ -200,7 +200,6 @@ _usenet_service_commands() {
         'bazarr:Subtitle automation'
         'prowlarr:Indexer manager'
         'whisparr:Adult content manager'
-        'readarr:Book automation'
         'mylar:Comic book automation'
         'yacreader:Comic reader server'
         'jackett:Indexer proxy'

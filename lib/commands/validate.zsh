@@ -578,7 +578,6 @@ validate_port_conflicts() {
         "8096:Jellyfin"
         "8265:Tdarr Server"
         "8266:Tdarr Web"
-        "8787:Readarr"
         "8989:Sonarr"
         "9000:Portainer"
         "9091:Transmission Web"

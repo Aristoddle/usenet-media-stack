@@ -33,8 +33,8 @@ services:
     networks:
       - edge
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/home/deck/traefik/file-config:/etc/traefik/file-config:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /var/home/deck/traefik/file-config:/etc/traefik/file-config:rw,Z
       - /var/home/deck/traefik/acme.json:/etc/traefik/acme.json
     environment:
       - CF_API_TOKEN=${CF_API_TOKEN:-}

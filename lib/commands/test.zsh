@@ -237,7 +237,6 @@ test_web_interfaces_legacy() {
         # Core Media Automation  
         [sonarr]="8989"
         [radarr]="7878"
-        [readarr]="8787"
         [bazarr]="6767"
         [whisparr]="6969"
         [prowlarr]="9696"
@@ -288,7 +287,6 @@ test_web_interfaces_sequential() {
         # Core Media Automation  
         [sonarr]="8989"
         [radarr]="7878"
-        [readarr]="8787"
         [bazarr]="6767"
         [whisparr]="6969"
         [prowlarr]="9696"
@@ -344,7 +342,6 @@ test_web_interfaces_parallel() {
         # Core Media Automation  
         [sonarr]="8989"
         [radarr]="7878"
-        [readarr]="8787"
         [bazarr]="6767"
         [whisparr]="6969"
         [prowlarr]="9696"
@@ -464,7 +461,6 @@ test_api_endpoints_legacy() {
         [sonarr]="8989"
         [radarr]="7878"
         [prowlarr]="9696"
-        [readarr]="8787"
         [whisparr]="6969"
         [bazarr]="6767"
     )

@@ -75,7 +75,7 @@ services:
       - PGID=1000
     volumes:
       - ./config/homepage:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
     labels:
       - "homepage.group=Management"
       - "homepage.name=Homepage"

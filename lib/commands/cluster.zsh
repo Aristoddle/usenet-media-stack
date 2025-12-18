@@ -32,7 +32,6 @@ detect_media_services() {
         [9000]="portainer"
         [8080]="sabnzbd"
         [9696]="prowlarr"
-        [8787]="readarr"
         [6969]="whisparr"
         [6767]="bazarr"
         [8265]="tdarr"
@@ -143,7 +142,7 @@ cleanup_docker_stack() {
     # Check for orphaned containers with media stack names
     local media_containers=(
         "sonarr" "radarr" "jellyfin" "overseerr" "portainer"
-        "sabnzbd" "prowlarr" "readarr" "whisparr" "bazarr" 
+        "sabnzbd" "prowlarr" "whisparr" "bazarr" 
         "tdarr" "transmission" "netdata" "yacreader" "mylar"
         "recyclarr" "samba" "nfs-server"
     )
@@ -195,7 +194,7 @@ cleanup_system_services() {
     
     local media_services=(
         "sonarr" "radarr" "jellyfin" "overseerr" 
-        "sabnzbd" "prowlarr" "readarr" "whisparr" "bazarr"
+        "sabnzbd" "prowlarr" "whisparr" "bazarr"
         "transmission" "netdata"
     )
     

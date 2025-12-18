@@ -208,7 +208,6 @@ test_layer4_api_integration() {
         [sonarr]="8989:/api/v3/system/status"
         [radarr]="7878:/api/v3/system/status"
         [prowlarr]="9696:/api/v1/system/status"
-        [readarr]="8787:/api/v1/system/status"
         [bazarr]="6767:/api/system/status"
     )
     

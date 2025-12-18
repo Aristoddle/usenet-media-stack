@@ -67,7 +67,7 @@ get_api_key() {
     local api_key=""
     
     case "$service" in
-        prowlarr|sonarr|radarr|readarr|lidarr|bazarr)
+        prowlarr|sonarr|radarr|lidarr|bazarr)
             config_file="$CONFIG_DIR/$service/config.xml"
             if [[ -f "$config_file" ]]; then
                 api_key=$(grep -oP '(?<=<ApiKey>)[^<]+' "$config_file" 2>/dev/null || true)
@@ -339,7 +339,7 @@ configure_prowlarr_apps() {
     
     log_info "Configuring Prowlarr applications..."
     
-    local -a apps=(sonarr radarr readarr lidarr)
+    local -a apps=(sonarr radarr lidarr)
     
     for app in $apps; do
         local app_api_key=$(get_api_key "$app")
@@ -387,7 +387,7 @@ EOF
 # Function: configure_arr_apps
 # Description: Configure all *arr applications
 #
-# Sets up Sonarr, Radarr, Readarr, Lidarr with download client and paths.
+# Sets up Sonarr, Radarr, Lidarr with download client and paths.
 #
 # Arguments:
 #   None
@@ -405,7 +405,6 @@ configure_arr_apps() {
     local -A app_paths=(
         [sonarr]="/tv"
         [radarr]="/movies"
-        [readarr]="/books"
         [lidarr]="/music"
     )
     
@@ -545,7 +544,6 @@ SERVICES
     sabnzbd            Download client
     sonarr             TV shows
     radarr             Movies
-    readarr            Books
     lidarr             Music
     all                All services
 
@@ -610,7 +608,7 @@ main() {
                 show_configure_help
                 return 0
                 ;;
-            prowlarr|sabnzbd|sonarr|radarr|readarr|lidarr|all)
+            prowlarr|sabnzbd|sonarr|radarr|lidarr|all)
                 target="$1"
                 ;;
             *)
@@ -656,7 +654,7 @@ main() {
         arr)
             configure_arr_apps
             ;;
-        sonarr|radarr|readarr|lidarr)
+        sonarr|radarr|lidarr)
             configure_arr_app "$target" "${app_paths[$target]}"
             ;;
     esac

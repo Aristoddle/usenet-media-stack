@@ -43,7 +43,6 @@ load_stack_config() {
         [prowlarr]="http://${PROWLARR_HOST:-localhost}:${PROWLARR_PORT:-9696}"
         [sonarr]="http://${SONARR_HOST:-localhost}:${SONARR_PORT:-8989}"
         [radarr]="http://${RADARR_HOST:-localhost}:${RADARR_PORT:-7878}"
-        [readarr]="http://${READARR_HOST:-localhost}:${READARR_PORT:-8787}"
         [lidarr]="http://${LIDARR_HOST:-localhost}:${LIDARR_PORT:-8686}"
         [bazarr]="http://${BAZARR_HOST:-localhost}:${BAZARR_PORT:-6767}"
         [mylar]="http://${MYLAR_HOST:-localhost}:${MYLAR_PORT:-8090}"

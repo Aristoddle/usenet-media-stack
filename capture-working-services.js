@@ -1,4 +1,4 @@
-// Comprehensive documentation capture for 22 confirmed working services
+// Comprehensive documentation capture for working services
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
@@ -14,7 +14,6 @@ const workingServices = [
     { name: 'sonarr', url: 'http://localhost:8989', desc: 'TV Automation', features: 'Automatically manage series downloads' },
     { name: 'radarr', url: 'http://localhost:7878', desc: 'Movie Automation', features: 'Automatically manage movie downloads' },
     { name: 'prowlarr', url: 'http://localhost:9696', desc: 'Indexer Manager', features: 'Unified indexer management for usenet and torrent sources' },
-    { name: 'readarr', url: 'http://localhost:8787', desc: 'Book Automation', features: 'Automated book and audiobook downloading and organization' },
     { name: 'bazarr', url: 'http://localhost:6767', desc: 'Subtitle Automation', features: 'Automatic subtitle downloading' },
     { name: 'whisparr', url: 'http://localhost:6969', desc: 'Adult Content Automation', features: 'Automated adult content management' },
     { name: 'mylar', url: 'http://localhost:8090', desc: 'Comic Automation', features: 'Automated comic downloading and organization' },
