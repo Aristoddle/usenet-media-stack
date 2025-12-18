@@ -1,6 +1,7 @@
 # Komga Corrupt CBZ Report
 
 Generated: 18Dec25 @ 06:28:59 -0500 (rerun `scripts/komga-corrupt-scan.sh docs/komga-corrupt-cbz.md` after any library changes)
+Validated: 18Dec25 @ 13:12:56 -0500 (script reported all listed files OK; Komga still logs errors → likely real corruption despite zip validation)
 
 Source: Komga task logs (ZipException/EOFException) mapped to Komga DB book URLs.
 
