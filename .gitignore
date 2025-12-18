@@ -84,8 +84,6 @@ volumes/
 !docs/
 docs/node_modules/
 docs/.vitepress/cache/
-docs/.vitepress/dist/assets/
-docs/.vitepress/dist/hashmap.json
 
 # Keep intelligence data but ignore temporary files
 !.intelligence/
