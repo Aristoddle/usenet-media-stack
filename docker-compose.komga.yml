@@ -16,7 +16,7 @@ services:
       # Persistent config/db
       - ${CONFIG_ROOT:-/srv/usenet/config}/komga:/config:rw,Z
       # Temp dir (thumbnail extraction)
-      - ${KOMGA_TMP:-/srv/usenet/config/komga/tmp}:/tmp
+      - ${KOMGA_TMP:-/srv/usenet/config/komga/tmp}:/tmp:rw,Z
     ports:
       - "${KOMGA_PORT:-8081}:25600"
     restart: unless-stopped

@@ -1,6 +1,6 @@
 # Komga Corrupt CBZ Report
 
-Generated: 18Dec25 @ 06:28:59 -0500
+Generated: 18Dec25 @ 06:28:59 -0500 (rerun `scripts/komga-corrupt-scan.sh docs/komga-corrupt-cbz.md` after any library changes)
 
 Source: Komga task logs (ZipException/EOFException) mapped to Komga DB book URLs.
 

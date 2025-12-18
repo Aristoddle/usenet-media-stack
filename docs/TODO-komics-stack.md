@@ -16,11 +16,12 @@
   - Detailed list tracked in `docs/komga-corrupt-cbz.md`.
   - Use `scripts/komga-corrupt-scan.sh docs/komga-corrupt-cbz.md` to validate or quarantine.
   - Re-run a library scan after repairs to confirm clean hashes.
+  - Note: list timestamp is 18Dec25 @ 06:28; rerun the scan script after any file changes.
 - Decide whether to ignore/disable ComicInfo provider noise (missing ComicInfo.xml entries).
 - Review `config.yml` skeleton for Kometa at `${KOMETA_CONFIG}/config.yml` and fill Plex token/URL if you plan to run Kometa.
 
 ## Post-reboot tasks (Docker needed)
-- Add Kometa service to compose/swarm (official image recommended):
+- Kometa (optional, not shipped in compose): if you enable it, set `${KOMETA_CONFIG}` and `${COMICS_ROOT}` and add the official image snippet below. Kometa is Plex-only.
   ```yaml
   kometa:
     image: kometateam/kometa:latest
@@ -34,7 +35,7 @@
       - ${KOMETA_CONFIG}:/config
     restart: unless-stopped
   ```
-- Note: Kometa is designed for Plex; it cannot manage Komga directly. Kometa is optional for Plex-only use.
+  (Not included in current compose files.)
 - Review healthchecks and storage constraints in compose (Bazarr/Overseerr/Tdarr) when bringing the stack up.
 
 ### Additional services to add after reboot

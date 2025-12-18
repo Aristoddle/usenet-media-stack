@@ -1,19 +1,19 @@
 # 🎬 Beppe's Arr Stack
 
-> Current, tested snapshot (Dec 18, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Kavita + Suwayomi + Audiobookshelf + Portainer/Netdata. Plex is primary for streaming (claim pending). Transmission/Aria2 exposed on host (no Traefik yet); services are loopback/LAN-only.
+> Current, tested snapshot (Dec 18, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Kavita + Suwayomi + Audiobookshelf + Portainer/Netdata. Plex is primary for streaming (claim pending). Transmission/Aria2 exposed on host; **Traefik is not deployed yet** (LAN/loopback only).
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![Services](https://img.shields.io/badge/Working%20Services-see%20docs%2FSERVICES-green.svg)](docs/SERVICES.md)
 [![Platform](https://img.shields.io/badge/Platform-Linux-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Validated](https://img.shields.io/badge/Tested-2025--12--16-green.svg)](docs/SERVICES.md)
+[![Validated](https://img.shields.io/badge/Tested-2025--12--16-green.svg)](docs/SERVICES.md) *(docs site currently stale; see repo docs for truth)*
 
 **Real functionality over aspirational claims. Tested and validated working services on the Bazzite seed node (see docs/SERVICES.md for the current count; downloader endpoints summarized in [`downloaders_readme.md`](downloaders_readme.md)).**  
 Project memory/KG conventions: [`MEMORY_SPEC.md`](MEMORY_SPEC.md).
 
 > **State of the stack (Dec 18, 2025)**  
 > - Comics library now at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (copy complete)  
-> - Traefik not yet wired; all services are reachable on localhost/LAN only; Transmission exposed on host 9091  
+> - Traefik **not deployed**; services are reachable on localhost/LAN only; Transmission exposed on host 9091  
 > - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
 > - Plex primary (pending claim; set `PLEX_CLAIM` and bring up the Plex service)
 
@@ -45,13 +45,14 @@ cd usenet-media-stack
 Before first boot, copy `.env.example` → `.env` and set:
 - `CONFIG_ROOT`, `MEDIA_ROOT`, `DOWNLOADS_ROOT` (required)
 - `BOOKS_ROOT` / `COMICS_ROOT` / `AUDIOBOOKS_ROOT` (if using the reading stack)
+- Secrets for tests/downloads: `NEWSHOSTING_USER`/`NEWSHOSTING_PASS`, at least one indexer API key, and (if VPN tests) `MULLVAD_WG_KEY` at `/tmp/mullvad_wg_private.key`
 - `PLEX_CLAIM` (first-time Plex setup)
 
 **Running on a single storage host with Docker Swarm?** See `docs/SWARM_QUICKSTART.md` for a ready-made bind-mount override and labels to get a swarm up today while keeping room for Pi workers later.
 
 Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick matrix (single host, Swarm with bind or NFS, VPN/tunnel variants) and required Docker/SELinux prerequisites.
 
-**Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex.
+**Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex (claim pending). Traefik not deployed.
 
 ### **What Actually Works (Dec 18, 2025)** ✅
 ```bash
@@ -77,14 +78,14 @@ audiobookshelf (13378)     # Audiobooks/podcasts
 tdarr        (8265)        # Transcoding
 portainer    (9000)        # Containers
 netdata      (19999)       # Metrics
-docs         (4173)        # Site (stale)
+docs         (local build only; hosted site is stale)
 ```
 
 **📊 Current status**
 - ✅ Automation online (Sonarr/Radarr/SAB/Prowlarr) with indexers wired
 - ✅ Requests, comics/books services healthy
-- ✅ Traefik running (routes pending)
-- ✅ Path normalization complete; set `.env` paths (CONFIG_ROOT/MEDIA_ROOT/DOWNLOADS_ROOT/BOOKS_ROOT).
+- ⚠️ Traefik not deployed; all services LAN/localhost only
+- ✅ Path normalization complete; set `.env` paths (CONFIG_ROOT/MEDIA_ROOT/DOWNLOADS_ROOT/BOOKS_ROOT)
 - ⚙️ Plex primary; pending claim (`PLEX_CLAIM`) + first-run setup
 - 🎧 Clients: Plexamp for audio, Plex HTPC for TVs/consoles (plus native Plex apps)
 

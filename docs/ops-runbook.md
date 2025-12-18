@@ -1,7 +1,7 @@
 # Operations Runbook (Bazzite host)
 
 ## Daily/quick checks
-- `docker ps` to confirm containers are up.
+- `sudo docker ps` (or ensure `newgrp docker` after adding user to docker group) to confirm containers are up.
 - Komga up: `curl -I http://localhost:8081`.
 - Komf up: `curl -I http://localhost:8085`.
 - Comics mount: ensure `${COMICS_ROOT}` is present and writable (example: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`).
