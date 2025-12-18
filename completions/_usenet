@@ -201,7 +201,6 @@ _usenet_service_commands() {
         'prowlarr:Indexer manager'
         'whisparr:Adult content manager'
         'mylar:Comic book automation'
-        'yacreader:Comic reader server'
         'jackett:Indexer proxy'
         'plex:Media server'
         'overseerr:Request management'

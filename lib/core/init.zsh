@@ -52,7 +52,6 @@ load_stack_config() {
         [portainer]="http://${PORTAINER_HOST:-localhost}:${PORTAINER_PORT:-9000}"
         [tautulli]="http://${TAUTULLI_HOST:-localhost}:${TAUTULLI_PORT:-8181}"
         [netdata]="http://${NETDATA_HOST:-localhost}:${NETDATA_PORT:-19999}"
-        [yacreader]="http://${YACREADER_HOST:-localhost}:${YACREADER_PORT:-8083}"
         [tdarr]="http://${TDARR_HOST:-localhost}:${TDARR_PORT:-8265}"
     )
     

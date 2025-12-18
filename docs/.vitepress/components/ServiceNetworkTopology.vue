@@ -78,7 +78,6 @@ const serviceData = {
     'nfs-server': { port: 2049, type: 'file-sharing', cpu: 'medium', connections: [] }
   },
   special: {
-    yacreader: { port: 8082, type: 'comic-reader', cpu: 'low', connections: [] },
     mylar: { port: 8090, type: 'comic-automation', cpu: 'low', connections: ['sabnzbd'] },
     whisparr: { port: 6969, type: 'specialized-automation', cpu: 'low', connections: ['sabnzbd', 'transmission'] },
     stash: { port: 9999, type: 'media-organizer', cpu: 'medium', connections: [] }

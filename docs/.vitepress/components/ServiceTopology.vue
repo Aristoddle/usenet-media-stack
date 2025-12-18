@@ -148,7 +148,6 @@ const services = [
   // Media Servers
   { id: 'plex', label: 'Plex', group: 'Media Server', port: '32400', status: 'running', description: 'Media server with hardware transcoding' },
   { id: 'overseerr', label: 'Overseerr', group: 'Media Server', port: '5055', status: 'running', description: 'Beautiful request management interface' },
-  { id: 'yacreader', label: 'YACReader', group: 'Media Server', port: '8082', status: 'running', description: 'Comic/manga server and reader' },
   
   // Processing
   { id: 'tdarr', label: 'Tdarr', group: 'Processing', port: '8265', status: 'running', description: 'Automated transcoding with GPU acceleration' },

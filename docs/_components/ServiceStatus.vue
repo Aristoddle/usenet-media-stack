@@ -80,13 +80,6 @@ export default {
           status: 'working'
         },
         {
-          name: 'YACReader',
-          description: 'Comic Reader - Digital comic library',
-          port: 8083,
-          url: 'http://localhost:8083',
-          status: 'working'
-        },
-        {
           name: 'Sonarr',
           description: 'TV Automation - Series management',
           port: 8989,

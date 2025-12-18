@@ -674,7 +674,6 @@ show_summary() {
     print "\n${COLOR_BOLD}Media Services:${COLOR_RESET}"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Plex:  ${SERVICE_URLS[plex]}  - Media Streaming"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Overseerr: ${SERVICE_URLS[overseerr]}  - Request Management"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} YACReader: ${SERVICE_URLS[yacreader]}  - Manga/Comic Server"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Tautulli:  ${SERVICE_URLS[tautulli]}  - Statistics"
     
     print "\n${COLOR_BOLD}Processing:${COLOR_RESET}"

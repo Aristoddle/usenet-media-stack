@@ -101,7 +101,6 @@ analyze_port_conflicts_intelligently() {
         "6767:Bazarr:automation"
         "9696:Prowlarr:indexer"
         "8090:Mylar3:comics"
-        "8082:YACReader:reader"
         "32400:Plex:media"
         "5055:Overseerr:requests"
         "8265:Tdarr:transcoding"

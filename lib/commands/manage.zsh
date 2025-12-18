@@ -185,7 +185,6 @@ check_port_conflicts() {
         "6767:Bazarr"
         "9696:Prowlarr"
         "8090:Mylar3"
-        "8082:YACReader"
         "32400:Plex"
         "5055:Overseerr"
         "8265:Tdarr"

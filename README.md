@@ -82,7 +82,7 @@ kavita       (5000)        # Reader
 - ✅ Automation online (Sonarr/Radarr/SAB/Prowlarr) with indexers wired
 - ✅ Requests, comics/books services healthy
 - ✅ Traefik running (routes pending)
-- 🔄 Path normalization pending (binds will move to /var/mnt/fast8tb/{config,Local/downloads,Local/media,Cloud/OneDrive/Books/Comics})
+- ✅ Path normalization complete; set `.env` paths (CONFIG_ROOT/MEDIA_ROOT/DOWNLOADS_ROOT/BOOKS_ROOT).
 - ⚙️ Plex primary; pending claim (`PLEX_CLAIM`) + first-run setup
 - 🎧 Clients: Plexamp for audio, Plex HTPC for TVs/consoles (plus native Plex apps)
 
@@ -243,7 +243,6 @@ usenet-media-stack/
 🎬 Media Services  
 ├── Plex (32400)   → Media streaming with GPU transcoding
 ├── Overseerr (5055)  → Request management interface
-├── YACReader (8082)  → Comic/manga server
 └── Tdarr (8265)      → Automated transcoding pipeline
 
 🔧 Download & Processing

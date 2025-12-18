@@ -17,7 +17,7 @@
 # Services: 19 total
 # DOWNLOADERS:  SABnzbd (8080), Transmission (9092)
 # AUTOMATION:   Sonarr (8989), Radarr (7878), Bazarr (6767), Prowlarr (9696)
-# SPECIALIZED:  Whisparr (6969), Mylar3 (8090), YACReader (8082), Stash (9999)
+# SPECIALIZED:  Whisparr (6969), Mylar3 (8090), Stash (9999)
 # MEDIA:        Plex (32400)
 # REQUESTS:     Overseerr (5055)
 # TRANSCODING:  Tdarr (8265)

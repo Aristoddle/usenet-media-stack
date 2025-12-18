@@ -95,10 +95,6 @@
               <rect x="420" y="330" width="80" height="40" rx="5" fill="#9b59b6" :class="{ active: selectedService === 'tdarr' }"/>
               <text x="460" y="355" text-anchor="middle" class="service-text">Tdarr</text>
             </g>
-            <g class="service-node operational" @click.stop="selectService('yacreader')">
-              <rect x="520" y="330" width="80" height="40" rx="5" fill="#10B981" :class="{ active: selectedService === 'yacreader' }"/>
-              <text x="560" y="355" text-anchor="middle" class="service-text">YACReader ✅</text>
-            </g>
           </g>
 
           <!-- Downloads & Processing -->
@@ -262,7 +258,6 @@ const serviceDetails = {
   plex: { name: 'Plex', description: 'Media server with hardware transcoding', port: '32400', type: 'Media Server', status: 'running' },
   overseerr: { name: 'Overseerr', description: 'Beautiful request management interface - Currently not running due to port conflicts', port: '5055', type: 'Media Server', status: 'stopped' },
   tdarr: { name: 'Tdarr', description: 'Automated transcoding with GPU acceleration - Currently not running due to port conflicts', port: '8265', type: 'Processing', status: 'stopped' },
-  yacreader: { name: 'YACReader', description: 'Comic/manga server and reader - OPERATIONAL ✅', port: '8083', type: 'Media Server', status: 'running' },
   sabnzbd: { name: 'SABnzbd', description: 'High-speed Usenet downloader - Currently not running due to port conflicts', port: '8080', type: 'Download Client', status: 'stopped' },
   transmission: { name: 'Transmission', description: 'P2P liberation network - OPERATIONAL ✅', port: '9091', type: 'Download Client', status: 'running' },
   portainer: { name: 'Portainer', description: 'Docker container management', port: '9000', type: 'Management' },

@@ -37,7 +37,6 @@ detect_media_services() {
         [8265]="tdarr"
         [9092]="transmission"
         [19999]="netdata"
-        [8082]="yacreader"
         [8090]="mylar"
     )
     
@@ -143,7 +142,7 @@ cleanup_docker_stack() {
     local media_containers=(
         "sonarr" "radarr" "plex" "overseerr" "portainer"
         "sabnzbd" "prowlarr" "whisparr" "bazarr" 
-        "tdarr" "transmission" "netdata" "yacreader" "mylar"
+        "tdarr" "transmission" "netdata" "mylar"
         "recyclarr" "samba" "nfs-server"
     )
     

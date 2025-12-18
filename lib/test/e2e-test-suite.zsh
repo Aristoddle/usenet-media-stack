@@ -111,7 +111,6 @@ test_layer2_network_connectivity() {
         [8080]="sabnzbd"
         [9000]="portainer"
         [19999]="netdata"
-        [8083]="yacreader"
         [9998]="stash"
     )
     

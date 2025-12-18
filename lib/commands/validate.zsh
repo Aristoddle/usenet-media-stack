@@ -573,7 +573,6 @@ validate_port_conflicts() {
         "7878:Radarr"
         "8000:Portainer Data"
         "8080:SABnzbd"
-        "8083:YACReader"
         "8090:Mylar3"
         "32400:Plex"
         "8265:Tdarr Server"

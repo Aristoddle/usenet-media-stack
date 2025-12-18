@@ -1,7 +1,7 @@
 # FAQ
 
 ## Do I need Docker or Podman?
-- On Bazzite/Deck: Podman is built-in; Docker (moby-engine) is staged and becomes available after a reboot. Use Podman now; switch to Docker when you need Swarm/Compose v2.
+- Full stack requires **Docker Engine + Compose v2**. Podman is only supported for scoped/light services (e.g., Komga/reading stack) when explicitly noted.
 
 ## Can I reboot right now?
 - Not while long transfers (e.g., `rsync-comics`) are running. Finish them first, then reboot to activate Docker.

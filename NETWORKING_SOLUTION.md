@@ -156,7 +156,6 @@ usenet --stop                       # Always works
 # ✅ Configuration Valid
 $ docker compose config --services
 transmission
-yacreader  
 sabnzbd
 radarr
 sonarr

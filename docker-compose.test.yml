@@ -48,10 +48,6 @@ services:
     ports:
       - "20090:8090"
       
-  yacreader:
-    ports:
-      - "20082:8080"
-      
   netdata:
     ports:
       - "21999:19999"

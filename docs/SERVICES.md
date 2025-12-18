@@ -35,26 +35,24 @@
 
 ## 📸 Service Screenshots
 
-All services have been validated with visual confirmation:
+Selected services have screenshots for reference (not all services are currently running):
 - [Prowlarr Dashboard](./public/images/services/prowlarr.png)  
 - [Portainer Management](./public/images/services/portainer.png)
 - [Bazarr Subtitles](./public/images/services/bazarr.png)
 - [Tdarr Processing](./public/images/services/tdarr.png)
-- [YACReader Comics](./public/images/services/yacreader.png)
 
 ## 🚀 Getting Started
 
 ### Quick Access URLs
 ```bash
-# Core Services (All Working)
+# Core Services (Key URLs)
 Plex:      http://localhost:32400 # Media streaming (pending claim)
 Prowlarr:  http://localhost:9696  # Indexer management  
 Portainer: http://localhost:9000  # Container management
 
-# Automation Services (All Working)
+# Automation Services (Key URLs)
 Bazarr:    http://localhost:6767  # Subtitles
 Tdarr:     http://localhost:8265  # Transcoding
-YACReader: http://localhost:8083  # Comics
 ```
 
 ### CLI Management

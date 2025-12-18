@@ -1,8 +1,8 @@
 {
   "metadata": {
     "capturedAt": "2025-12-18T08:03:07.382088+00:00",
-    "workingServices": 21,
-    "totalServices": 21,
+    "workingServices": 20,
+    "totalServices": 20,
     "successRate": "100%"
   },
   "services": [
@@ -20,14 +20,6 @@
       "url": "http://localhost:5055",
       "desc": "Request Management",
       "features": "Media request management interface",
-      "status": "documented"
-    },
-    {
-      "service": "yacreader",
-      "title": "YACReader",
-      "url": "http://localhost:8083",
-      "desc": "Comic Reader",
-      "features": "Digital comic and manga library management",
       "status": "documented"
     },
     {

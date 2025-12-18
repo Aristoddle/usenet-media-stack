@@ -170,7 +170,7 @@ add_storage_drive() {
 ```bash
 # New service registry with metadata
 declare -A SERVICE_GROUPS=(
-    [media]="plex overseerr tdarr yacreader"
+    [media]="plex overseerr tdarr"
     [automation]="sonarr radarr bazarr prowlarr recyclarr"
     [download]="sabnzbd transmission"
     [monitoring]="netdata portainer"

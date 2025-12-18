@@ -29,7 +29,6 @@ Three core principles make this system work reliably across any hardware setup:
 ### **🎬 Media Services (4 Services)**
 - **Plex** (32400) - Media server with hardware transcoding
 - **Overseerr** (5055) - Request management interface
-- **YACReader** (8082) - Comic/manga server
 - **Tdarr** (8265) - Automated transcoding
 
 ### **⬇️ Download & Processing (2 Services)**

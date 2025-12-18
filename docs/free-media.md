@@ -57,7 +57,6 @@ If something’s broken, file an issue on GitHub. If you need setup help or can�
 - **[Digital Comic Museum](https://digitalcomicmuseum.com/)** - Historical comics and graphic novels
 
 ### **Comic & Manga Management**
-- **[YACReader](https://www.yacreader.com/)** - Professional comic reading and library management
 - **[Kavita](https://www.kavitareader.com/)** - Self-hosted ebook/comics server
 - **[ComicRack](https://www.comicscape.co.uk/ComicRack/)** - Windows comic book reader and organizer
 - **[Vimm's Lair](https://vimm.net/)** - Preservation-focused classic console manuals/ROM info (reference)
@@ -68,7 +67,7 @@ If something’s broken, file an issue on GitHub. If you need setup help or can�
 - **[MangaUpdates](https://www.mangaupdates.com/)** - Comprehensive manga database
 - **[MyAnimeList](https://myanimelist.net/manga.php)** - Manga tracking and discovery
 
-<a href="mailto:j3lanzone@gmail.com?subject=Manga%20%26%20Comic%20Setup%20Help&body=Hi%20Joe,%0A%0AI%20need%20help%20with:%0A%0A-%20Setting%20up%20manga%20downloaders%0A-%20Finding%20specific%20series:%0A-%20YACReader%20configuration%0A-%20My%20OS:%20%0A%0AThanks!" style="display: inline-block; padding: 10px 20px; background: #f39c12; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 16px 0;">🎨 **Get Manga Setup Help**</a>
+<a href="mailto:j3lanzone@gmail.com?subject=Manga%20%26%20Comic%20Setup%20Help&body=Hi%20Joe,%0A%0AI%20need%20help%20with:%0A%0A-%20Setting%20up%20manga%20downloaders%0A-%20Finding%20specific%20series:%0A-%20Komga/Kavita%20configuration%0A-%20My%20OS:%20%0A%0AThanks!" style="display: inline-block; padding: 10px 20px; background: #f39c12; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 16px 0;">🎨 **Get Manga Setup Help**</a>
 
 ---
 

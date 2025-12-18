@@ -10,7 +10,6 @@ const REGISTRY_PATH = path.join(ROOT_DIR, 'docs', 'service-registry.json');
 const workingServices = [
     { name: 'plex', url: 'http://localhost:32400', desc: 'Media Server', features: 'Stream movies, TV shows, music with hardware transcoding' },
     { name: 'overseerr', url: 'http://localhost:5055', desc: 'Request Management', features: 'Media request management interface' },
-    { name: 'yacreader', url: 'http://localhost:8083', desc: 'Comic Reader', features: 'Digital comic and manga library management' },
     { name: 'sonarr', url: 'http://localhost:8989', desc: 'TV Automation', features: 'Automatically manage series downloads' },
     { name: 'radarr', url: 'http://localhost:7878', desc: 'Movie Automation', features: 'Automatically manage movie downloads' },
     { name: 'prowlarr', url: 'http://localhost:9696', desc: 'Indexer Manager', features: 'Unified indexer management for usenet and torrent sources' },

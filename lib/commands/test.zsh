@@ -246,7 +246,6 @@ test_web_interfaces_legacy() {
         # Media Servers
         [plex]="32400"
         [overseerr]="5055"
-        [yacreader]="8083"
         [stash]="9998"
         [tautulli]="8181"
         
@@ -296,7 +295,6 @@ test_web_interfaces_sequential() {
         # Media Servers
         [plex]="32400"
         [overseerr]="5055"
-        [yacreader]="8083"
         [stash]="9998"
         [tautulli]="8181"
         
@@ -351,7 +349,6 @@ test_web_interfaces_parallel() {
         # Media Servers
         [plex]="32400"
         [overseerr]="5055"
-        [yacreader]="8083"
         [stash]="9998"
         [tautulli]="8181"
         
