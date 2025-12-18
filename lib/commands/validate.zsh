@@ -575,7 +575,7 @@ validate_port_conflicts() {
         "8080:SABnzbd"
         "8083:YACReader"
         "8090:Mylar3"
-        "8096:Jellyfin"
+        "32400:Plex"
         "8265:Tdarr Server"
         "8266:Tdarr Web"
         "8989:Sonarr"

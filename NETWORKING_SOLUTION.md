@@ -182,7 +182,7 @@ docker compose up -d
 # http://localhost:8989 (Sonarr)
 # http://localhost:7878 (Radarr)  
 # http://localhost:8080 (SABnzbd)
-# http://localhost:8096 (Jellyfin)
+# http://localhost:32400 (Plex)
 ```
 
 ### 2. Agent-Friendly CLI  
@@ -308,7 +308,7 @@ docker network inspect bridge
 # Test communication between services (inside containers)
 docker compose exec sonarr wget -qO- http://sabnzbd:8080/api?mode=version
 docker compose exec radarr curl -s http://prowlarr:9696/api/v1/system/status
-docker compose exec jellyfin ping -c 1 sonarr
+docker compose exec plex ping -c 1 sonarr
 
 # Test from host to services
 curl http://localhost:8989/api/v3/system/status  # Sonarr

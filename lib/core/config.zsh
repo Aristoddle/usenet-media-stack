@@ -286,7 +286,7 @@ build_service_config() {
         [lidarr]=8686
         [bazarr]=6767
         [mylar3]=8090
-        [jellyfin]=8096
+        [plex]=32400
         [overseerr]=5055
         [portainer]=9000
         [netdata]=19999

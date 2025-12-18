@@ -57,7 +57,7 @@ readonly -a ALL_SERVICES=(
     lidarr
     mylar3
     bazarr
-    jellyfin
+    plex
     overseerr
     tautulli
     unpackerr

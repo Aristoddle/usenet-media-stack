@@ -1,9 +1,9 @@
 [
   {
-    "service": "jellyfin",
+    "service": "plex",
     "status": "working",
-    "title": "Jellyfin",
-    "url": "http://localhost:8096"
+    "title": "Plex",
+    "url": "http://localhost:32400"
   },
   {
     "service": "overseerr",

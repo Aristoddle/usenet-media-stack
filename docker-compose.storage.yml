@@ -26,7 +26,7 @@ services:
       - /media/joe/Fast_8TB_3:/movies/drive1:rw
       - /media/joe/Fast_8TB_3:/media/drive1:rw
 
-  jellyfin:
+  plex:
     volumes:
       - /media/joe/Fast_8TB_3:/tv/drive1:rw
       - /media/joe/Fast_8TB_3:/movies/drive1:rw

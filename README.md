@@ -1,6 +1,6 @@
 # 🎬 Beppe's Arr Stack
 
-> Current, tested snapshot (Dec 17, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata + Kavita. Jellyfin is optional/disabled; Plex is primary for streaming. Transmission/Aria2 exposed on host (no Traefik yet); services are loopback/LAN-only.
+> Current, tested snapshot (Dec 17, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata + Kavita. Plex is primary for streaming. Transmission/Aria2 exposed on host (no Traefik yet); services are loopback/LAN-only.
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![Services](https://img.shields.io/badge/Working%20Services-see%20docs%2FSERVICES-green.svg)](docs/SERVICES.md)
@@ -11,11 +11,11 @@
 **Real functionality over aspirational claims. Tested and validated working services on the Bazzite seed node (see docs/SERVICES.md for the current count; downloader endpoints summarized in [`downloaders_readme.md`](downloaders_readme.md)).**  
 Project memory/KG conventions: [`MEMORY_SPEC.md`](MEMORY_SPEC.md).
 
-> **State of the stack (Dec 16, 2025)**  
+> **State of the stack (Dec 18, 2025)**  
 > - Comics library now at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (copy complete)  
 > - Traefik not yet wired; all services are reachable on localhost only; Transmission exposed on host 9091 via gluetun  
 > - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
-> - Jellyfin disabled (Plex is primary)
+> - Plex primary (pending claim; set `PLEX_CLAIM` and bring up the Plex service)
 
 ## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)** _(site currently stale; see docs/ and README notes for up-to-date paths & services)_
 
@@ -42,11 +42,16 @@ cd usenet-media-stack
 ./usenet deploy --auto
 ```
 
+Before first boot, copy `.env.example` → `.env` and set:
+- `CONFIG_ROOT`, `MEDIA_ROOT`, `DOWNLOADS_ROOT` (required)
+- `BOOKS_ROOT` / `COMICS_ROOT` / `AUDIOBOOKS_ROOT` (if using the reading stack)
+- `PLEX_CLAIM` (first-time Plex setup)
+
 **Running on a single storage host with Docker Swarm?** See `docs/SWARM_QUICKSTART.md` for a ready-made bind-mount override and labels to get a swarm up today while keeping room for Pi workers later.
 
 Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick matrix (single host, Swarm with bind or NFS, VPN/tunnel variants) and required Docker/SELinux prerequisites.
 
-**Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex; Jellyfin optional.
+**Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex.
 
 ### **What Actually Works (Dec 17, 2025)** ✅
 ```bash
@@ -78,7 +83,8 @@ kavita       (5000)        # Reader
 - ✅ Requests, comics/books services healthy
 - ✅ Traefik running (routes pending)
 - 🔄 Path normalization pending (binds will move to /var/mnt/fast8tb/{config,Local/downloads,Local/media,Cloud/OneDrive/Books/Comics})
-- ⚙️ Jellyfin disabled; Plex is primary streamer
+- ⚙️ Plex primary; pending claim (`PLEX_CLAIM`) + first-run setup
+- 🎧 Clients: Plexamp for audio, Plex HTPC for TVs/consoles (plus native Plex apps)
 
 **📸 [View Service Screenshots](docs/SERVICES.md)** | **🔧 [See Service Status](docs/SERVICES.md)**
 
@@ -173,7 +179,7 @@ kavita       (5000)        # Reader
 # Service operations
 ./usenet services list              # Health check all services
 ./usenet services start sonarr      # Start specific service
-./usenet services logs jellyfin     # View service logs
+./usenet services logs plex     # View service logs
 ./usenet services restart --all     # Restart all services
 ```
 
@@ -235,7 +241,7 @@ usenet-media-stack/
 └── Prowlarr (9696)   → Universal indexer management
 
 🎬 Media Services  
-├── Jellyfin (8096)   → Media streaming with GPU transcoding
+├── Plex (32400)   → Media streaming with GPU transcoding
 ├── Overseerr (5055)  → Request management interface
 ├── YACReader (8082)  → Comic/manga server
 └── Tdarr (8265)      → Automated transcoding pipeline
@@ -560,7 +566,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### **Technical Foundations**
 - **TRaSH Guides** community for quality optimization standards
 - **LinuxServer.io** for excellent Docker containers  
-- **Jellyfin**, **Sonarr**, **Radarr** teams for outstanding media automation
+- **Plex**, **Sonarr**, **Radarr** teams for outstanding media automation
 - The **open-source media automation** community
 
 ### **Inspiration Sources**

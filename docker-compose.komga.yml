@@ -12,9 +12,9 @@ services:
       - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
     volumes:
       # Comics library (rw for shared tooling)
-      - ${COMICS_ROOT:-/srv/comics}:/comics:rw,Z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,Z
       # Persistent config/db
-      - ${KOMGA_CONFIG:-./config/komga}:/config
+      - ${KOMGA_CONFIG:-/srv/usenet/config/komga}:/config
       # Temp dir (thumbnail extraction)
       - ${KOMGA_TMP:-/tmp/komga}:/tmp
     ports:
@@ -28,7 +28,7 @@ services:
       # Point Komf at Komga; override if running remotely
       - KOMGA_BASE_URI=http://komga:25600
     volumes:
-      - ${KOMF_CONFIG:-./config/komf}:/config:rw,Z
+      - ${KOMF_CONFIG:-/srv/usenet/config/komf}:/config:rw,Z
     depends_on:
       - komga
     ports:

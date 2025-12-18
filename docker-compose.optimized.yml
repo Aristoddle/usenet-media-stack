@@ -23,7 +23,7 @@ services:
       - VAAPI_DEVICE=/dev/dri/renderD128
       - AMD_HW_DECODE=1
 
-  jellyfin:
+  plex:
     deploy:
       resources:
         limits:

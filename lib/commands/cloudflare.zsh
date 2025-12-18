@@ -167,7 +167,7 @@ setup_dns_records() {
         [radarr]="movies"
         [prowlarr]="indexers"
         [sabnzbd]="downloads"
-        [jellyfin]="watch"
+        [plex]="watch"
         [overseerr]="requests"
         [lidarr]="music"
         [bazarr]="subtitles"
@@ -247,7 +247,7 @@ ingress:
     
   # Media Streaming
   - hostname: watch.$DOMAIN
-    service: ${SERVICE_URLS[jellyfin]}
+    service: ${SERVICE_URLS[plex]}
     
   # Requests
   - hostname: requests.$DOMAIN

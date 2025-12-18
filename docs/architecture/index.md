@@ -10,7 +10,8 @@ Three core principles make this system work reliably across any hardware setup:
 
 **19 integrated services** that work together automatically:
 - **Media Management**: Sonarr, Radarr, Prowlarr (finds and organizes everything)
-- **Media Server**: Jellyfin with hardware acceleration (streams anywhere)
+- **Media Server**: Plex with hardware acceleration (streams anywhere)
+- **Clients**: Plexamp (audio), Plex HTPC (TV/console), native Plex apps on Smart TVs
 - **Downloads**: SABnzbd + Transmission (gets your content fast)
 - **Quality**: Bazarr subtitles, Tdarr transcoding, TRaSH optimization
 - **Access**: Secure Cloudflare tunnel (no ports, no VPN needed)
@@ -26,7 +27,7 @@ Three core principles make this system work reliably across any hardware setup:
 - **Recyclarr** - Automatic quality optimization
 
 ### **🎬 Media Services (4 Services)**
-- **Jellyfin** (8096) - Media server with hardware transcoding
+- **Plex** (32400) - Media server with hardware transcoding
 - **Overseerr** (5055) - Request management interface
 - **YACReader** (8082) - Comic/manga server
 - **Tdarr** (8265) - Automated transcoding

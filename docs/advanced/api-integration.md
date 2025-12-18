@@ -25,7 +25,7 @@ the production Usenet Media Stack CLI and current service versions.
 | Overseerr    | `config/overseerr`    | `read` + `manage`      |
 | Prowlarr     | `config/prowlarr`     | Indexer CRUD           |
 | Sonarr/Radarr| `config/*/config.xml` | Full automation        |
-| Jellyfin     | `config/jellyfin`     | Library management     |
+| Plex         | `config/plex`         | Library management     |
 | Bazarr       | `config/bazarr`       | Subtitle sync          |
 
 Tokens are rotated automatically when you run `./usenet backup create`.

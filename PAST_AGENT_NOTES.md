@@ -12,13 +12,13 @@ Last updated: 2025-12-16
 
 ## Live System Snapshot (2025-12-16, rootful Docker)
 - `docker compose` project: `usenet-media-stack` (sources: `docker-compose.yml` + `docker-compose.override.yml`).
-- Services up (24m): jellyfin, prowlarr, portainer, sonarr, radarr, overseerr, bazarr, whisparr, sabnzbd, tdarr, transmission, komga, komf, mylar, stash, calibre, audiobookshelf, netdata (healthy), samba (healthy), recyclarr.
+- Services up (24m): plex, prowlarr, portainer, sonarr, radarr, overseerr, bazarr, whisparr, sabnzbd, tdarr, transmission, komga, komf, mylar, stash, calibre, audiobookshelf, netdata (healthy), samba (healthy), recyclarr.
 - Failing/unhealthy: 
   - `nfs-server` restarting: kernel module `nfs` missing on host (needs `modprobe nfs` or host support).
   - `usenet-docs` unhealthy: nginx serving empty `/usr/share/nginx/html` → 403; likely missing built docs volume or wrong working dir.
 - Komga: starts cleanly on 25600 (published 8081). Komf: up on 8085. No errors seen in tails.
 - Sonarr/Radarr: running but warn “No available indexers” (Prowlarr not wired/configured).
-- Ports published on host (selected): Jellyfin 8096, Prowlarr 9696, Sonarr 8989, Radarr 7878, Bazarr 6767, Overseerr 5055, Tdarr 8265-8266, Komga 8081->25600, Komf 8085, Transmission 9091, Portainer 9000, Netdata 19999, Sabnzbd 8080.
+- Ports published on host (selected): Plex 32400, Prowlarr 9696, Sonarr 8989, Radarr 7878, Bazarr 6767, Overseerr 5055, Tdarr 8265-8266, Komga 8081->25600, Komf 8085, Transmission 9091, Portainer 9000, Netdata 19999, Sabnzbd 8080.
 
 ## High-Priority Actions (unchanged, still top of queue)
 1) **Security:** Rotate/revoke Cloudflare token; scrub from repo/history; add secret scanning (gitleaks + GH secret scanning/pre-commit); remove plaintext tokens from docs/scripts.
@@ -73,4 +73,4 @@ Last updated: 2025-12-16
 - If stopping Podman user services pre-reboot: `systemctl --user stop container-komga.service container-komf.service`.
 
 ## What Not to Promise
-- No “Plex/Jellyfin cluster” scaling; extra nodes are for worker-able workloads (Tdarr, background jobs) and resilience, not multi-node Plex.
+- No “Plex/Plex cluster” scaling; extra nodes are for worker-able workloads (Tdarr, background jobs) and resilience, not multi-node Plex.

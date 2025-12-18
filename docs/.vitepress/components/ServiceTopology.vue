@@ -146,7 +146,7 @@ const services = [
   { id: 'recyclarr', label: 'Recyclarr', group: 'Media Automation', port: 'N/A', status: 'running', description: 'Automatic TRaSH Guide optimization' },
   
   // Media Servers
-  { id: 'jellyfin', label: 'Jellyfin', group: 'Media Server', port: '8096', status: 'running', description: 'Open-source media server with hardware transcoding' },
+  { id: 'plex', label: 'Plex', group: 'Media Server', port: '32400', status: 'running', description: 'Media server with hardware transcoding' },
   { id: 'overseerr', label: 'Overseerr', group: 'Media Server', port: '5055', status: 'running', description: 'Beautiful request management interface' },
   { id: 'yacreader', label: 'YACReader', group: 'Media Server', port: '8082', status: 'running', description: 'Comic/manga server and reader' },
   
@@ -200,11 +200,11 @@ const connections = [
   { from: 'radarr', to: 'bazarr', type: 'subtitle-request', label: 'Subtitle Request' },
   
   // Media servers access content
-  { from: 'jellyfin', to: 'sonarr', type: 'library-scan', label: 'Library Scan' },
-  { from: 'jellyfin', to: 'radarr', type: 'library-scan', label: 'Library Scan' },
+  { from: 'plex', to: 'sonarr', type: 'library-scan', label: 'Library Scan' },
+  { from: 'plex', to: 'radarr', type: 'library-scan', label: 'Library Scan' },
   
   // Tdarr processes media
-  { from: 'tdarr', to: 'jellyfin', type: 'transcoding', label: 'Transcoding' },
+  { from: 'tdarr', to: 'plex', type: 'transcoding', label: 'Transcoding' },
   
   // Overseerr manages requests
   { from: 'overseerr', to: 'sonarr', type: 'media-request', label: 'Media Request' },
@@ -215,8 +215,8 @@ const connections = [
   { from: 'recyclarr', to: 'radarr', type: 'config-sync', label: 'TRaSH Config' },
   
   // File sharing access
-  { from: 'samba', to: 'jellyfin', type: 'file-access', label: 'File Access' },
-  { from: 'nfs', to: 'jellyfin', type: 'file-access', label: 'File Access' },
+  { from: 'samba', to: 'plex', type: 'file-access', label: 'File Access' },
+  { from: 'nfs', to: 'plex', type: 'file-access', label: 'File Access' },
   
   // Jackett legacy indexer support
   { from: 'jackett', to: 'sonarr', type: 'legacy-indexer', label: 'Legacy Indexer' },

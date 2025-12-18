@@ -175,7 +175,7 @@ I run a comprehensive Plex server using the same professional automation stack d
 
 ### **My Automation Stack**
 The same professional-grade system powering this resource hub:
-- **19 integrated services** (Sonarr, Radarr, Jellyfin, etc.)
+- **19 integrated services** (Sonarr, Radarr, Plex, etc.)
 - **Hot-swappable storage** for portable camping setups
 - **GPU-accelerated transcoding** (4K → 60+ FPS)
 - **API-driven automation** with zero manual intervention

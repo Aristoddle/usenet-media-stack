@@ -297,7 +297,7 @@ verify_deployment_health() {
     ((total_checks++))
     
     # Check 2: Port Availability
-    local port_conflicts=$(netstat -tln 2>/dev/null | grep -E ":5055|:8096|:8989|:7878" | wc -l)
+    local port_conflicts=$(netstat -tln 2>/dev/null | grep -E ":5055|:32400|:8989|:7878" | wc -l)
     if [[ $port_conflicts -ge 3 ]]; then
         ((health_score++))
         info "✅ Key services responding on expected ports"

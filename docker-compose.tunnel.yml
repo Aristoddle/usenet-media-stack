@@ -28,7 +28,7 @@ services:
       - radarr
       - prowlarr
       - sabnzbd
-      - jellyfin
+      - plex
 
   # Optional: Authentik for SSO
   authentik:

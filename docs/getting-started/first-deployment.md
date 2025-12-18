@@ -13,15 +13,17 @@
      ```
 
 3) **Config files**
-   - Copy `.env.example` → `.env` and add Prowlarr/NZB/SAB creds.
-   - Kometa config skeleton: `/var/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml` (Plex token/URL placeholders).
+   - Copy `.env.example` → `.env` and add Prowlarr/NZB/SAB creds + `PLEX_CLAIM` (first-time Plex setup).
+   - Set `BOOKS_ROOT`, `COMICS_ROOT`, `AUDIOBOOKS_ROOT` to your actual library paths.
+   - Kometa config skeleton (if used): `${KOMETA_CONFIG:-/srv/usenet/config/kometa}/config.yml`.
 
 4) **Bring up services**
    - Reading stack (after Docker):
      ```bash
      docker compose -f docker-compose.reading.yml up -d
      ```
-   - Main stack (Arr/Jellyfin/etc.):
+     - If Audiobookshelf paths don’t match your host, update the mounts first (current file still uses `/mnt/fast8tb/...`).
+   - Main stack (Arr/Plex/etc.):
      ```bash
      docker compose up -d
      ```
@@ -38,7 +40,7 @@
 
 7) **Health & cleanup**
    - Check containers: `docker ps`.
-   - Ensure healthchecks are present for Bazarr/Overseerr/Jellyfin/Tdarr when you bring the main stack up; reapply if missing.
+   - Ensure healthchecks are present for Bazarr/Overseerr/Plex/Tdarr when you bring the main stack up; reapply if missing.
 
 8) **Backup configs**
    - All configs live under OneDrive-backed paths on `/var/mnt/fast8tb/Cloud/OneDrive/*Config`. Snapshot them once services are running.

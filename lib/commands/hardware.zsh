@@ -469,48 +469,48 @@ calculate_resource_limits() {
         dedicated)
             TDARR_CPU_LIMIT=$(echo "$CPU_THREADS * 0.8" | bc)
             TDARR_MEMORY_LIMIT="${RAM_AVAILABLE_GB}G"
-            JELLYFIN_CPU_LIMIT=$(echo "$CPU_THREADS * 0.6" | bc)
-            JELLYFIN_MEMORY_LIMIT="4G"
+            PLEX_CPU_LIMIT=$(echo "$CPU_THREADS * 0.6" | bc)
+            PLEX_MEMORY_LIMIT="4G"
             SABNZBD_CPU_LIMIT="2.0"
             SABNZBD_MEMORY_LIMIT="2G"
             ;;
         high_performance)
             TDARR_CPU_LIMIT=$(echo "$CPU_THREADS * 0.6" | bc)
             TDARR_MEMORY_LIMIT="$((RAM_AVAILABLE_GB * 3 / 4))G"
-            JELLYFIN_CPU_LIMIT="2.0"
-            JELLYFIN_MEMORY_LIMIT="2G"
+            PLEX_CPU_LIMIT="2.0"
+            PLEX_MEMORY_LIMIT="2G"
             SABNZBD_CPU_LIMIT="1.5"
             SABNZBD_MEMORY_LIMIT="1G"
             ;;
         balanced)
             TDARR_CPU_LIMIT=$(echo "$CPU_THREADS * 0.4" | bc)
             TDARR_MEMORY_LIMIT="$((RAM_AVAILABLE_GB / 2))G"
-            JELLYFIN_CPU_LIMIT="1.0"
-            JELLYFIN_MEMORY_LIMIT="1G"
+            PLEX_CPU_LIMIT="1.0"
+            PLEX_MEMORY_LIMIT="1G"
             SABNZBD_CPU_LIMIT="1.0"
             SABNZBD_MEMORY_LIMIT="1G"
             ;;
         light)
             TDARR_CPU_LIMIT="1.0"
             TDARR_MEMORY_LIMIT="$((RAM_AVAILABLE_GB / 4))G"
-            JELLYFIN_CPU_LIMIT="0.5"
-            JELLYFIN_MEMORY_LIMIT="512M"
+            PLEX_CPU_LIMIT="0.5"
+            PLEX_MEMORY_LIMIT="512M"
             SABNZBD_CPU_LIMIT="0.5"
             SABNZBD_MEMORY_LIMIT="512M"
             ;;
         development)
             TDARR_CPU_LIMIT="0.5"
             TDARR_MEMORY_LIMIT="512M"
-            JELLYFIN_CPU_LIMIT="0.25"
-            JELLYFIN_MEMORY_LIMIT="256M"
+            PLEX_CPU_LIMIT="0.25"
+            PLEX_MEMORY_LIMIT="256M"
             SABNZBD_CPU_LIMIT="0.25"
             SABNZBD_MEMORY_LIMIT="256M"
             ;;
         custom)
             TDARR_CPU_LIMIT="$CUSTOM_CPU"
             TDARR_MEMORY_LIMIT="${CUSTOM_RAM}G"
-            JELLYFIN_CPU_LIMIT="1.0"
-            JELLYFIN_MEMORY_LIMIT="1G"
+            PLEX_CPU_LIMIT="1.0"
+            PLEX_MEMORY_LIMIT="1G"
             SABNZBD_CPU_LIMIT="1.0"
             SABNZBD_MEMORY_LIMIT="1G"
             ;;
@@ -598,7 +598,7 @@ EOF
       - /dev/vchiq:/dev/vchiq
       - /dev/vcsm-cma:/dev/vcsm-cma
     volumes:
-      - /opt/vc/lib:/opt/vc/lib:ro
+      - /opt/vc/lib:/opt/vc/lib:rw
     environment:
       - LD_LIBRARY_PATH=/opt/vc/lib
       - RPI_GPU_MEM=128
@@ -610,12 +610,12 @@ EOF
     # Add other service optimizations
     cat >> "$compose_file" <<EOF
 
-  jellyfin:
+  plex:
     deploy:
       resources:
         limits:
-          cpus: '$JELLYFIN_CPU_LIMIT'
-          memory: $JELLYFIN_MEMORY_LIMIT
+          cpus: '$PLEX_CPU_LIMIT'
+          memory: $PLEX_MEMORY_LIMIT
 
   sabnzbd:
     deploy:

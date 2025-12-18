@@ -97,7 +97,7 @@ DESCRIPTION
     • Sonarr (TV management)
     • Radarr (Movie management)  
     • Prowlarr (Indexer management)
-    • Jellyfin (Media streaming)
+    • Plex (Media streaming)
     • And more...
 
 OPTIONS
@@ -197,7 +197,7 @@ SERVICES
         lidarr          Music
         
     Streaming
-        jellyfin        Media server
+        plex        Media server
         overseerr       Request manager
         
     Support

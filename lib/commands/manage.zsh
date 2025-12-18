@@ -186,7 +186,7 @@ check_port_conflicts() {
         "9696:Prowlarr"
         "8090:Mylar3"
         "8082:YACReader"
-        "8096:Jellyfin"
+        "32400:Plex"
         "5055:Overseerr"
         "8265:Tdarr"
         "19999:Netdata"

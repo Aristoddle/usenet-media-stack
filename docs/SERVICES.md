@@ -1,6 +1,6 @@
 # Working Services Documentation
 
-**Status**: Live snapshot (Dec 17, 2025) — core automation online; streaming via Plex (Jellyfin optional/disabled). This is the single source of truth for working services.
+**Status**: Live snapshot (Dec 18, 2025) — core automation online. Plex is pending claim; Audiobookshelf is not running. This is the single source of truth for working services.
 
 ## 🎯 Core Working Services
 
@@ -20,6 +20,9 @@
 - **Whisparr** — http://localhost:6969
 - **Kavita** — http://localhost:5000
 
+### 🎬 Media server
+- **Plex** — http://localhost:32400 _(pending claim / not running yet)_
+
 ### 🛠 Processing & Management
 - **Tdarr** — http://localhost:8265
 - **Portainer** — http://localhost:9000
@@ -27,14 +30,12 @@
 - **Docs site** — http://localhost:4173 (stale)
 
 ### ❌ Disabled / not in scope
-- Jellyfin (disabled; Plex primary)
 - Traefik routes (not wired)
+- Audiobookshelf (reading stack not running; compose paths pending normalization)
 
 ## 📸 Service Screenshots
 
 All services have been validated with visual confirmation:
-
-- [Jellyfin Interface](./public/images/services/jellyfin.png)
 - [Prowlarr Dashboard](./public/images/services/prowlarr.png)  
 - [Portainer Management](./public/images/services/portainer.png)
 - [Bazarr Subtitles](./public/images/services/bazarr.png)
@@ -46,7 +47,7 @@ All services have been validated with visual confirmation:
 ### Quick Access URLs
 ```bash
 # Core Services (All Working)
-Jellyfin:  http://localhost:8096  # Media streaming
+Plex:      http://localhost:32400 # Media streaming (pending claim)
 Prowlarr:  http://localhost:9696  # Indexer management  
 Portainer: http://localhost:9000  # Container management
 
@@ -62,7 +63,7 @@ YACReader: http://localhost:8083  # Comics
 ./usenet services list
 
 # Individual service logs
-./usenet services logs jellyfin
+./usenet services logs plex
 ./usenet services logs prowlarr
 
 # System validation
@@ -71,15 +72,15 @@ YACReader: http://localhost:8083  # Comics
 
 ## 🔧 Technical Notes
 
-### Validation Method (Dec 17, 2025)
+### Validation Method (Dec 18, 2025)
 - Direct HTTP/API checks for each running container
 - Docker health/status inspection
 - Manual RPC tests: Transmission, Aria2, SABnzbd
 
 ### Summary
-- Working services: 16/23 (listed above)
-- Disabled/retired: Jellyfin, Traefik routes
+- Working services: listed above (snapshot)
+- Disabled/retired: Traefik routes
 
 ---
 
-*Last validated: 2025-05-28 via automated Playwright testing*
+*Last validated: 18Dec25 via manual HTTP probe*

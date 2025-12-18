@@ -18,7 +18,7 @@
 # DOWNLOADERS:  SABnzbd (8080), Transmission (9092)
 # AUTOMATION:   Sonarr (8989), Radarr (7878), Bazarr (6767), Prowlarr (9696)
 # SPECIALIZED:  Whisparr (6969), Mylar3 (8090), YACReader (8082), Stash (9999)
-# MEDIA:        Jellyfin (8096)
+# MEDIA:        Plex (32400)
 # REQUESTS:     Overseerr (5055)
 # TRANSCODING:  Tdarr (8265)
 # OPTIMIZATION: Recyclarr (TRaSH Guide automation)
@@ -210,21 +210,22 @@ services:
     restart: unless-stopped
 
   # ================================
-  # Jellyfin - Media Server
-  # Access at http://localhost:8096
+  # Plex - Media Server
+  # Access at http://localhost:32400
   # ================================
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    hostname: jellyfin
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    hostname: plex
     # NO networks: section - uses default bridge
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+      - VERSION=docker
+      - PLEX_CLAIM=${PLEX_CLAIM:-}
     volumes:
-      - ${CONFIG_ROOT:-/home/deck/usenet/config}/jellyfin:/config
+      - ${CONFIG_ROOT:-/home/deck/usenet/config}/plex:/config
       - ${MEDIA_ROOT:-/home/deck/usenet/media}:/media
       # JBOD media access
       - /media/joe/Fast_8TB_1:/tv/fast1:rw,Z
@@ -232,7 +233,7 @@ services:
       - /media/joe/Fast_4TB_1:/movies/fast1:rw,Z
       - /media/joe/Fast_4TB_2:/movies/fast2:rw,Z
     ports:
-      - "8096:8096"
+      - "32400:32400"
     restart: unless-stopped
 
   # ================================

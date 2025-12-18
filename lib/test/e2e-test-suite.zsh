@@ -103,7 +103,7 @@ test_layer2_network_connectivity() {
     
     # Core service ports to test
     local -A core_ports=(
-        [8096]="jellyfin"
+        [32400]="plex"
         [5055]="overseerr"
         [9696]="prowlarr"
         [8989]="sonarr"

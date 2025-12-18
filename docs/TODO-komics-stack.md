@@ -2,15 +2,18 @@
 
 ## Current state
 - Komga running in Docker (rootful) at `http://localhost:8081` (maps to internal 25600).
-- Comics root: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (rclone copy complete).
-- Docker Engine is active (gluetun/transmission via compose).
+- Komf (Komelia UI) running at `http://localhost:8085`, linked to Komga.
+- Kavita running at `http://localhost:5000` (official image, library exists).
+- Comics root: `${COMICS_ROOT}` (example: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`).
+- Docker Engine is active; stack is running via compose (Transmission direct, no VPN).
 
 ## Immediate tasks
-- Ensure Komga/Komf/Mylar libraries point to `/comics` (host bind `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`); run a rescan.
-- Review `config.yml` skeleton for Kometa at `/var/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml` and fill Plex token/URL if you plan to run Kometa.
+- Ensure Komga/Komf/Mylar libraries point to `/comics`; run a rescan (Komga + Kavita are set; Mylar path set, verify in UI).
+- Triage Komga corrupt archives list (`/tmp/komga-zip-errors*.txt`) and re-download/repair broken CBZs.
+- Decide whether to ignore/disable ComicInfo provider noise (missing ComicInfo.xml entries).
+- Review `config.yml` skeleton for Kometa at `${KOMETA_CONFIG}/config.yml` and fill Plex token/URL if you plan to run Kometa.
 
 ## Post-reboot tasks (Docker needed)
-- Enable Docker (done): `sudo systemctl enable --now docker && sudo usermod -aG docker $USER && newgrp docker`.
 - Add Kometa service to compose/swarm (official image recommended):
   ```yaml
   kometa:
@@ -21,21 +24,20 @@
       - TZ=Etc/UTC
       - KOMETA_TIME=03:00
     volumes:
-      - /var/mnt/fast8tb/Cloud/OneDrive/Books/Comics:/media:ro
-      - /var/mnt/fast8tb/Cloud/OneDrive/KometaConfig:/config
+      - ${COMICS_ROOT}:/media:rw
+      - ${KOMETA_CONFIG}:/config
     restart: unless-stopped
   ```
-- Note: Kometa is designed for Plex (and Jellyfin beta); it cannot manage Komga directly. We are not planning Jellyfin; Kometa is optional for Plex-only use.
-- Restore/keep healthchecks and storage constraints in compose (Bazarr/Overseerr/Tdarr) when bringing the stack up.
+- Note: Kometa is designed for Plex; it cannot manage Komga directly. Kometa is optional for Plex-only use.
+- Review healthchecks and storage constraints in compose (Bazarr/Overseerr/Tdarr) when bringing the stack up.
 
 ### Additional services to add after reboot
-- Audiobookshelf for audiobooks/podcasts; point it at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks` (create after initial sync).
+- Audiobookshelf for audiobooks/podcasts; point it at `${AUDIOBOOKS_ROOT}` (create after initial sync).
 - Ebooks are handled by Kavita in the main compose stack; finalize `/Books/Ebooks` layout before adding libraries.
 
 See `docker-compose.reading.yml` for the Audiobookshelf definition (ports shifted to avoid Komga collisions).
 
 ### Documentation improvements (queued)
-- Add GVFS/rsync note to `docs/advanced/hot-swap.md`.
 - Add nightly rsync timer templates (done): see `scripts/rsync-comics.service` and `.timer`; enable after current transfers.
 
 ### Documentation improvements (done)
@@ -45,6 +47,10 @@ See `docker-compose.reading.yml` for the Audiobookshelf definition (ports shifte
 - Storage/Paths table added in `docs/architecture/index.md` (no separate storage doc).
 - Operations Runbook (`docs/ops-runbook.md`) covering healthchecks, rsync, reboot checklist.
 - Secrets/env page for `.env` (indexer/API keys).
+- GVFS/rsync note in `docs/advanced/hot-swap.md`.
+
+### Completed
+- Enable Docker: `sudo systemctl enable --now docker && sudo usermod -aG docker $USER && newgrp docker`.
 
 ## Nice-to-haves
 - Create a systemd user timer for nightly rsync from OneDrive → Comics once GVFS stability is confirmed.

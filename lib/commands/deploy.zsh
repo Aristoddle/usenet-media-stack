@@ -418,7 +418,7 @@ show_deployment_summary() {
     
     # Show key service URLs
     print "\n${COLOR_BOLD}Quick Access:${COLOR_RESET}"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Jellyfin:  ${SERVICE_URLS[jellyfin]:-http://localhost:8096}"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Plex:  ${SERVICE_URLS[plex]:-http://localhost:32400}"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Sonarr:    ${SERVICE_URLS[sonarr]:-http://localhost:8989}"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Radarr:    ${SERVICE_URLS[radarr]:-http://localhost:7878}"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Prowlarr:  ${SERVICE_URLS[prowlarr]:-http://localhost:9696}"
@@ -451,7 +451,7 @@ show_deployment_summary() {
     # Next steps
     print "\n${COLOR_BOLD}Next Steps:${COLOR_RESET}"
     print "  1. Add indexers in Prowlarr: ${SERVICE_URLS[prowlarr]:-http://localhost:9696}"
-    print "  2. Configure media libraries in Jellyfin"
+    print "  2. Configure media libraries in Plex"
     print "  3. Set up quality profiles in Sonarr/Radarr"
     
     # Useful commands
@@ -539,7 +539,7 @@ PROFILES
 
 POST-DEPLOYMENT
     After deployment completes:
-    • Access Jellyfin to configure media libraries
+    • Access Plex to configure media libraries
     • Add indexers in Prowlarr
     • Configure quality profiles in Sonarr/Radarr
     • Set up user accounts and permissions
@@ -770,7 +770,7 @@ deploy_with_port_resolution() {
     # Key service connectivity check
     info "Testing service connectivity..."
     local key_services=(
-        "8096:Jellyfin"
+        "32400:Plex"
         "9696:Prowlarr"  
         "8989:Sonarr"
         "7878:Radarr"
@@ -801,7 +801,7 @@ deploy_with_port_resolution() {
         print "\n${COLOR_GREEN}🎉 Deployment completed successfully!${COLOR_RESET}"
         
         print "\n${COLOR_BOLD}Access your services:${COLOR_RESET}"
-        print "  • Jellyfin (Media Server): http://localhost:8096"
+        print "  • Plex (Media Server): http://localhost:32400"
         print "  • Overseerr (Requests): http://localhost:5055"
         print "  • Prowlarr (Indexers): http://localhost:9696"
         print "  • Sonarr (TV): http://localhost:8989"

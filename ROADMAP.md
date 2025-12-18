@@ -2,8 +2,12 @@
 
 **Project**: Usenet Media Stack  
 **Current Version**: v2.0  
-**Last Updated**: 2025-05-25  
-**Status**: Production-ready CLI with professional-grade UX
+**Last Updated**: 2025-12-18  
+**Status**: Plex-first stack in active build-out; one-line deploy + path normalization in progress
+
+> **2025-12-18 update**: This file contains legacy CLI-focused milestones below.  
+> Current priorities are: **one-line deploy**, **Plex bring-up**, **Recyclarr/TRaSH sync**, and **docs deploy**.  
+> See `DEVELOPMENT_STATUS.md` for the live status summary.
 
 ---
 
@@ -166,7 +170,7 @@ add_storage_drive() {
 ```bash
 # New service registry with metadata
 declare -A SERVICE_GROUPS=(
-    [media]="jellyfin overseerr tdarr yacreader"
+    [media]="plex overseerr tdarr yacreader"
     [automation]="sonarr radarr bazarr prowlarr recyclarr"
     [download]="sabnzbd transmission"
     [monitoring]="netdata portainer"
@@ -174,14 +178,14 @@ declare -A SERVICE_GROUPS=(
 )
 
 declare -A SERVICE_PORTS=(
-    [jellyfin]=8096 [overseerr]=5055 [sonarr]=8989 [radarr]=7878
+    [plex]=32400 [overseerr]=5055 [sonarr]=8989 [radarr]=7878
     [prowlarr]=9696 [sabnzbd]=8080 [transmission]=9092
     [tdarr]=8265 [netdata]=19999 [portainer]=9000
     # ... complete mapping for all 19 services
 )
 
 declare -A SERVICE_HEALTH_ENDPOINTS=(
-    [jellyfin]="/health" [sonarr]="/api/v3/system/status" 
+    [plex]="/health" [sonarr]="/api/v3/system/status" 
     [radarr]="/api/v3/system/status" [prowlarr]="/api/v1/system/status"
     # ... health check endpoints for API-enabled services
 )
@@ -214,7 +218,7 @@ $ usenet services list
 └── ✅ recyclarr              │ Timer │ Last run: 2h ago
 
 🎬 Media Services (3/3 healthy)  
-├── ✅ jellyfin      (8096)  │ Ready │ 2.1GB RAM │ GPU: AMD VAAPI
+├── ✅ plex      (32400)  │ Ready │ 2.1GB RAM │ GPU: AMD VAAPI
 ├── ✅ overseerr     (5055)  │ Ready │ 0.4GB RAM │ API: ✓
 └── ✅ tdarr         (8265)  │ Ready │ 1.8GB RAM │ GPU: AMD VAAPI
 
@@ -255,7 +259,7 @@ check_service_health() {
 **Service Dependencies**: Some services must start in order
 - Start download clients (sabnzbd, transmission) first
 - Then automation services (sonarr, radarr, prowlarr)  
-- Finally media services (jellyfin, overseerr)
+- Finally media services (plex, overseerr)
 - Monitoring services (netdata, portainer) can start anytime
 
 **Error Handling**: Services may be temporarily unavailable during restarts
@@ -786,7 +790,7 @@ wait_for_drive_in_containers() {
         local containers_ready=0
         local total_containers=0
         
-        for service in sonarr radarr jellyfin; do
+        for service in sonarr radarr plex; do
             ((total_containers++))
             if docker exec "usenet-${service}-1" test -d "$drive_path" 2>/dev/null; then
                 ((containers_ready++))

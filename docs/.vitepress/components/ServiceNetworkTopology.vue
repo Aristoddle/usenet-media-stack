@@ -53,13 +53,13 @@ const layers = [
 // Real service data from actual system
 const serviceData = {
   core: {
-    jellyfin: { port: 8096, type: 'media-server', cpu: 'medium', connections: ['sonarr', 'radarr', 'tdarr'] },
-    overseerr: { port: 5055, type: 'request-management', cpu: 'low', connections: ['jellyfin', 'sonarr', 'radarr'] },
-    tdarr: { port: 8265, type: 'transcoding', cpu: 'high', connections: ['jellyfin'] }
+    plex: { port: 32400, type: 'media-server', cpu: 'medium', connections: ['sonarr', 'radarr', 'tdarr'] },
+    overseerr: { port: 5055, type: 'request-management', cpu: 'low', connections: ['plex', 'sonarr', 'radarr'] },
+    tdarr: { port: 8265, type: 'transcoding', cpu: 'high', connections: ['plex'] }
   },
   automation: {
-    sonarr: { port: 8989, type: 'tv-automation', cpu: 'medium', connections: ['sabnzbd', 'transmission', 'prowlarr', 'jellyfin'] },
-    radarr: { port: 7878, type: 'movie-automation', cpu: 'medium', connections: ['sabnzbd', 'transmission', 'prowlarr', 'jellyfin'] },
+    sonarr: { port: 8989, type: 'tv-automation', cpu: 'medium', connections: ['sabnzbd', 'transmission', 'prowlarr', 'plex'] },
+    radarr: { port: 7878, type: 'movie-automation', cpu: 'medium', connections: ['sabnzbd', 'transmission', 'prowlarr', 'plex'] },
     prowlarr: { port: 9696, type: 'indexer-manager', cpu: 'medium', connections: ['sonarr', 'radarr'] },
     bazarr: { port: 6767, type: 'subtitle-automation', cpu: 'low', connections: ['sonarr', 'radarr'] },
     recyclarr: { port: null, type: 'config-sync', cpu: 'low', connections: ['sonarr', 'radarr'] }

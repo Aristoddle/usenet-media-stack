@@ -244,7 +244,7 @@ test_web_interfaces_legacy() {
         [jackett]="9117"
         
         # Media Servers
-        [jellyfin]="8096"
+        [plex]="32400"
         [overseerr]="5055"
         [yacreader]="8083"
         [stash]="9998"
@@ -294,7 +294,7 @@ test_web_interfaces_sequential() {
         [jackett]="9117"
         
         # Media Servers
-        [jellyfin]="8096"
+        [plex]="32400"
         [overseerr]="5055"
         [yacreader]="8083"
         [stash]="9998"
@@ -349,7 +349,7 @@ test_web_interfaces_parallel() {
         [jackett]="9117"
         
         # Media Servers
-        [jellyfin]="8096"
+        [plex]="32400"
         [overseerr]="5055"
         [yacreader]="8083"
         [stash]="9998"
@@ -615,7 +615,7 @@ run_smoke_tests() {
     fi
     
     # Test 3: Key ports accessible (parallel)
-    local key_ports=(8096 5055 9696 8080 9000)
+    local key_ports=(32400 5055 9696 8080 9000)
     local temp_dir=$(mktemp -d)
     local pids=()
     

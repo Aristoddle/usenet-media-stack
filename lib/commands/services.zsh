@@ -29,7 +29,7 @@ FLAGS:
 EXAMPLES:
     usenet services list                # Show all service status
     usenet services start sonarr       # Start specific service
-    usenet services logs jellyfin      # View service logs
+    usenet services logs plex      # View service logs
     usenet services health             # Health check all services
 
 EOF

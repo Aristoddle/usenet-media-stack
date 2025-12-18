@@ -222,7 +222,7 @@ services:
       - /mnt/disk1:/tv/drive1:rw
       - /mnt/disk2:/tv/drive2:rw
       - /mnt/disk3:/tv/drive3:rw
-  jellyfin:
+  plex:
     volumes:
       - /mnt/disk1:/media/drive1:rw
       - /mnt/disk2:/media/drive2:rw
@@ -231,7 +231,7 @@ services:
 
 **Service Integration:**
 - **Sonarr/Radarr**: Separate `/tv/driveN` and `/movies/driveN` paths
-- **Jellyfin**: Unified `/media/driveN` access
+- **Plex**: Unified `/media/driveN` access
 - **Tdarr**: All drives available for transcoding
 - **Sharing**: Samba/NFS export all pool drives
 

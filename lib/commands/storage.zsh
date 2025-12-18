@@ -424,7 +424,7 @@ EOF
     done < "$config_file"
     
     # Add mounts to relevant services
-    for service in sonarr radarr bazarr jellyfin tdarr; do
+    for service in sonarr radarr bazarr plex tdarr; do
         cat >> "$compose_override" <<EOF
 
   ${service}:
@@ -632,7 +632,7 @@ interactive_drive_selection() {
     
     # Display selection interface
     print "${COLOR_GREEN}Select drives to include in media storage pool:${COLOR_RESET}"
-    print "${COLOR_BLUE}These drives will be accessible to all media services (Sonarr, Radarr, Jellyfin, etc.)${COLOR_RESET}\n"
+    print "${COLOR_BLUE}These drives will be accessible to all media services (Sonarr, Radarr, Plex, etc.)${COLOR_RESET}\n"
     
     local changed=false
     
@@ -644,7 +644,7 @@ interactive_drive_selection() {
         print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         print ""
         print "${COLOR_YELLOW}Select drives for your media storage pool:${COLOR_RESET}"
-        print "${COLOR_BLUE}All selected drives will be accessible to Sonarr, Radarr, Jellyfin, Tdarr, etc.${COLOR_RESET}"
+        print "${COLOR_BLUE}All selected drives will be accessible to Sonarr, Radarr, Plex, Tdarr, etc.${COLOR_RESET}"
         print ""
         
         local index=1
@@ -768,7 +768,7 @@ apply_storage_changes() {
     fi
     
     # Check if Docker services are running
-    if docker ps --format "table {{.Names}}" | grep -q "sonarr\|radarr\|jellyfin"; then
+    if docker ps --format "table {{.Names}}" | grep -q "sonarr\|radarr\|plex"; then
         info "Restarting Docker services with new storage configuration..."
         
         # Use the main manage script to restart services

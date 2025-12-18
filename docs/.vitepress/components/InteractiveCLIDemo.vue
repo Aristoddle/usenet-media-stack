@@ -137,7 +137,7 @@ const demoScenarios = {
     { type: 'output', content: '🐳 <span class="info">Docker containers starting...</span>' },
     { type: 'output', content: '📺 <span class="success">Sonarr (8989): Running</span>' },
     { type: 'output', content: '🎬 <span class="success">Radarr (7878): Running</span>' },
-    { type: 'output', content: '🎭 <span class="success">Jellyfin (8096): Running with GPU acceleration</span>' },
+    { type: 'output', content: '🎭 <span class="success">Plex (32400): Running with hardware acceleration</span>' },
     { type: 'output', content: '🎉 <span class="success">Stack ready at:</span> <span class="link">https://beppesarrstack.net</span>' }
   ],
   
@@ -158,7 +158,7 @@ const demoScenarios = {
   
   'usenet services list': [
     { type: 'output', content: '📊 <span class="highlight">SERVICE HEALTH CHECK:</span>' },
-    { type: 'output', content: '🎬 Jellyfin       <span class="success">●</span> Running  (8096) GPU: Active' },
+    { type: 'output', content: '🎬 Plex           <span class="success">●</span> Running  (32400) GPU: Active' },
     { type: 'output', content: '📺 Sonarr         <span class="success">●</span> Running  (8989)' },
     { type: 'output', content: '🎭 Radarr         <span class="success">●</span> Running  (7878)' },
     { type: 'output', content: '✅ <span class="success">All services operational</span>' }

@@ -3,6 +3,15 @@ x-logging: &id001
   options:
     max-size: 50m
     max-file: '3'
+x-network-tweaks: &network_tweaks
+  dns:
+    - 1.1.1.1
+    - 1.0.0.1
+  dns_opt:
+    - use-vc
+  sysctls:
+    - net.ipv6.conf.all.disable_ipv6=1
+    - net.ipv6.conf.default.disable_ipv6=1
 volumes:
   portainer_data:
     driver: local
@@ -23,11 +32,11 @@ services:
 
 '
     volumes:
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw
+      - ${CONFIG_ROOT:-/srv/usenet/config}:/config:rw
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -69,9 +78,9 @@ services:
       - SYS_ADMIN
     privileged: true
     volumes:
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media:rw
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}:/config:rw
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw
+      - ${CONFIG_ROOT:-/srv/usenet/config}:/config:rw
     environment:
       - SHARED_DIRECTORY=/media
       - SHARED_DIRECTORY_2=/downloads
@@ -140,6 +149,7 @@ services:
       driver: json-file
       options: *id002
   sabnzbd:
+    <<: *network_tweaks
     image: docker.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
     hostname: sabnzbd
@@ -148,8 +158,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sabnzbd:/config
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${CONFIG_ROOT:-/srv/usenet/config}/sabnzbd:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
     ports:
       - 8080:8080
     restart: unless-stopped
@@ -180,6 +190,7 @@ services:
       driver: json-file
       options: *id002
   transmission:
+    <<: *network_tweaks
     image: docker.io/linuxserver/transmission:latest
     container_name: transmission
     environment:
@@ -187,11 +198,11 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-    - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/transmission:/config
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-    - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}/watch:/watch
+      - ${CONFIG_ROOT:-/srv/usenet/config}/transmission:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/watch:/watch
     ports:
-    - 9091:9091
+      - 9091:9091
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -211,6 +222,7 @@ services:
       driver: json-file
       options: *id002
   sonarr:
+    <<: *network_tweaks
     image: docker.io/linuxserver/sonarr:latest
     container_name: sonarr
     hostname: sonarr
@@ -219,9 +231,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sonarr:/config
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+      - ${CONFIG_ROOT:-/srv/usenet/config}/sonarr:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -245,6 +257,7 @@ services:
       driver: json-file
       options: *id002
   radarr:
+    <<: *network_tweaks
     image: docker.io/linuxserver/radarr:latest
     container_name: radarr
     hostname: radarr
@@ -253,9 +266,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/radarr:/config
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies:rw
+      - ${CONFIG_ROOT:-/srv/usenet/config}/radarr:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -279,6 +292,7 @@ services:
       driver: json-file
       options: *id002
   bazarr:
+    <<: *network_tweaks
     image: docker.io/linuxserver/bazarr:latest
     container_name: bazarr
     hostname: bazarr
@@ -287,8 +301,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/bazarr:/config
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+      - ${CONFIG_ROOT:-/srv/usenet/config}/bazarr:/config
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw
     ports:
       - 6767:6767
     restart: unless-stopped
@@ -312,6 +326,7 @@ services:
       driver: json-file
       options: *id002
   prowlarr:
+    <<: *network_tweaks
     image: docker.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     hostname: prowlarr
@@ -320,17 +335,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/prowlarr:/config
+      - ${CONFIG_ROOT:-/srv/usenet/config}/prowlarr:/config
     ports:
       - 9696:9696
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
-    dns_opt:
-      - use-vc
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.default.disable_ipv6=1
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -349,6 +356,7 @@ services:
       driver: json-file
       options: *id002
   whisparr:
+    <<: *network_tweaks
     image: docker.io/thespad/whisparr:latest
     container_name: whisparr
     hostname: whisparr
@@ -357,10 +365,10 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/whisparr:/config
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
+      - ${CONFIG_ROOT:-/srv/usenet/config}/whisparr:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv
     ports:
       - 6969:6969
     restart: unless-stopped
@@ -378,6 +386,7 @@ services:
       driver: json-file
       options: *id002
   lidarr:
+    <<: *network_tweaks
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
     hostname: lidarr
@@ -386,9 +395,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/lidarr:/config
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-      - ${MUSIC_ROOT:-/var/mnt/fast8tb/Local/media/music}:/music:rw
+      - ${CONFIG_ROOT:-/srv/usenet/config}/lidarr:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
+      - ${MUSIC_ROOT:-/srv/usenet/media/music}:/music:rw
     ports:
       - 8686:8686
     restart: unless-stopped
@@ -403,6 +412,7 @@ services:
       driver: json-file
       options: *id002
   mylar:
+    <<: *network_tweaks
     image: docker.io/linuxserver/mylar3:latest
     container_name: mylar
     hostname: mylar
@@ -411,9 +421,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/mylar:/config
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
-      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/mylar:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
     ports:
       - 8090:8090
     restart: unless-stopped
@@ -427,32 +437,36 @@ services:
     logging:
       driver: json-file
       options: *id002
-  jellyfin:
-    image: docker.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    hostname: jellyfin
+  plex:
+    image: docker.io/linuxserver/plex:latest
+    container_name: plex
+    hostname: plex
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+      - VERSION=docker
+      - PLEX_CLAIM=${PLEX_CLAIM:-}
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/jellyfin:/config
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/music:/music
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/books:/books
+      - ${CONFIG_ROOT:-/srv/usenet/config}/plex:/config
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/media
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv
+      - ${MEDIA_ROOT:-/srv/usenet/media}/music:/music
+      - ${BOOKS_ROOT:-/srv/usenet/books}:/books
     ports:
-      - 8096:8096
+      - 32400:32400
     restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
       resources:
         limits:
-          cpus: '1.0'
-          memory: 1G
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
     logging:
       driver: json-file
       options: *id002
@@ -465,7 +479,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/overseerr:/config
+      - ${CONFIG_ROOT:-/srv/usenet/config}/overseerr:/config
     ports:
       - 5055:5055
     restart: unless-stopped
@@ -488,7 +502,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/recyclarr:/config
+      - ${CONFIG_ROOT:-/srv/usenet/config}/recyclarr:/config
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -515,13 +529,13 @@ services:
       - internalNode=true
       - nodeID=MainNode
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/server:/app/server
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/configs:/app/configs
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/tdarr/logs:/app/logs
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}:/media
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/movies:/movies
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}/tdarr_transcode:/temp
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/server:/app/server
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/configs:/app/configs
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/logs:/app/logs
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/media
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/tdarr_transcode:/temp
     ports:
       - 8265:8265
       - 8266:8266
@@ -587,13 +601,13 @@ services:
       - STASH_PORT=9999
     volumes:
       - /etc/localtime:/etc/localtime:rw
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash:/root/.stash:Z
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/adult:/data
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/metadata:/metadata:Z
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/cache:/cache:Z
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/blobs:/blobs:Z
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/stash/generated:/generated:Z
-      - ${MEDIA_ROOT:-/var/mnt/fast8tb/Local/media}/tv:/tv:rw
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash:/root/.stash:rw,Z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/adult:/data
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/metadata:/metadata:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/cache:/cache:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/blobs:/blobs:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/generated:/generated:rw,Z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw
     ports:
       - 9998:9999
     restart: unless-stopped
@@ -614,6 +628,7 @@ services:
           cpus: '0.25'
           memory: 256M
   komga:
+    <<: *network_tweaks
     image: ghcr.io/gotson/komga:1.23.6
     container_name: komga
     user: 1000:1000
@@ -625,13 +640,14 @@ services:
       - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
       - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
     volumes:
-      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
-      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics_mirror:rw,z
-      - /var/mnt/fast8tb/config/komga:/config:Z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics_mirror:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/komga:/config:rw,Z
     ports:
       - 8081:25600
     restart: unless-stopped
   komf:
+    <<: *network_tweaks
     image: sndxr/komf:1.3.0
     container_name: komf
     logging: *id001
@@ -645,26 +661,28 @@ services:
       - KOMF_ANILIST_CLIENT_ID=${KOMF_ANILIST_CLIENT_ID:-}
       - KOMF_ANILIST_CLIENT_SECRET=${KOMF_ANILIST_CLIENT_SECRET:-}
     volumes:
-      - /var/home/deck/komf-config:/config:rw,z
-      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+      - ${KOMF_CONFIG:-/srv/usenet/config/komf}:/config:rw,z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
     depends_on:
       - komga
     ports:
       - 8085:8085
     restart: unless-stopped
   kavita:
+    <<: *network_tweaks
     image: jvmilazz0/kavita:latest
     container_name: kavita
     environment:
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/kavita:/kavita/config:rw,Z
-      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/kavita:/kavita/config:rw,Z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
     ports:
       - 5000:5000
     restart: unless-stopped
   aria2:
+    <<: *network_tweaks
     build: ./aria2
     container_name: aria2
     environment:
@@ -673,8 +691,8 @@ services:
       - TZ=Etc/UTC
       - ARIA2_SECRET=${ARIA2_SECRET}
     volumes:
-      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/aria2:/config
-      - ${DOWNLOADS_ROOT:-/var/mnt/fast8tb/Local/downloads}:/downloads
+      - ${CONFIG_ROOT:-/srv/usenet/config}/aria2:/config
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads
     ports:
       - 6800:6800
     restart: unless-stopped

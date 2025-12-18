@@ -203,7 +203,7 @@ _usenet_service_commands() {
         'mylar:Comic book automation'
         'yacreader:Comic reader server'
         'jackett:Indexer proxy'
-        'jellyfin:Media server'
+        'plex:Media server'
         'overseerr:Request management'
         'recyclarr:TRaSH guide automation'
         'tdarr:Transcoding automation'

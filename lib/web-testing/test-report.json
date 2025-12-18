@@ -24,7 +24,7 @@
       "timestamp": "2025-05-28T06:37:02.291Z"
     },
     {
-      "name": "jellyfin_loading",
+      "name": "plex_loading",
       "passed": true,
       "details": {
         "loadTime": 220
@@ -32,15 +32,15 @@
       "timestamp": "2025-05-28T06:37:03.533Z"
     },
     {
-      "name": "jellyfin_title",
+      "name": "plex_title",
       "passed": true,
       "details": {
-        "title": "Jellyfin"
+        "title": "Plex"
       },
       "timestamp": "2025-05-28T06:37:03.538Z"
     },
     {
-      "name": "jellyfin_elements",
+      "name": "plex_elements",
       "passed": false,
       "details": {
         "found": 0,
@@ -49,13 +49,13 @@
       "timestamp": "2025-05-28T06:37:03.584Z"
     },
     {
-      "name": "jellyfin_navigation",
+      "name": "plex_navigation",
       "passed": true,
       "details": {},
       "timestamp": "2025-05-28T06:37:03.587Z"
     },
     {
-      "name": "jellyfin_performance",
+      "name": "plex_performance",
       "passed": true,
       "details": {
         "loadTime": 220
@@ -288,11 +288,11 @@
       ]
     },
     {
-      "name": "jellyfin",
-      "port": 8096,
+      "name": "plex",
+      "port": 32400,
       "tests": [
         {
-          "name": "jellyfin_loading",
+          "name": "plex_loading",
           "passed": true,
           "details": {
             "loadTime": 220
@@ -300,15 +300,15 @@
           "timestamp": "2025-05-28T06:37:03.533Z"
         },
         {
-          "name": "jellyfin_title",
+          "name": "plex_title",
           "passed": true,
           "details": {
-            "title": "Jellyfin"
+            "title": "Plex"
           },
           "timestamp": "2025-05-28T06:37:03.538Z"
         },
         {
-          "name": "jellyfin_elements",
+          "name": "plex_elements",
           "passed": false,
           "details": {
             "found": 0,
@@ -317,13 +317,13 @@
           "timestamp": "2025-05-28T06:37:03.584Z"
         },
         {
-          "name": "jellyfin_navigation",
+          "name": "plex_navigation",
           "passed": true,
           "details": {},
           "timestamp": "2025-05-28T06:37:03.587Z"
         },
         {
-          "name": "jellyfin_performance",
+          "name": "plex_performance",
           "passed": true,
           "details": {
             "loadTime": 220

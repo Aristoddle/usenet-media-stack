@@ -31,7 +31,6 @@ The following table tracks the migration of advanced documentation from
 
 ## Next Steps
 
-- Publish the updated documentation site to ensure navigation includes the
-  Advanced section.
+- Publish the updated documentation site (Cloudflare Pages deploy pending).
 - Archive the legacy `codex/collab` workspace or mark it read-only to avoid
-  future divergence.
+  future divergence (backlog).

@@ -1,30 +1,178 @@
 {
   "metadata": {
-    "capturedAt": "2025-05-28T07:39:02.590Z",
+    "capturedAt": "2025-12-18T08:03:07.382088+00:00",
     "workingServices": 21,
     "totalServices": 21,
     "successRate": "100%"
   },
   "services": [
-    {"service":"jellyfin","title":"Jellyfin","url":"http://localhost:8096","desc":"Media Server","features":"Stream movies, TV shows, music with hardware transcoding","status":"documented"},
-    {"service":"overseerr","title":"Overseerr","url":"http://localhost:5055","desc":"Request Management","features":"Media request management interface","status":"documented"},
-    {"service":"yacreader","title":"YACReader","url":"http://localhost:8083","desc":"Comic Reader","features":"Digital comic and manga library management","status":"documented"},
-    {"service":"sonarr","title":"Sonarr","url":"http://localhost:8989","desc":"TV Automation","features":"Automatically manage series downloads","status":"documented"},
-    {"service":"radarr","title":"Radarr","url":"http://localhost:7878","desc":"Movie Automation","features":"Automatically manage movie downloads","status":"documented"},
-    {"service":"prowlarr","title":"Prowlarr","url":"http://localhost:9696","desc":"Indexer Manager","features":"Unified indexer management for usenet and torrent sources","status":"documented"},
-    {"service":"bazarr","title":"Bazarr","url":"http://localhost:6767","desc":"Subtitle Automation","features":"Automatic subtitle downloading","status":"documented"},
-    {"service":"whisparr","title":"Whisparr","url":"http://localhost:6969","desc":"Adult Content Automation","features":"Automated adult content management","status":"documented"},
-    {"service":"mylar","title":"Mylar","url":"http://localhost:8090","desc":"Comic Automation","features":"Automated comic downloading and organization","status":"documented"},
-    {"service":"sabnzbd","title":"SABnzbd","url":"http://localhost:8080","desc":"Usenet Downloader","features":"High-speed usenet downloading","status":"documented"},
-    {"service":"transmission","title":"Transmission","url":"http://localhost:9091","desc":"Torrent Client","features":"BitTorrent downloads with VPN","status":"documented"},
-    {"service":"jackett","title":"Jackett","url":"http://localhost:9117","desc":"Indexer Proxy","features":"Legacy torrent/usenet indexer aggregator","status":"documented"},
-    {"service":"tdarr","title":"Tdarr","url":"http://localhost:8265","desc":"Transcoding Engine","features":"Automated video transcoding and optimization","status":"documented"},
-    {"service":"recyclarr","title":"Recyclarr","url":"http://localhost:3000","desc":"Automation","features":"TRaSH Guide quality automation","status":"documented"},
-    {"service":"unpackerr","title":"Unpackerr","url":"http://localhost:5657","desc":"Extractor","features":"Automated extraction of completed downloads","status":"documented"},
-    {"service":"portainer","title":"Portainer","url":"http://localhost:9000","desc":"Container Management","features":"Docker container management interface","status":"documented"},
-    {"service":"netdata","title":"Netdata","url":"http://localhost:19999","desc":"System Monitoring","features":"Real-time system metrics","status":"documented"},
-    {"service":"samba","title":"Samba","url":"smb://localhost","desc":"File Sharing","features":"Windows file sharing","status":"documented"},
-    {"service":"stash","title":"Stash","url":"http://localhost:9998","desc":"Media Organizer","features":"Video library management","status":"documented"},
-    {"service":"tautulli","title":"Tautulli","url":"http://localhost:8181","desc":"Usage Analytics","features":"Monitor Jellyfin stream statistics","status":"documented"},
-    {"service":"usenet-docs","title":"Documentation","url":"http://localhost:4173","desc":"Documentation Site","features":"VitePress-based docs","status":"documented"}
-  ]}
+    {
+      "service": "plex",
+      "title": "Plex",
+      "url": "http://localhost:32400",
+      "desc": "Media Server",
+      "features": "Stream movies, TV shows, music with hardware transcoding",
+      "status": "documented"
+    },
+    {
+      "service": "overseerr",
+      "title": "Overseerr",
+      "url": "http://localhost:5055",
+      "desc": "Request Management",
+      "features": "Media request management interface",
+      "status": "documented"
+    },
+    {
+      "service": "yacreader",
+      "title": "YACReader",
+      "url": "http://localhost:8083",
+      "desc": "Comic Reader",
+      "features": "Digital comic and manga library management",
+      "status": "documented"
+    },
+    {
+      "service": "sonarr",
+      "title": "Sonarr",
+      "url": "http://localhost:8989",
+      "desc": "TV Automation",
+      "features": "Automatically manage series downloads",
+      "status": "documented"
+    },
+    {
+      "service": "radarr",
+      "title": "Radarr",
+      "url": "http://localhost:7878",
+      "desc": "Movie Automation",
+      "features": "Automatically manage movie downloads",
+      "status": "documented"
+    },
+    {
+      "service": "prowlarr",
+      "title": "Prowlarr",
+      "url": "http://localhost:9696",
+      "desc": "Indexer Manager",
+      "features": "Unified indexer management for usenet and torrent sources",
+      "status": "documented"
+    },
+    {
+      "service": "bazarr",
+      "title": "Bazarr",
+      "url": "http://localhost:6767",
+      "desc": "Subtitle Automation",
+      "features": "Automatic subtitle downloading",
+      "status": "documented"
+    },
+    {
+      "service": "whisparr",
+      "title": "Whisparr",
+      "url": "http://localhost:6969",
+      "desc": "Adult Content Automation",
+      "features": "Automated adult content management",
+      "status": "documented"
+    },
+    {
+      "service": "mylar",
+      "title": "Mylar",
+      "url": "http://localhost:8090",
+      "desc": "Comic Automation",
+      "features": "Automated comic downloading and organization",
+      "status": "documented"
+    },
+    {
+      "service": "sabnzbd",
+      "title": "SABnzbd",
+      "url": "http://localhost:8080",
+      "desc": "Usenet Downloader",
+      "features": "High-speed usenet downloading",
+      "status": "documented"
+    },
+    {
+      "service": "transmission",
+      "title": "Transmission",
+      "url": "http://localhost:9091",
+      "desc": "Torrent Client",
+      "features": "BitTorrent downloads with VPN",
+      "status": "documented"
+    },
+    {
+      "service": "jackett",
+      "title": "Jackett",
+      "url": "http://localhost:9117",
+      "desc": "Indexer Proxy",
+      "features": "Legacy torrent/usenet indexer aggregator",
+      "status": "documented"
+    },
+    {
+      "service": "tdarr",
+      "title": "Tdarr",
+      "url": "http://localhost:8265",
+      "desc": "Transcoding Engine",
+      "features": "Automated video transcoding and optimization",
+      "status": "documented"
+    },
+    {
+      "service": "recyclarr",
+      "title": "Recyclarr",
+      "url": "http://localhost:3000",
+      "desc": "Automation",
+      "features": "TRaSH Guide quality automation",
+      "status": "documented"
+    },
+    {
+      "service": "unpackerr",
+      "title": "Unpackerr",
+      "url": "http://localhost:5657",
+      "desc": "Extractor",
+      "features": "Automated extraction of completed downloads",
+      "status": "documented"
+    },
+    {
+      "service": "portainer",
+      "title": "Portainer",
+      "url": "http://localhost:9000",
+      "desc": "Container Management",
+      "features": "Docker container management interface",
+      "status": "documented"
+    },
+    {
+      "service": "netdata",
+      "title": "Netdata",
+      "url": "http://localhost:19999",
+      "desc": "System Monitoring",
+      "features": "Real-time system metrics",
+      "status": "documented"
+    },
+    {
+      "service": "samba",
+      "title": "Samba",
+      "url": "smb://localhost",
+      "desc": "File Sharing",
+      "features": "Windows file sharing",
+      "status": "documented"
+    },
+    {
+      "service": "stash",
+      "title": "Stash",
+      "url": "http://localhost:9998",
+      "desc": "Media Organizer",
+      "features": "Video library management",
+      "status": "documented"
+    },
+    {
+      "service": "tautulli",
+      "title": "Tautulli",
+      "url": "http://localhost:8181",
+      "desc": "Usage Analytics",
+      "features": "Monitor Plex stream statistics",
+      "status": "documented"
+    },
+    {
+      "service": "usenet-docs",
+      "title": "Documentation",
+      "url": "http://localhost:4173",
+      "desc": "Documentation Site",
+      "features": "VitePress-based docs",
+      "status": "documented"
+    }
+  ]
+}

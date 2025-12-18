@@ -32,7 +32,7 @@
 - Docs (VitePress dev/preview): [http://localhost:4173](http://localhost:4173)
 
 ## Media servers
-- Jellyfin (if enabled): [http://localhost:8096](http://localhost:8096)
+- Plex (primary): [http://localhost:32400](http://localhost:32400)
 - Stash: [http://localhost:9998](http://localhost:9998)
 
 ### Notes

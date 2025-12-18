@@ -27,7 +27,7 @@ detect_media_services() {
     local -A media_ports=(
         [8989]="sonarr"
         [7878]="radarr"  
-        [8096]="jellyfin"
+        [32400]="plex"
         [5055]="overseerr"
         [9000]="portainer"
         [8080]="sabnzbd"
@@ -141,7 +141,7 @@ cleanup_docker_stack() {
     
     # Check for orphaned containers with media stack names
     local media_containers=(
-        "sonarr" "radarr" "jellyfin" "overseerr" "portainer"
+        "sonarr" "radarr" "plex" "overseerr" "portainer"
         "sabnzbd" "prowlarr" "whisparr" "bazarr" 
         "tdarr" "transmission" "netdata" "yacreader" "mylar"
         "recyclarr" "samba" "nfs-server"
@@ -193,7 +193,7 @@ cleanup_system_services() {
     info "🔧 Checking for systemd media services..."
     
     local media_services=(
-        "sonarr" "radarr" "jellyfin" "overseerr" 
+        "sonarr" "radarr" "plex" "overseerr" 
         "sabnzbd" "prowlarr" "whisparr" "bazarr"
         "transmission" "netdata"
     )
@@ -246,9 +246,9 @@ suggest_ports() {
     echo "  radarr:"
     echo "    ports:"
     echo "      - \"20878:7878\""
-    echo "  jellyfin:"
+    echo "  plex:"
     echo "    ports:"
-    echo "      - \"20096:8096\""
+    echo "      - \"20096:32400\""
     echo "  overseerr:"
     echo "    ports:"
     echo "      - \"20055:5055\""

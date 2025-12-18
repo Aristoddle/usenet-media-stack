@@ -598,7 +598,7 @@ main() {
     show_progress "Setting up media services"
     
     # Check if media services are already running
-    if docker ps | grep -q "jellyfin"; then
+    if docker ps | grep -q "plex"; then
         log_info "Media services already running"
     elif [[ -f "$PROJECT_ROOT/docker-compose.media.yml" ]]; then
         log_info "Deploying media services..."
@@ -672,7 +672,7 @@ show_summary() {
     print "  ${COLOR_GREEN}●${COLOR_RESET} Mylar3:    ${SERVICE_URLS[mylar3]}  - Comics"
     
     print "\n${COLOR_BOLD}Media Services:${COLOR_RESET}"
-    print "  ${COLOR_GREEN}●${COLOR_RESET} Jellyfin:  ${SERVICE_URLS[jellyfin]}  - Media Streaming"
+    print "  ${COLOR_GREEN}●${COLOR_RESET} Plex:  ${SERVICE_URLS[plex]}  - Media Streaming"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Overseerr: ${SERVICE_URLS[overseerr]}  - Request Management"
     print "  ${COLOR_GREEN}●${COLOR_RESET} YACReader: ${SERVICE_URLS[yacreader]}  - Manga/Comic Server"
     print "  ${COLOR_GREEN}●${COLOR_RESET} Tautulli:  ${SERVICE_URLS[tautulli]}  - Statistics"
@@ -698,7 +698,7 @@ show_summary() {
     print "  Stop all:     ./usenet stop"
     print "  Run tests:    ./usenet test all"
     
-    print "\n${COLOR_YELLOW}Note: Complete Jellyfin/Overseerr setup via web UI${COLOR_RESET}"
+    print "\n${COLOR_YELLOW}Note: Complete Plex/Overseerr setup via web UI${COLOR_RESET}"
     
     # Proactive GPU optimization detection
     if command -v "${PROJECT_ROOT}/usenet" >/dev/null 2>&1; then

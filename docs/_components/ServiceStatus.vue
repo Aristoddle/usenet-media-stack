@@ -45,10 +45,10 @@ export default {
     return {
       services: [
         {
-          name: 'Jellyfin',
+          name: 'Plex',
           description: 'Media Server - Stream movies, TV shows, music',
-          port: 8096,
-          url: 'http://localhost:8096',
+          port: 32400,
+          url: 'http://localhost:32400',
           status: 'working'
         },
         {

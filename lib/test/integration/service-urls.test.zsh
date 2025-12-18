@@ -39,7 +39,7 @@ test_service_urls_loads_all_services() {
     done
     
     # Test media services are defined
-    local media_services=("jellyfin" "overseerr")
+    local media_services=("plex" "overseerr")
     
     for service in $media_services; do
         if [[ -n "$SERVICE_URLS[$service]" ]]; then

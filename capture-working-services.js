@@ -8,7 +8,7 @@ const IMAGE_DIR = path.join(ROOT_DIR, 'docs', 'public', 'images', 'services');
 const REGISTRY_PATH = path.join(ROOT_DIR, 'docs', 'service-registry.json');
 
 const workingServices = [
-    { name: 'jellyfin', url: 'http://localhost:8096', desc: 'Media Server', features: 'Stream movies, TV shows, music with hardware transcoding' },
+    { name: 'plex', url: 'http://localhost:32400', desc: 'Media Server', features: 'Stream movies, TV shows, music with hardware transcoding' },
     { name: 'overseerr', url: 'http://localhost:5055', desc: 'Request Management', features: 'Media request management interface' },
     { name: 'yacreader', url: 'http://localhost:8083', desc: 'Comic Reader', features: 'Digital comic and manga library management' },
     { name: 'sonarr', url: 'http://localhost:8989', desc: 'TV Automation', features: 'Automatically manage series downloads' },
@@ -27,7 +27,7 @@ const workingServices = [
     { name: 'netdata', url: 'http://localhost:19999', desc: 'System Monitoring', features: 'Real-time system metrics' },
     { name: 'samba', url: 'smb://localhost', desc: 'File Sharing', features: 'Windows file sharing', skip: true },
     { name: 'stash', url: 'http://localhost:9998', desc: 'Media Organizer', features: 'Video library management' },
-    { name: 'tautulli', url: 'http://localhost:8181', desc: 'Usage Analytics', features: 'Monitor Jellyfin stream statistics' },
+    { name: 'tautulli', url: 'http://localhost:8181', desc: 'Usage Analytics', features: 'Monitor Plex stream statistics' },
     { name: 'usenet-docs', url: 'http://localhost:4173', desc: 'Documentation Site', features: 'VitePress-based docs' }
 ];
 

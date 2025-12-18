@@ -20,7 +20,7 @@ export default defineConfig({
     ['meta', { name: 'twitter:title', content: "Beppe's Arr Stack" }],
     ['meta', { name: 'twitter:description', content: 'Opinionated Usenet+torrent homelab stack with hot-swap storage and GPU assist.' }],
     ['meta', { name: 'twitter:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
-    ['meta', { name: 'keywords', content: 'media automation, docker, jellyfin, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
+    ['meta', { name: 'keywords', content: 'media automation, docker, plex, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
   ],
   // Allow dead links during local builds to keep CI green while docs are being realigned
   ignoreDeadLinks: true,

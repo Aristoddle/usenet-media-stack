@@ -41,18 +41,20 @@ services:
       - media_network
     restart: unless-stopped
 
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin-test
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex-test
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
+      - VERSION=docker
+      - PLEX_CLAIM=
     volumes:
-      - ./config/jellyfin:/config
-      - ./media:/data/media
+      - ./config/plex:/config
+      - ./media:/data
     ports:
-      - "20096:8096"
+      - "20324:32400"
     networks:
       - media_network
     restart: unless-stopped

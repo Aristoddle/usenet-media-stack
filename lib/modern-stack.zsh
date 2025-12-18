@@ -178,14 +178,14 @@ setup_homepage() {
           key: {{SABNZBD_API_KEY}}
           
 - Media Server:
-    - Jellyfin:
-        icon: jellyfin.svg
-        href: http://localhost:8096
+    - Plex:
+        icon: plex.svg
+        href: http://localhost:32400
         description: Media Streaming
         widget:
-          type: jellyfin
-          url: http://jellyfin:8096
-          key: {{JELLYFIN_API_KEY}}
+          type: plex
+          url: http://plex:32400
+          key: {{PLEX_API_KEY}}
 EOF
     
     # Deploy Homepage
@@ -264,8 +264,8 @@ services:
     networks:
       - media_network
     volumes:
-      - /var/log:/var/log:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:rw
+      - /var/lib/docker/containers:/var/lib/docker/containers:rw
       - ./config/promtail:/etc/promtail
     command: -config.file=/etc/promtail/config.yml
     
@@ -319,7 +319,7 @@ setup_service_discovery() {
     log_info "Configuring service discovery labels..."
     
     # Add labels to existing services
-    local services=(sonarr radarr prowlarr sabnzbd jellyfin)
+    local services=(sonarr radarr prowlarr sabnzbd plex)
     
     for service in $services; do
         # Check if service is running

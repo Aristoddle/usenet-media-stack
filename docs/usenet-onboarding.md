@@ -29,9 +29,9 @@
 3. Check logs if it stalls: SAB history, Arr “Activity” for import failures, Prowlarr API errors.
 
 ## 6) Folder mappings (this stack)
-- Host downloads: `/var/mnt/fast8tb/Local/downloads` (adjust per your `.env`).
-- Media roots: `/var/mnt/fast8tb/Local/media/movies`, `/var/mnt/fast8tb/Local/media/tv`.
-- Books: `/var/mnt/fast8tb/Cloud/OneDrive/Books` (comics/ebooks/audiobooks).
+- Host downloads: `${DOWNLOADS_ROOT}` (example: `/var/mnt/fast8tb/Local/downloads`).
+- Media roots: `${MEDIA_ROOT}/movies`, `${MEDIA_ROOT}/tv` (example: `/var/mnt/fast8tb/Local/media/<movies|tv>`).
+- Books: `${BOOKS_ROOT}` (comics/ebooks/audiobooks).
 - Containers see these as `/downloads`, `/movies`, `/tv`, `/books`, `/comics` via compose volume mappings.
 
 ## 7) Security & hygiene

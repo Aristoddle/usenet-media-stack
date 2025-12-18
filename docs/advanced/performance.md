@@ -10,8 +10,8 @@ how to tune compute, network, and storage layers for demanding workflows.
 
 ## Performance Baselines
 
-- **Transcoding**: Jellyfin with VAAPI should reach 60 FPS for 4K HEVC on
-  supported GPUs.
+- **Transcoding**: Plex hardware transcoding should reach 60 FPS for 4K HEVC on
+  supported GPUs (Plex Pass required for hardware acceleration).
 - **Downloads**: SABnzbd saturates gigabit links with tuned article cache
   and parallelism settings.
 - **Indexing**: Prowlarr updates should complete within five minutes even
@@ -28,13 +28,13 @@ how to tune compute, network, and storage layers for demanding workflows.
 Profiles adjust compose overrides to allocate CPU shares, memory limits,
 and GPU device mappings.
 
-## Jellyfin Optimisation
+## Plex Optimisation
 
 1. Install the latest drivers for your GPU family.
-2. Enable hardware transcoding in the Jellyfin dashboard and map `/dev/dri`
+2. Enable hardware transcoding in the Plex dashboard and map `/dev/dri`
    via the hardware profile.
-3. Set `FFmpeg` threads to match `nproc --all` minus one to reserve headroom
-   for other services.
+3. Keep transcoder temp on fast storage and leave 1-2 CPU cores free for
+   other services under sustained load.
 
 ## Download Pipeline
 

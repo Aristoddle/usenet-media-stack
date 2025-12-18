@@ -213,7 +213,7 @@ const managementActions = [
 ]
 
 const monitoringActions = [
-  { command: 'usenet services logs jellyfin', label: 'Jellyfin Logs' },
+  { command: 'usenet services logs plex', label: 'Plex Logs' },
   { command: 'usenet hardware list', label: 'Hardware Info' },
   { command: 'docker compose ps', label: 'Container Status' }
 ]
@@ -241,7 +241,7 @@ const getCommandOutput = (command) => {
       { type: 'info', content: '⚙️  Generating optimized Docker Compose configurations...' },
       { type: 'success', content: '✅ Hardware profile: <span class="value">High Performance (75% allocation)</span>' },
       { type: 'info', content: '🐳 Starting 19 services with GPU optimization...' },
-      { type: 'success', content: '✅ Jellyfin: <span class="value">Started with VAAPI transcoding</span>' },
+      { type: 'success', content: '✅ Plex: <span class="value">Started with hardware transcoding</span>' },
       { type: 'success', content: '✅ Sonarr: <span class="value">Started with TRaSH Guide profiles</span>' },
       { type: 'success', content: '✅ Radarr: <span class="value">Started with quality optimization</span>' },
       { type: 'success', content: '✅ Tdarr: <span class="value">GPU transcoding queue ready</span>' },
@@ -282,7 +282,7 @@ const getCommandOutput = (command) => {
     'usenet services list': [
       { type: 'info', content: '📊 <span class="highlight">Service Health Status</span>' },
       { type: 'step', content: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' },
-      { type: 'running', content: '🟢 <span class="service">jellyfin</span>      <span class="port">:8096</span>  <span class="status">Running</span> <span class="info">(4K VAAPI transcoding active)</span>' },
+      { type: 'running', content: '🟢 <span class="service">plex</span>         <span class="port">:32400</span> <span class="status">Running</span> <span class="info">(4K hardware transcoding active)</span>' },
       { type: 'running', content: '🟢 <span class="service">sonarr</span>        <span class="port">:8989</span>  <span class="status">Running</span> <span class="info">(TRaSH profiles loaded)</span>' },
       { type: 'running', content: '🟢 <span class="service">radarr</span>        <span class="port">:7878</span>  <span class="status">Running</span> <span class="info">(Quality profiles optimized)</span>' },
       { type: 'running', content: '🟢 <span class="service">prowlarr</span>      <span class="port">:9696</span>  <span class="status">Running</span> <span class="info">(Indexers synchronized)</span>' },

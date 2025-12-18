@@ -127,7 +127,3 @@ services:
           cpus: '0.25'
           memory: 256M
     restart: unless-stopped
-
-  # Disable Jellyfin in single-node/default runs (Plex is primary)
-  jellyfin:
-    profiles: ["disabled"]

@@ -8,9 +8,10 @@ All services are on the seed host; replace `localhost` with the host IP for LAN 
   - Quick test: `curl -s 'http://localhost:8080/api?mode=queue&output=json&apikey=<API>'`
 - **Transmission** – http://localhost:9091 (web) / RPC at `http://localhost:9091/transmission/rpc`  
   - No auth. Downloads: `/downloads/transmission/complete`; partials: `/downloads/transmission/incomplete`; watch: `/downloads/transmission/watch`.  
+  - Watch-folder tip: ensure `.torrent` files are readable by the container user (abc:users); e.g., `chmod 644` + correct owner.
   - Test RPC: `sid=$(curl -si http://localhost:9091/transmission/rpc | awk -F': ' 'tolower($1)==\"x-transmission-session-id:\"{print $2;exit}'|tr -d '\\r'); curl -s -H \"X-Transmission-Session-Id: $sid\" -d '{\"method\":\"session-get\"}' http://localhost:9091/transmission/rpc`
 - **Aria2** – XML-RPC at `http://localhost:6800/rpc` (Prowlarr) or JSON-RPC at `/jsonrpc` (manual)  
-  - Auth: Prowlarr expects the raw secret (it prepends `token:`); manual JSON-RPC uses `token:${ARIA2_SECRET}`. Downloads: `/downloads/aria2/complete`.  
+  - Auth: Prowlarr expects the raw secret (`${ARIA2_SECRET}`) and adds `token:` internally; manual XML/JSON-RPC should use `token:${ARIA2_SECRET}`. Downloads: `/downloads/aria2/complete`.  
   - Test: `curl -s -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":\"v\",\"method\":\"aria2.getVersion\",\"params\":[\"token:${ARIA2_SECRET}\"]}' http://localhost:6800/jsonrpc`
 
 ## Indexer/front-end
@@ -61,4 +62,4 @@ All services are on the seed host; replace `localhost` with the host IP for LAN 
 - Prowlarr/Sonarr/Radarr/Bazarr/Lidarr/Overseerr: no auth (LAN only)
 
 ## Notes on Prowlarr + Aria2
-- Prowlarr uses **XML-RPC** at `/rpc` and expects the secret **without** the `token:` prefix (it adds it). Manual curl uses JSON-RPC at `/jsonrpc`.
+- Prowlarr uses **XML-RPC** at `/rpc` and expects the raw secret (it prefixes `token:` itself). Manual curl uses JSON-RPC at `/jsonrpc` with `token:${ARIA2_SECRET}`.

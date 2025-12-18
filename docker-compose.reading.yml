@@ -7,11 +7,11 @@ services:
     environment:
       - TZ=Etc/UTC
     volumes:
-      - /mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks:/audiobooks
-      - /mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig:/config
-      - /mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig/metadata:/metadata
+      - ${AUDIOBOOKS_ROOT:-/srv/usenet/books/Audiobooks}:/audiobooks
+      - ${AUDIOBOOKSHELF_CONFIG:-/srv/usenet/config/audiobookshelf}:/config
+      - ${AUDIOBOOKSHELF_CONFIG:-/srv/usenet/config/audiobookshelf}/metadata:/metadata
       # Optional: add /podcasts when you decide on a canonical path
-      # - /mnt/fast8tb/Cloud/OneDrive/Books/Podcasts:/podcasts
+      # - ${PODCASTS_ROOT:-/srv/usenet/books/Podcasts}:/podcasts
     ports:
       - "13378:80"   # Audiobookshelf web
     restart: unless-stopped

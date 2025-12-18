@@ -91,6 +91,13 @@ volumes:
       o: addr=${NFS_SERVER},nolock,soft,rw
       device: ":${NFS_PATH}/config/overseerr"
 
+  plex_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_SERVER},nolock,soft,rw
+      device: ":${NFS_PATH}/config/plex"
+
   media_volume:
     driver: local
     driver_opts:
@@ -430,13 +437,13 @@ services:
       retries: 3
 
   # ================================
-  # Jellyfin - Media Server
+  # Plex - Media Server
   # Placement: High/medium performance nodes with GPU access
   # Works great on Steam Deck when it's not gaming!
   # ================================
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    hostname: jellyfin
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    hostname: plex
     networks:
       - media_network
       - traefik-public
@@ -444,8 +451,12 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=${TZ:-UTC}
+      - VERSION=docker
+      - PLEX_CLAIM=${PLEX_CLAIM:-}
     volumes:
-      - downloads_volume:/media
+      - plex_config:/config
+      - media_volume:/media
+      - downloads_volume:/downloads
     deploy:
       mode: replicated
       replicas: 1
@@ -459,10 +470,10 @@ services:
       labels:
         # Traefik routing
         - traefik.enable=true
-        - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
-        - traefik.http.routers.jellyfin.entrypoints=websecure
-        - traefik.http.routers.jellyfin.tls.certresolver=letsencrypt
-        - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+        - traefik.http.routers.plex.rule=Host(`plex.${DOMAIN}`)
+        - traefik.http.routers.plex.entrypoints=websecure
+        - traefik.http.routers.plex.tls.certresolver=letsencrypt
+        - traefik.http.services.plex.loadbalancer.server.port=32400
       resources:
         limits:
           cpus: '4.0'
@@ -476,7 +487,7 @@ services:
         max_attempts: 3
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8096"]
+      test: ["CMD", "curl", "-f", "http://localhost:32400"]
       interval: 30s
       timeout: 10s
       retries: 3

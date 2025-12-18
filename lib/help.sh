@@ -84,7 +84,7 @@ USAGE
 
 DESCRIPTION
     Deploy and configure the complete Usenet media automation stack.
-    Includes: SABnzbd, Sonarr, Radarr, Prowlarr, Jellyfin, and more.
+    Includes: SABnzbd, Sonarr, Radarr, Prowlarr, Plex, and more.
 
 OPTIONS
     --test-only         Run deployment in test mode (no changes)

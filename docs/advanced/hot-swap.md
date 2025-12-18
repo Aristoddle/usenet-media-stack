@@ -47,7 +47,7 @@ current hardware detection routines and JBOD best practices.
 ## Post-Swap Validation
 
 - Monitor Netdata for I/O anomalies over the first 24 hours.
-- Confirm Jellyfin and download clients have access to restored mounts.
+- Confirm Plex and download clients have access to restored mounts.
 - Schedule a SMART long test with `smartctl -t long` to baseline the disk.
 
 ## Troubleshooting

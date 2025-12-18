@@ -11,9 +11,9 @@ services:
     ports:
       - "20878:7878"
       
-  jellyfin:
+  plex:
     ports:
-      - "20096:8096"
+      - "20324:32400"
       
   overseerr:
     ports:

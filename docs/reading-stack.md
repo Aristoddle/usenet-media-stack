@@ -5,15 +5,24 @@
 - **Ebooks**: Kavita (in the main compose stack). Canonical path will be `/Books/Ebooks` once legacy folders are merged.
 - **Audiobooks**: Audiobookshelf via `docker-compose.reading.yml`.
 - **Podcasts**: Optional — add a `/Books/Podcasts` mount only when you decide on a canonical path.
-- **Kometa**: Optional (Plex-first metadata); config skeleton at `/var/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml`.
+- **Kometa**: Optional (Plex-first metadata); config at `${KOMETA_CONFIG:-/srv/usenet/config/kometa}/config.yml`.
 
-## Paths (OneDrive-backed on fast8tb mount)
+## Paths (set via `.env`)
+- `BOOKS_ROOT` (default `/srv/usenet/books`)
+- `COMICS_ROOT` (default `/srv/usenet/books/Comics`)
+- `EBOOKS_ROOT` (default `/srv/usenet/books/Ebooks`)
+- `AUDIOBOOKS_ROOT` (default `/srv/usenet/books/Audiobooks`)
+- `PODCASTS_ROOT` (default `/srv/usenet/books/Podcasts`)
+- `AUDIOBOOKSHELF_CONFIG` (default `/srv/usenet/config/audiobookshelf`)
+- `KOMETA_CONFIG` (if used; recommend `/srv/usenet/config/kometa`)
+
+Example (fast8tb + OneDrive):
 - Comics: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`
-- Ebooks (planned): `/var/mnt/fast8tb/Cloud/OneDrive/Books/Ebooks`
+- Ebooks: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Ebooks`
 - Audiobooks: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks`
-- Podcasts (optional): `/var/mnt/fast8tb/Cloud/OneDrive/Books/Podcasts` (not created yet)
-- Audiobookshelf config: `/var/mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig`
-- Kometa config: `/var/mnt/fast8tb/Cloud/OneDrive/KometaConfig`
+- Podcasts: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Podcasts`
+
+> Note: ensure your `.env` paths match your host before bringing up the reading stack.
 
 ## Compose (post-reboot)
 - Comics: `docker compose -f docker-compose.komga.yml up -d`
@@ -22,10 +31,10 @@
 
 ## Ordering / Constraints
 1. Start Docker, then bring up the reading stack compose files.
-2. Komga library path: `/comics` (host `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`). Run a rescan after library is set.
+2. Komga library path: `/comics` (host `${COMICS_ROOT}`). Run a rescan after library is set.
 3. Komf handles metadata once Komga is reachable.
 4. Kavita library paths should follow the finalized `/Books/Ebooks` layout.
-5. Kavita uses the official image; config bind is `/var/mnt/fast8tb/config/kavita` → `/kavita/config`.
+5. Kavita uses the official image; config bind is `${CONFIG_ROOT}/kavita` → `/kavita/config`.
 5. Books reorg plan: see `docs/books-reorg-plan.md`.
 
 ## OPDS / Clients

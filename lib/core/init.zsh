@@ -47,7 +47,7 @@ load_stack_config() {
         [bazarr]="http://${BAZARR_HOST:-localhost}:${BAZARR_PORT:-6767}"
         [mylar]="http://${MYLAR_HOST:-localhost}:${MYLAR_PORT:-8090}"
         [sabnzbd]="http://${SABNZBD_HOST:-localhost}:${SABNZBD_PORT:-8080}"
-        [jellyfin]="http://${JELLYFIN_HOST:-localhost}:${JELLYFIN_PORT:-8096}"
+        [plex]="http://${PLEX_HOST:-localhost}:${PLEX_PORT:-32400}"
         [overseerr]="http://${OVERSEERR_HOST:-localhost}:${OVERSEERR_PORT:-5055}"
         [portainer]="http://${PORTAINER_HOST:-localhost}:${PORTAINER_PORT:-9000}"
         [tautulli]="http://${TAUTULLI_HOST:-localhost}:${TAUTULLI_PORT:-8181}"

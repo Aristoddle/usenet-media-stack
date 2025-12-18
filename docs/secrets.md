@@ -4,12 +4,13 @@
 - `.env` (gitignored):
   - `PROWLARR_API_KEY`
   - NZB provider creds (e.g., `NZBGEK_API_KEY`, `SABNZBD_API_KEY`)
+  - `PLEX_CLAIM` (first-time Plex setup)
   - Domain overrides if needed (`DOMAIN`, `TZ`, etc.)
 - `config/recyclarr/secrets.yml` (gitignored):
   - `sonarr_api_key`
   - `radarr_api_key`
-- `/var/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml`: Plex token/URL for Kometa.
-- Audiobookshelf config lives under its `*Config` dir on OneDrive-backed disk.
+- `${KOMETA_CONFIG}/config.yml`: Plex token/URL for Kometa (if enabled).
+- Audiobookshelf config lives under `${AUDIOBOOKSHELF_CONFIG}`.
 
 ## Guidance
 - Keep `.env` out of git; copy from `.env.example` and fill in locally.

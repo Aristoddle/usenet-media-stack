@@ -8,7 +8,7 @@ const SCREENSHOT_DIR = path.join(ROOT_DIR, 'validation-screenshots');
 const RESULTS_PATH = path.join(ROOT_DIR, 'validation-results.json');
 
 const services = [
-    { name: 'jellyfin', url: 'http://localhost:8096', desc: 'Media Server' },
+    { name: 'plex', url: 'http://localhost:32400', desc: 'Media Server' },
     { name: 'overseerr', url: 'http://localhost:5055', desc: 'Request Management' },
     { name: 'prowlarr', url: 'http://localhost:9696', desc: 'Indexer Manager' },
     { name: 'sonarr', url: 'http://localhost:8989', desc: 'TV Automation' },
@@ -90,4 +90,7 @@ async function main() {
         JSON.stringify(results, null, 2)
     );
     
-    console.log(`💾 Results saved to: ${RESULTS_PATH}`);main().catch(console.error);
+    console.log(`💾 Results saved to: ${RESULTS_PATH}`);
+}
+
+main().catch(console.error);

@@ -83,9 +83,9 @@
           <!-- Media Servers -->
           <g class="service-group">
             <text x="500" y="270" text-anchor="middle" class="group-title">🎬 Media Servers</text>
-            <g class="service-node" @click.stop="selectService('jellyfin')">
-              <rect x="420" y="280" width="80" height="40" rx="5" fill="#2980b9" :class="{ active: selectedService === 'jellyfin' }"/>
-              <text x="460" y="305" text-anchor="middle" class="service-text">Jellyfin</text>
+            <g class="service-node" @click.stop="selectService('plex')">
+              <rect x="420" y="280" width="80" height="40" rx="5" fill="#2980b9" :class="{ active: selectedService === 'plex' }"/>
+              <text x="460" y="305" text-anchor="middle" class="service-text">Plex</text>
             </g>
             <g class="service-node" @click.stop="selectService('overseerr')">
               <rect x="520" y="280" width="80" height="40" rx="5" fill="#2980b9" :class="{ active: selectedService === 'overseerr' }"/>
@@ -259,7 +259,7 @@ const serviceDetails = {
   radarr: { name: 'Radarr', description: 'Movie automation with custom quality profiles - Currently not running due to port conflicts', port: '7878', type: 'Media Automation', status: 'stopped' },
   prowlarr: { name: 'Prowlarr', description: 'Universal indexer management for breaking paywall barriers - OPERATIONAL ✅', port: '9696', type: 'Media Automation', status: 'running' },
   bazarr: { name: 'Bazarr', description: 'Subtitle automation for 40+ languages - Currently not running due to port conflicts', port: '6767', type: 'Media Automation', status: 'stopped' },
-  jellyfin: { name: 'Jellyfin', description: 'Open-source media server with hardware transcoding - Currently not running due to port conflicts', port: '8096', type: 'Media Server', status: 'stopped' },
+  plex: { name: 'Plex', description: 'Media server with hardware transcoding', port: '32400', type: 'Media Server', status: 'running' },
   overseerr: { name: 'Overseerr', description: 'Beautiful request management interface - Currently not running due to port conflicts', port: '5055', type: 'Media Server', status: 'stopped' },
   tdarr: { name: 'Tdarr', description: 'Automated transcoding with GPU acceleration - Currently not running due to port conflicts', port: '8265', type: 'Processing', status: 'stopped' },
   yacreader: { name: 'YACReader', description: 'Comic/manga server and reader - OPERATIONAL ✅', port: '8083', type: 'Media Server', status: 'running' },

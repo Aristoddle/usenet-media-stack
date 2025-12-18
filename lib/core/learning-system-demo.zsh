@@ -130,8 +130,8 @@ demo_memory_management() {
     create_entity "docker_service" "overseerr" \
         '{"name": "overseerr", "port": 5055, "category": "requests", "description": "Media request management"}'
     
-    create_entity "docker_service" "jellyfin" \
-        '{"name": "jellyfin", "port": 8096, "category": "media", "description": "Media server"}'
+    create_entity "docker_service" "plex" \
+        '{"name": "plex", "port": 32400, "category": "media", "description": "Media server"}'
     
     create_entity "docker_service" "sonarr" \
         '{"name": "sonarr", "port": 8989, "category": "automation", "description": "TV show automation"}'

@@ -22,7 +22,7 @@ while aligning examples with the latest configuration layout in `config/`.
 ```
 config/
 ├── overrides/
-│   ├── jellyfin/
+│   ├── plex/
 │   ├── sonarr/
 │   └── radarr/
 ├── profiles/

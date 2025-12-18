@@ -210,7 +210,7 @@ const particles = ref([])
 
 // Demo data
 const demoServices = ref([
-  { id: 'jellyfin', name: 'Jellyfin', icon: '🎬', status: 'running', metric: '4K/60fps' },
+  { id: 'plex', name: 'Plex', icon: '🎬', status: 'running', metric: '4K/60fps' },
   { id: 'sonarr', name: 'Sonarr', icon: '📺', status: 'running', metric: '1.2K shows' },
   { id: 'radarr', name: 'Radarr', icon: '🎭', status: 'running', metric: '3.4K movies' },
   { id: 'tdarr', name: 'Tdarr', icon: '⚡', status: 'processing', metric: 'GPU active' },
