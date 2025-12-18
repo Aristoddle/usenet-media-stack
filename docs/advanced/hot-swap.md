@@ -19,6 +19,8 @@ current hardware detection routines and JBOD best practices.
 1. Confirm that `usenet storage list` returns the pool you plan to edit.
 2. Ensure recent backups exist for both configuration and media volumes.
 3. Verify that `systemd-udevd` rules are loaded for the enclosure.
+4. If OneDrive comics sync is running (GVFS + rsync), wait for it to complete
+   before any swap or reboot. Check `journalctl --user -u rsync-comics -f`.
 
 ## Swap Workflow
 

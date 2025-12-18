@@ -10,7 +10,7 @@
 ## Role separation (the “pachinko” model)
 - **Providers** (e.g., Newshosting, Eweka, UsenetExpress) store articles and honor takedowns; retention and completion vary.
 - **Indexers** (e.g., NZBGeek, DogNZB) watch binary groups, de-dup releases, and expose APIs/search; they usually require an invite/fee.
-- **Clients** (SABnzbd, NZBGet) download via NNTP using provider creds; automation tools (Sonarr/Radarr/Readarr/Whisparr/Lidarr) talk to indexers through Prowlarr and hand NZBs to the client.
+- **Clients** (SABnzbd, NZBGet) download via NNTP using provider creds; automation tools (Sonarr/Radarr/Whisparr/Lidarr) talk to indexers through Prowlarr and hand NZBs to the client.
 - **Why this matters:** keeping these roles separate reduces legal coupling—indexers list, providers serve, clients fetch.
 
 ## Binaries, NZBs, and retention
@@ -27,14 +27,14 @@
 - Respect local laws and copyrights; many groups host public-domain or permissively shared content—support creators when you can.
 
 ## How this stack uses Usenet
-- **Prowlarr** centralizes indexers and feeds them to Sonarr/Radarr/Readarr/Whisparr/Lidarr.
+- **Prowlarr** centralizes indexers and feeds them to Sonarr/Radarr/Whisparr/Lidarr.
 - **SABnzbd** (or NZBGet) downloads from your paid provider using NZB instructions.
 - **Arr apps** monitor your libraries, request from indexers, and hand NZBs to SABnzbd automatically.
 
 ## Finding and joining indexers
 - Public/paid: NZBGeek, DrunkenSlug (invite), DogNZB (invite). Each has APIs for Prowlarr.
 - Community reference threads often list current indexers and mirrors; expect churn and invites.
-- Keep `.env.local` up to date with API keys before running the stack.
+- Keep `.env` up to date with API keys before running the stack.
 
 ## Further reading
 - [Usenet (Wikipedia)](https://en.wikipedia.org/wiki/Usenet)

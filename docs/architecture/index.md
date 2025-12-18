@@ -18,10 +18,9 @@ Three core principles make this system work reliably across any hardware setup:
 <details>
 <summary>📋 <strong>Complete Service List</strong></summary>
 
-### **📺 Media Automation (6 Services)**
+### **📺 Media Automation (5 Services)**
 - **Sonarr** (8989) - TV show automation
 - **Radarr** (7878) - Movie automation  
-- **Readarr** (8787) - Book/audiobook automation
 - **Bazarr** (6767) - Subtitle automation for 40+ languages
 - **Prowlarr** (9696) - Universal indexer management
 - **Recyclarr** - Automatic quality optimization
@@ -107,13 +106,11 @@ Detects all your storage and lets you pick what to use:
 #### Canonical paths we use today (Bazzite host)
 | Purpose | Path (host) | Consumed by |
 |---------|-------------|-------------|
-| Comics library | `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` | Komga, (optional) Kometa, Kavita/Calibre if desired |
-| Ebooks | `/mnt/fast8tb/Cloud/OneDrive/Books` | Calibre, Calibre-Web |
-| Audiobooks | `/mnt/fast8tb/Cloud/OneDrive/Audiobooks` | Audiobookshelf |
-| Podcasts | `/mnt/fast8tb/Cloud/OneDrive/Podcasts` | Audiobookshelf |
-| Kometa config | `/mnt/fast8tb/Cloud/OneDrive/KometaConfig` | Kometa |
-| Calibre config | `/mnt/fast8tb/Cloud/OneDrive/CalibreConfig` | Calibre, Calibre-Web |
-| Audiobookshelf config | `/mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig` | Audiobookshelf |
+| Comics library | `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` | Komga, (optional) Kometa, Kavita |
+| Ebooks (planned layout) | `/var/mnt/fast8tb/Cloud/OneDrive/Books/Ebooks` | Kavita |
+| Audiobooks | `/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks` | Audiobookshelf |
+| Kometa config | `/var/mnt/fast8tb/Cloud/OneDrive/KometaConfig` | Kometa |
+| Audiobookshelf config | `/var/mnt/fast8tb/Cloud/OneDrive/AudiobookshelfConfig` | Audiobookshelf |
 | OneDrive comics source (GVFS) | `/run/user/1000/gvfs/onedrive:host=gmail.com,user=J3lanzone/Bundles_b896e2bb7ca3447691823a44c4ad6ad7/Books/Comics/` | rsync-comics (source) |
 
 Keep configs on the OneDrive-backed disk so backups/versioning are automatic; media paths stay consistent across Podman and Docker.

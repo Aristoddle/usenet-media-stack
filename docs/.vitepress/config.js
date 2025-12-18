@@ -37,7 +37,9 @@ export default defineConfig({
           { text: 'Ops Runbook', link: '/ops-runbook' },
           { text: 'Usenet Primer', link: '/usenet-primer' },
           { text: 'Usenet Onboarding', link: '/usenet-onboarding' },
+          { text: 'TRaSH Guides', link: '/trash-guides' },
           { text: 'Reading Stack', link: '/reading-stack' },
+          { text: 'Books Reorg Plan', link: '/books-reorg-plan' },
           { text: 'Komics TODO', link: '/TODO-komics-stack' },
           { text: 'FAQ', link: '/faq' }
         ]

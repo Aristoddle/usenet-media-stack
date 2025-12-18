@@ -17,27 +17,28 @@
 - For Podman: `podman --version` and `podman info --debug`
 
 ## Paths (used by the stack)
-- Media root: `/mnt/fast8tb/Cloud/OneDrive`
+- Media root (books): `/var/mnt/fast8tb/Cloud/OneDrive`
   - Comics: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`
-  - Ebooks: `/mnt/fast8tb/Cloud/OneDrive/Books`
-  - Audiobooks: `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`
-  - Configs: `/mnt/fast8tb/Cloud/OneDrive/*Config`
+  - Ebooks (planned layout): `/var/mnt/fast8tb/Cloud/OneDrive/Books/Ebooks`
+  - Audiobooks: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks`
+  - Configs: `/var/mnt/fast8tb/Cloud/OneDrive/*Config`
+- Media root (video): `/var/mnt/fast8tb/Local/media`
 - OneDrive source (GVFS): `/run/user/1000/gvfs/onedrive:host=gmail.com,user=J3lanzone/Bundles_b896e2bb7ca3447691823a44c4ad6ad7/Books/Comics/`
 
 ## Clone and configure
 ```bash
 git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
-cp .env.example .env.local   # fill in your API keys (Prowlarr/NZBs, etc.)
+cp .env.example .env   # fill in your API keys (Prowlarr/NZBs, etc.)
 ```
 
 ## First bring-up (after choosing runtime)
-- **Podman (Bazzite, now):** Comics only: `podman compose -f docker-compose.komga.yml up -d` (Komga+Komf). Other reading services: `podman compose -f docker-compose.reading.yml up -d` post-reboot if desired.
-- **Docker (post-reboot):** `docker compose -f docker-compose.komga.yml up -d` (comics), plus `docker compose -f docker-compose.reading.yml up -d` (Calibre/Audiobookshelf), then `docker compose up -d` for the main stack.
+- **Podman (Bazzite, now):** Comics only: `podman compose -f docker-compose.komga.yml up -d` (Komga+Komf). Audiobookshelf is in `docker-compose.reading.yml` post-reboot if desired.
+- **Docker (post-reboot):** `docker compose -f docker-compose.komga.yml up -d` (comics), plus `docker compose -f docker-compose.reading.yml up -d` (Audiobookshelf), then `docker compose up -d` for the main stack.
 
 ## Verify
 - Komga: `http://localhost:8081` (after comics sync, add library `/comics`).
-- Reading stack (after Docker): Calibre `:18080/18081`, Calibre-Web `:18083`, Audiobookshelf `:13378`.
+- Reading stack (after Docker): Audiobookshelf `:13378`.
 
 ## Notes on OneDrive comics sync
 - Active user service: `rsync-comics.service` (systemd-run). Monitor: `journalctl --user -u rsync-comics -f`.

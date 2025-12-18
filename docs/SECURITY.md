@@ -150,6 +150,8 @@ BASIC_AUTH_USERS=username:$2y$10$...
 
 ## 🔍 Security Checklist
 
+> This checklist is a pre-exposure hardening guide. Track active items in the KG under `task-secrets`, `task-traefik`, and `task-ops-monitoring` to avoid drift.
+
 - [ ] All credentials in `.env` file
 - [ ] `.env` added to `.gitignore`
 - [ ] No ports exposed to internet (using Cloudflare Tunnel)

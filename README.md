@@ -1,14 +1,15 @@
 # 🎬 Beppe's Arr Stack
 
-> Current, tested snapshot (Dec 16, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata. Jellyfin is optional/disabled; Plex is primary for streaming. Torrent client is Transmission behind Mullvad/gluetun on host port 9091; services are loopback-only (Traefik routes pending).
+> Current, tested snapshot (Dec 17, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Portainer/Netdata + Kavita. Jellyfin is optional/disabled; Plex is primary for streaming. Transmission/Aria2 exposed on host (no Traefik yet); services are loopback/LAN-only.
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
-[![Services](https://img.shields.io/badge/Working%20Services-live%20snapshot-green.svg)](docs/SERVICES.md)
+[![Services](https://img.shields.io/badge/Working%20Services-see%20docs%2FSERVICES-green.svg)](docs/SERVICES.md)
 [![Platform](https://img.shields.io/badge/Platform-Linux-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Validated](https://img.shields.io/badge/Tested-2025--12--16-green.svg)](docs/SERVICES.md)
 
-**Real functionality over aspirational claims. Tested and validated working services on the Bazzite seed node.**
+**Real functionality over aspirational claims. Tested and validated working services on the Bazzite seed node (see docs/SERVICES.md for the current count; downloader endpoints summarized in [`downloaders_readme.md`](downloaders_readme.md)).**  
+Project memory/KG conventions: [`MEMORY_SPEC.md`](MEMORY_SPEC.md).
 
 > **State of the stack (Dec 16, 2025)**  
 > - Comics library now at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (copy complete)  
@@ -16,7 +17,7 @@
 > - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
 > - Jellyfin disabled (Plex is primary)
 
-## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)**
+## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)** _(site currently stale; see docs/ and README notes for up-to-date paths & services)_
 
 <div align="center">
 
@@ -47,13 +48,15 @@ Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick mat
 
 **Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex; Jellyfin optional.
 
-### **What Actually Works (Dec 2025)** ✅
+### **What Actually Works (Dec 17, 2025)** ✅
 ```bash
 # Core automation
 prowlarr     (9696)  # indexers
 sonarr       (8989)  # TV
 radarr       (7878)  # Movies
 sabnzbd      (8080)  # Usenet DL
+transmission (9091)  # Torrents (LAN)
+aria2        (6800)  # Torrents (RPC)
 overseerr    (5055)  # Requests
 
 # Libraries
@@ -66,7 +69,8 @@ whisparr     (6969)        # Adult/alt
 tdarr        (8265)        # Transcoding
 portainer    (9000)        # Containers
 netdata      (19999)       # Metrics
-docs         (4173)        # Site
+docs         (4173)        # Site (stale)
+kavita       (5000)        # Reader
 ```
 
 **📊 Current status**
@@ -227,7 +231,6 @@ usenet-media-stack/
 📺 Media Automation
 ├── Sonarr (8989)     → TV show automation with TRaSH Guide
 ├── Radarr (7878)     → Movie automation with 4K remux priority  
-├── Readarr (8787)    → Book/audiobook automation
 ├── Bazarr (6767)     → Subtitle automation (40+ languages)
 └── Prowlarr (9696)   → Universal indexer management
 

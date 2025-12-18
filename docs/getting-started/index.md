@@ -13,20 +13,20 @@ Try our commands directly in this interactive terminal simulator:
 ```bash
 git clone https://github.com/Aristoddle/usenet-media-stack.git
 cd usenet-media-stack
-cp .env.example .env.local   # fill provider/API keys
+cp .env.example .env   # fill provider/API keys
 docker compose up -d         # after Docker is installed
 ```
 
 ## Bazzite / Podman-first
 - Use Komga on Podman (already running) while transfers finish.
-- After reboot (when ready): enable Docker, then `docker compose up -d` plus optional `-f docker-compose.reading.yml` for Calibre/Audiobookshelf.
+- After reboot (when ready): enable Docker, then `docker compose up -d` plus optional `-f docker-compose.reading.yml` for Audiobookshelf.
 
 ## What You Get
 
-- 19 integrated services (Sonarr, Radarr, Jellyfin, etc.)
+- A working subset of the media stack (see `docs/SERVICES.md` for the live count)
 - Hot-swappable JBOD drive support
 - Hardware-optimized transcoding
-- Secure Cloudflare tunnel access
+- Optional Cloudflare tunnel access (if enabled)
 
 ## Next Steps
 

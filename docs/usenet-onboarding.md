@@ -10,16 +10,16 @@
 ## 2) Pick an indexer
 - Indexers observe binary groups and publish NZBs. They are separate from providers.
 - Examples: NZBGeek (paid/public), DogNZB/DrunkenSlug (invite). Import into Prowlarr so all Arr apps share one place for indexers.
-- In Prowlarr: add the indexer → set API key → Sync to Sonarr/Radarr/Readarr/Whisparr/Lidarr with “Sync Level: Full Sync”.
+- In Prowlarr: add the indexer → set API key → Sync to Sonarr/Radarr/Whisparr/Lidarr with “Sync Level: Full Sync”.
 
 ## 3) Configure the download client
 - Use SABnzbd (default in this stack). Set host/port/API key in Prowlarr and Arr apps.
-- Paths: set SAB “Completed Download Folder” to `/downloads/completed` (maps to host downloads path).
+- Paths: set SAB “Completed Download Folder” to `/downloads/sabnzbd/complete` (maps to host downloads path).
 - Enable SSL and set connection count to your provider’s allowed max.
 
 ## 4) Wire the Arr apps
-- In each Arr app, add your media root: Movies → `/movies`, TV → `/tv`, Books → `/books`, Comics → `/comics` (adjust to your host mapping).
-- Quality/Profiles: pick TRaSH guides or your own; keep them consistent across Arr apps for fewer mismatches.
+- In each Arr app, add your media root: Movies → `/movies`, TV → `/tv`, Music → `/music`, Comics → `/comics` (adjust to your host mapping).
+- Quality/Profiles: pick TRaSH guides or your own; keep them consistent across Arr apps for fewer mismatches. See [TRaSH Guides alignment](/trash-guides).
 - Connect Download Client: SABnzbd via API key.
 - Connect Indexer: use Prowlarr “Sync App” to push configs automatically.
 
@@ -29,8 +29,9 @@
 3. Check logs if it stalls: SAB history, Arr “Activity” for import failures, Prowlarr API errors.
 
 ## 6) Folder mappings (this stack)
-- Host downloads: `/mnt/fast8tb/Cloud/OneDrive/Downloads` (adjust per your `.env.local`).
-- Media roots: `/mnt/fast8tb/Cloud/OneDrive/Movies`, `/tv`, `/books`, `/comics`.
+- Host downloads: `/var/mnt/fast8tb/Local/downloads` (adjust per your `.env`).
+- Media roots: `/var/mnt/fast8tb/Local/media/movies`, `/var/mnt/fast8tb/Local/media/tv`.
+- Books: `/var/mnt/fast8tb/Cloud/OneDrive/Books` (comics/ebooks/audiobooks).
 - Containers see these as `/downloads`, `/movies`, `/tv`, `/books`, `/comics` via compose volume mappings.
 
 ## 7) Security & hygiene

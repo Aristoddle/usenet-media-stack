@@ -1,39 +1,34 @@
 # Working Services Documentation
 
-**Status**: Live snapshot (Dec 2025) — core automation online; streaming via Plex (Jellyfin optional/disabled).
-
-This reflects current, tested functionality on the Bazzite host.
+**Status**: Live snapshot (Dec 17, 2025) — core automation online; streaming via Plex (Jellyfin optional/disabled). This is the single source of truth for working services.
 
 ## 🎯 Core Working Services
 
 ### 🔍 Search & Automation
-- **[Prowlarr](http://localhost:9696)** — unified indexers (Newznab configured)
-- **[Sonarr](http://localhost:8989)** — TV automation (wired to SABnzbd)
-- **[Radarr](http://localhost:7878)** — Movie automation (wired to SABnzbd)
-- **[SABnzbd](http://localhost:8080)** — Usenet downloader (categories tv/movies set)
-- **[Overseerr](http://localhost:5055)** — Request management
+- **Prowlarr** — http://localhost:9696
+- **Sonarr** — http://localhost:8989
+- **Radarr** — http://localhost:7878
+- **SABnzbd** — http://localhost:8080
+- **Transmission** — http://localhost:9091
+- **Aria2** — http://localhost:6800/jsonrpc (RPC)
+- **Overseerr** — http://localhost:5055
 
 ### 📚 Libraries
-- **[Komga](http://localhost:8081)** / **[Komf](http://localhost:8085)** — comics/PDF + metadata
-- **[Mylar](http://localhost:8090)** — comics automation
-- **[Whisparr](http://localhost:6969)** — adult/alt media
+- **Komga** — http://localhost:8081
+- **Komf** — http://localhost:8085
+- **Mylar** — http://localhost:8090
+- **Whisparr** — http://localhost:6969
+- **Kavita** — http://localhost:5000
 
 ### 🛠 Processing & Management
-- **[Tdarr](http://localhost:8265)** — transcoding
-- **[Portainer](http://localhost:9000)** — container management
-- **[Netdata](http://localhost:19999)** — host metrics
-- **Docs** (http://localhost:4173) — VitePress site
-- **Traefik** — running on 80/443 (routes pending; dashboard 8082)
+- **Tdarr** — http://localhost:8265
+- **Portainer** — http://localhost:9000
+- **Netdata** — http://localhost:19999
+- **Docs site** — http://localhost:4173 (stale)
 
-## ❌ Not in scope / retired
-- Readarr (project archived Jun 2025)
-- Jellyfin (disabled; Plex is primary)
-- YACReader (superseded by Komga)
-
-**What's Missing**:
-- ❌ **TV/Movie Automation**: Sonarr/Radarr not functional
-- ❌ **Download Management**: SABnzbd issues
-- ❌ **Request Interface**: Overseerr problems
+### ❌ Disabled / not in scope
+- Jellyfin (disabled; Plex primary)
+- Traefik routes (not wired)
 
 ## 📸 Service Screenshots
 
@@ -42,7 +37,6 @@ All services have been validated with visual confirmation:
 - [Jellyfin Interface](./public/images/services/jellyfin.png)
 - [Prowlarr Dashboard](./public/images/services/prowlarr.png)  
 - [Portainer Management](./public/images/services/portainer.png)
-- [Readarr Library](./public/images/services/readarr.png)
 - [Bazarr Subtitles](./public/images/services/bazarr.png)
 - [Tdarr Processing](./public/images/services/tdarr.png)
 - [YACReader Comics](./public/images/services/yacreader.png)
@@ -57,7 +51,6 @@ Prowlarr:  http://localhost:9696  # Indexer management
 Portainer: http://localhost:9000  # Container management
 
 # Automation Services (All Working)
-Readarr:   http://localhost:8787  # Books
 Bazarr:    http://localhost:6767  # Subtitles
 Tdarr:     http://localhost:8265  # Transcoding
 YACReader: http://localhost:8083  # Comics
@@ -78,22 +71,14 @@ YACReader: http://localhost:8083  # Comics
 
 ## 🔧 Technical Notes
 
-### Validation Method
-- **Playwright automated testing** - Visual confirmation of service interfaces
-- **Direct HTTP testing** - Endpoint accessibility verification  
-- **Container status validation** - Docker health checks
-- **Port mapping verification** - Network accessibility
+### Validation Method (Dec 17, 2025)
+- Direct HTTP/API checks for each running container
+- Docker health/status inspection
+- Manual RPC tests: Transmission, Aria2, SABnzbd
 
-### Performance
-- **7/19 total services working** (37% of full stack)
-- **7/13 core services working** (54% of essential functionality)
-- **All working services provide real user value**
-
-### Architecture Decisions
-- Focus on **working subset** rather than broken automation
-- **Honest documentation** over aspirational claims
-- **Visual proof** of functionality via screenshots
-- **Incremental improvement** rather than full-stack fixes
+### Summary
+- Working services: 16/23 (listed above)
+- Disabled/retired: Jellyfin, Traefik routes
 
 ---
 

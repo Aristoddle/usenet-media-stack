@@ -1,4 +1,4 @@
-# Local Endpoints (loopback only)
+# Local Endpoints (loopback / LAN)
 
 > Quick launcher for services when running the stack locally on this machine. All links are `http://localhost` and assume default ports and the current compose files. If a link 404s, check that the service is up with `docker ps` and that Traefik isn’t overriding ports.
 
@@ -9,13 +9,14 @@
 - Lidarr: [http://localhost:8686](http://localhost:8686)
 - Whisparr: [http://localhost:6969](http://localhost:6969)
 - SABnzbd: [http://localhost:8080](http://localhost:8080)
-- Transmission (via gluetun VPN): [http://localhost:9091](http://localhost:9091) (UI proxied through gluetun)
+- Transmission: [http://localhost:9091](http://localhost:9091)
+- Aria2 (RPC only): [http://localhost:6800/jsonrpc](http://localhost:6800/jsonrpc)
 
 ## Comics / books
 - Mylar: [http://localhost:8090](http://localhost:8090)
 - Komga: [http://localhost:8081](http://localhost:8081)
-- Komf: [http://localhost:8085](http://localhost:8085)
-- Calibre-web (stack calibre): [http://localhost:18080](http://localhost:18080)
+- Komf (Komelia UI): [http://localhost:8085](http://localhost:8085)
+- Kavita: [http://localhost:5000](http://localhost:5000)
 - Audiobookshelf: [http://localhost:13378](http://localhost:13378)
 
 ## Requests / oversight
@@ -27,14 +28,13 @@
 - Tdarr node: [http://localhost:8266](http://localhost:8266)
 
 ## Ingress / docs
-- Traefik dashboard: [http://localhost:8082](http://localhost:8082) (insecure, for local only)
+- Traefik dashboard: [http://localhost:8082](http://localhost:8082) (disabled/not routed)
 - Docs (VitePress dev/preview): [http://localhost:4173](http://localhost:4173)
-- Usenet Docs container: [http://localhost:4173](http://localhost:4173) (nginx serving built docs)
 
 ## Media servers
 - Jellyfin (if enabled): [http://localhost:8096](http://localhost:8096)
 - Stash: [http://localhost:9998](http://localhost:9998)
 
 ### Notes
-- Torrent traffic is routed through Mullvad via gluetun; if gluetun is down, Transmission UI may be unreachable.
+- Torrent traffic is direct (no VPN) in this snapshot.
 - If you override ports or enable Traefik host rules, update this page accordingly.

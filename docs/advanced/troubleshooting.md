@@ -39,6 +39,21 @@ remediation steps for the most common production issues.
 - Review Netdata dashboards for CPU steal or iowait spikes.
 - Restart automation containers with `./usenet services restart <name>`.
 
+### Transmission Watch Folder Not Importing
+
+1) **Confirm settings**
+   - `watch-dir-enabled` should be `true`.
+   - `watch-dir` should match the container path (often `/downloads/watch`).
+2) **Verify volume mapping**
+   - Ensure the host watch directory is mounted to the expected container path.
+3) **Permissions**
+   - Confirm the container UID/GID can read the watch folder.
+4) **Filesystem + inotify**
+   - Watch folders rely on inotify; some network mounts or GVFS paths can fail.
+   - Check `fs.inotify.max_user_watches` if you expect many files.
+5) **Dry test**
+   - Drop a small `.torrent` into the watch folder and tail logs for import activity.
+
 ### Failed Updates
 
 - Re-run `./usenet deploy --auto` to reapply Compose templates.

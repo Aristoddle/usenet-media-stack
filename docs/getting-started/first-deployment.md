@@ -13,8 +13,8 @@
      ```
 
 3) **Config files**
-   - Copy `.env.example` → `.env.local` and add Prowlarr/NZB/SAB creds.
-   - Kometa config skeleton: `/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml` (Plex token/URL placeholders).
+   - Copy `.env.example` → `.env` and add Prowlarr/NZB/SAB creds.
+   - Kometa config skeleton: `/var/mnt/fast8tb/Cloud/OneDrive/KometaConfig/config.yml` (Plex token/URL placeholders).
 
 4) **Bring up services**
    - Reading stack (after Docker):
@@ -29,16 +29,16 @@
 
 5) **Add libraries**
    - Komga: add library pointing to `/comics` (maps to `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`).
-   - Audiobookshelf: set library `/audiobooks` → `/mnt/fast8tb/Cloud/OneDrive/Audiobooks`.
-   - Calibre-Web: point to `/books` → `/mnt/fast8tb/Cloud/OneDrive/Books`.
+   - Audiobookshelf: set library `/audiobooks` → `/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks`.
+   - Kavita: add libraries for `/comics` and `/downloads` (and `/books` once `/Books/Ebooks` is finalized).
 
 6) **OPDS endpoints**
    - Komga: `http://<host>:8081/opds/v1.2`
-   - Calibre-Web: `http://<host>:18083/opds`
+   - Kavita: `http://<host>:5000/opds`
 
 7) **Health & cleanup**
    - Check containers: `docker ps`.
    - Ensure healthchecks are present for Bazarr/Overseerr/Jellyfin/Tdarr when you bring the main stack up; reapply if missing.
 
 8) **Backup configs**
-   - All configs live under OneDrive-backed paths on `/mnt/fast8tb/Cloud/OneDrive/*Config`. Snapshot them once services are running.
+   - All configs live under OneDrive-backed paths on `/var/mnt/fast8tb/Cloud/OneDrive/*Config`. Snapshot them once services are running.

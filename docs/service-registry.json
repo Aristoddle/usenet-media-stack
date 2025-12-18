@@ -1,8 +1,8 @@
 {
   "metadata": {
     "capturedAt": "2025-05-28T07:39:02.590Z",
-    "workingServices": 22,
-    "totalServices": 22,
+    "workingServices": 21,
+    "totalServices": 21,
     "successRate": "100%"
   },
   "services": [
@@ -12,7 +12,6 @@
     {"service":"sonarr","title":"Sonarr","url":"http://localhost:8989","desc":"TV Automation","features":"Automatically manage series downloads","status":"documented"},
     {"service":"radarr","title":"Radarr","url":"http://localhost:7878","desc":"Movie Automation","features":"Automatically manage movie downloads","status":"documented"},
     {"service":"prowlarr","title":"Prowlarr","url":"http://localhost:9696","desc":"Indexer Manager","features":"Unified indexer management for usenet and torrent sources","status":"documented"},
-    {"service":"readarr","title":"Readarr","url":"http://localhost:8787","desc":"Book Automation","features":"Automated book and audiobook downloading and organization","status":"documented"},
     {"service":"bazarr","title":"Bazarr","url":"http://localhost:6767","desc":"Subtitle Automation","features":"Automatic subtitle downloading","status":"documented"},
     {"service":"whisparr","title":"Whisparr","url":"http://localhost:6969","desc":"Adult Content Automation","features":"Automated adult content management","status":"documented"},
     {"service":"mylar","title":"Mylar","url":"http://localhost:8090","desc":"Comic Automation","features":"Automated comic downloading and organization","status":"documented"},

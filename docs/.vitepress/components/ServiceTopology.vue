@@ -143,7 +143,6 @@ const services = [
   { id: 'radarr', label: 'Radarr', group: 'Media Automation', port: '7878', status: 'running', description: 'Movie automation with custom quality profiles' },
   { id: 'prowlarr', label: 'Prowlarr', group: 'Media Automation', port: '9696', status: 'running', description: 'Universal indexer management' },
   { id: 'bazarr', label: 'Bazarr', group: 'Media Automation', port: '6767', status: 'running', description: 'Subtitle automation for 40+ languages' },
-  { id: 'readarr', label: 'Readarr', group: 'Media Automation', port: '8787', status: 'running', description: 'Book/audiobook automation' },
   { id: 'recyclarr', label: 'Recyclarr', group: 'Media Automation', port: 'N/A', status: 'running', description: 'Automatic TRaSH Guide optimization' },
   
   // Media Servers
@@ -181,7 +180,6 @@ const connections = [
   // Prowlarr feeds indexers to *arr apps
   { from: 'prowlarr', to: 'sonarr', type: 'indexer-feed', label: 'Indexer Config' },
   { from: 'prowlarr', to: 'radarr', type: 'indexer-feed', label: 'Indexer Config' },
-  { from: 'prowlarr', to: 'readarr', type: 'indexer-feed', label: 'Indexer Config' },
   { from: 'prowlarr', to: 'whisparr', type: 'indexer-feed', label: 'Indexer Config' },
   { from: 'prowlarr', to: 'mylar', type: 'indexer-feed', label: 'Indexer Config' },
   
@@ -190,7 +188,6 @@ const connections = [
   { from: 'sonarr', to: 'transmission', type: 'download', label: 'Download Request' },
   { from: 'radarr', to: 'sabnzbd', type: 'download', label: 'Download Request' },
   { from: 'radarr', to: 'transmission', type: 'download', label: 'Download Request' },
-  { from: 'readarr', to: 'sabnzbd', type: 'download', label: 'Download Request' },
   
   // Download clients notify completion
   { from: 'sabnzbd', to: 'sonarr', type: 'completion', label: 'Download Complete' },

@@ -60,13 +60,12 @@ const serviceData = {
   automation: {
     sonarr: { port: 8989, type: 'tv-automation', cpu: 'medium', connections: ['sabnzbd', 'transmission', 'prowlarr', 'jellyfin'] },
     radarr: { port: 7878, type: 'movie-automation', cpu: 'medium', connections: ['sabnzbd', 'transmission', 'prowlarr', 'jellyfin'] },
-    prowlarr: { port: 9696, type: 'indexer-manager', cpu: 'medium', connections: ['sonarr', 'radarr', 'readarr'] },
+    prowlarr: { port: 9696, type: 'indexer-manager', cpu: 'medium', connections: ['sonarr', 'radarr'] },
     bazarr: { port: 6767, type: 'subtitle-automation', cpu: 'low', connections: ['sonarr', 'radarr'] },
-    recyclarr: { port: null, type: 'config-sync', cpu: 'low', connections: ['sonarr', 'radarr'] },
-    readarr: { port: 8787, type: 'book-automation', cpu: 'low', connections: ['sabnzbd', 'prowlarr'] }
+    recyclarr: { port: null, type: 'config-sync', cpu: 'low', connections: ['sonarr', 'radarr'] }
   },
   download: {
-    sabnzbd: { port: 8080, type: 'usenet-client', cpu: 'medium', connections: ['sonarr', 'radarr', 'readarr'] },
+    sabnzbd: { port: 8080, type: 'usenet-client', cpu: 'medium', connections: ['sonarr', 'radarr'] },
     transmission: { port: 9091, type: 'torrent-client', cpu: 'medium', connections: ['sonarr', 'radarr'] }
   },
   infrastructure: {

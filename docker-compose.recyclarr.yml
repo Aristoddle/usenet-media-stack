@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:latest
+    container_name: recyclarr
+    environment:
+      - TZ=Etc/UTC
+      # Example: run daily at 03:15 local time
+      - CRON_SCHEDULE=15 3 * * *
+    volumes:
+      - ./config/recyclarr:/config
+    restart: unless-stopped

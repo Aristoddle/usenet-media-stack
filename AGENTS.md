@@ -1,9 +1,9 @@
 # Agents Guide (Truthful State & Priorities)
 
-## Current Truth (2025-12-13)
+## Current Truth (2025-12-18)
 - Supported runtime (full stack): **rootful Docker Engine + Docker Compose v2**.
 - Podman: **not supported for the full stack** (privileged/low ports, docker.sock consumers, Swarm assumptions). OK only for scoped/light services if explicitly noted.
-- Validated services: **7/23 working** per `docs/SERVICES.md` (Jellyfin, Prowlarr, Portainer, Readarr, Bazarr, Tdarr, YACReader). README claims of 22/23 are outdated.
+- Validated services: **see `docs/SERVICES.md`** (single source of truth). Readarr and Calibre are dropped to avoid drift.
 - Cloudflare: API token is present in docs/scripts → treat as compromised; must be rotated and scrubbed from history.
 - Paths: many docs/examples use machine-specific paths (`/run/media/deck/...`). `.env.example` also uses non-portable defaults.
 - Website: published site is stale (Roadmap last updated Jan 2025) and does not reflect current docs.

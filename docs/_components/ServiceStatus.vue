@@ -66,13 +66,6 @@ export default {
           status: 'working'
         },
         {
-          name: 'Readarr',
-          description: 'Book Automation - Books and audiobooks',
-          port: 8787,
-          url: 'http://localhost:8787',
-          status: 'working'
-        },
-        {
           name: 'Bazarr',
           description: 'Subtitle Automation - Multi-language subtitles',
           port: 6767,

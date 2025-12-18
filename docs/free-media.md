@@ -8,9 +8,9 @@ This is the most comprehensive free media resource collection on the internet. W
 
 ### 🗂️ **Self-Hosted Libraries (your stack)**
 - **Komga (Comics/OPDS)**: `http://<host>:8081` • OPDS: `http://<host>:8081/opds/v1.2`
-- **Calibre-Web (Ebooks/OPDS)**: `http://<host>:18083` • OPDS: `http://<host>:18083/opds`
+- **Kavita (Ebooks/Comics)**: `http://<host>:5000` • OPDS: `http://<host>:5000/opds`
 - **Audiobookshelf (Audiobooks/Podcasts)**: `http://<host>:13378`
-- Bring-up file: `docker-compose.reading.yml` (Calibre, Calibre-Web, Audiobookshelf). See [Reading Stack](/reading-stack).
+- Bring-up file: `docker-compose.reading.yml` (Audiobookshelf). See [Reading Stack](/reading-stack).
 
 ### 📧 **Need a hand?**
 If something’s broken, file an issue on GitHub. If you need setup help or can’t locate a book/paper/game you already have rights to read/view/play (e.g., offline/backup copy), reach out directly. Please include proof of ownership/licensing (receipt, library checkout, existing file metadata) so I can help faster.
@@ -58,7 +58,7 @@ If something’s broken, file an issue on GitHub. If you need setup help or can�
 
 ### **Comic & Manga Management**
 - **[YACReader](https://www.yacreader.com/)** - Professional comic reading and library management
-- **[Calibre](https://calibre-ebook.com/)** - E-book management with comic support
+- **[Kavita](https://www.kavitareader.com/)** - Self-hosted ebook/comics server
 - **[ComicRack](https://www.comicscape.co.uk/ComicRack/)** - Windows comic book reader and organizer
 - **[Vimm's Lair](https://vimm.net/)** - Preservation-focused classic console manuals/ROM info (reference)
 

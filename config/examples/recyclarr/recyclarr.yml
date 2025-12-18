@@ -1,0 +1,26 @@
+# Recyclarr example config (TRaSH Guides templates)
+# Copy to config/recyclarr/recyclarr.yml and keep API keys in config/recyclarr/secrets.yml
+# Use "recyclarr config list templates --includes" to pick the right 4K HDR templates.
+
+sonarr:
+  main:
+    # Use http://sonarr:8989 when running Recyclarr in Docker on the same compose network.
+    # Use http://localhost:8989 if running Recyclarr on the host.
+    base_url: http://sonarr:8989
+    api_key: !secret sonarr_api_key
+    include:
+      - template: sonarr-quality-definition-series
+      # 4K HDR target: confirm include IDs with `recyclarr config list templates --includes`
+      - template: sonarr-v4-quality-profile-web-2160p
+      - template: sonarr-v4-custom-formats-web-2160p
+
+radarr:
+  main:
+    # Use http://radarr:7878 when running Recyclarr in Docker on the same compose network.
+    # Use http://localhost:7878 if running Recyclarr on the host.
+    base_url: http://radarr:7878
+    api_key: !secret radarr_api_key
+    include:
+      - template: radarr-quality-definition-movie
+      - template: radarr-quality-profile-uhd-bluray-web
+      - template: radarr-custom-formats-uhd-bluray-web

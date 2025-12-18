@@ -7,18 +7,19 @@
 - Not while long transfers (e.g., `rsync-comics`) are running. Finish them first, then reboot to activate Docker.
 
 ## Where are my files and configs?
-- Media: `/mnt/fast8tb/Cloud/OneDrive/<Movies|TV|Comics|Books|Audiobooks>`
-- Configs: `/mnt/fast8tb/Cloud/OneDrive/*Config`
+- Video media: `/var/mnt/fast8tb/Local/media/<movies|tv>`
+- Books: `/var/mnt/fast8tb/Cloud/OneDrive/Books/<Comics|Ebooks|Audiobooks>`
+- Configs: `/var/mnt/fast8tb/Cloud/OneDrive/*Config`
 - OneDrive comics source (GVFS): `/run/user/1000/gvfs/onedrive:.../Books/Comics/`
 
 ## How do I add comics to Komga?
 - Let `rsync-comics` finish, then in Komga add a library pointing to `/comics` (container path). OPDS: `http://<host>:8081/opds/v1.2`.
 
 ## How do I set up ebooks/audiobooks?
-- After Docker is enabled, run `docker compose -f docker-compose.reading.yml up -d` for Calibre, Calibre-Web, Audiobookshelf. See `reading-stack.md`.
+- Ebooks are served via Kavita (main compose). Audiobooks use Audiobookshelf: `docker compose -f docker-compose.reading.yml up -d`. See `reading-stack.md`.
 
 ## Where do secrets live?
-- `.env.local` (gitignored) for indexer/API keys; Kometa token in `KometaConfig/config.yml`. See `secrets.md`.
+- `.env` (gitignored) for indexer/API keys; Kometa token in `KometaConfig/config.yml`. See `secrets.md`.
 
 ## My downloads won’t import
 - Check path mappings: SAB writes to `/downloads` (container) → host downloads path; Arr import paths must match (`/tv`, `/movies`, etc.).

@@ -167,7 +167,7 @@ add_storage_drive() {
 # New service registry with metadata
 declare -A SERVICE_GROUPS=(
     [media]="jellyfin overseerr tdarr yacreader"
-    [automation]="sonarr radarr readarr bazarr prowlarr recyclarr"
+    [automation]="sonarr radarr bazarr prowlarr recyclarr"
     [download]="sabnzbd transmission"
     [monitoring]="netdata portainer"
     [sharing]="samba nfs-server"
@@ -570,7 +570,7 @@ sync_storage_with_services() {
     local services=("${@:3}")  # Array of services to update
     
     if [[ ${#services[@]} -eq 0 ]]; then
-        services=(sonarr radarr readarr)  # Default services
+        services=(sonarr radarr)  # Default services
     fi
     
     info "Syncing storage with ${#services[@]} service(s)"
@@ -753,7 +753,7 @@ hot_swap_add_drive() {
     
     # 5. Update service APIs
     info "🔗 Updating service APIs..."
-    sync_storage_with_services "$drive_path" "add" sonarr radarr readarr || {
+    sync_storage_with_services "$drive_path" "add" sonarr radarr || {
         error "Failed to update service APIs"
         return 1
     }
