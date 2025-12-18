@@ -54,6 +54,10 @@ Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick mat
 
 **Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex (claim pending). Traefik not deployed.
 
+**Canonical compose files**
+- `docker-compose.yml` → full stack (Arrs, downloaders, Plex, comics stack, ops tools)
+- `docker-compose.reading.yml` → reading stack (Kavita/Komga/Komf/Audiobookshelf/Suwayomi) as a separate project
+
 ### **What Actually Works (Dec 18, 2025)** ✅
 ```bash
 # Core automation

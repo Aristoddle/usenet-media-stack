@@ -6,6 +6,11 @@
 - Komf up: `curl -I http://localhost:8085`.
 - Comics mount: ensure `${COMICS_ROOT}` is present and writable (example: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`).
 
+## Compose scope (which stack is which)
+- `docker-compose.yml` → full stack (Arrs, downloaders, Plex, comics, ops tools) with project name `media-main` (via systemd unit).
+- `docker-compose.reading.yml` → reading stack (Kavita/Komga/Komf/Audiobookshelf/Suwayomi) with project name `media-reading`.
+- Separate project names prevent `--remove-orphans` in one stack from tearing down the other.
+
 ## Reboot checklist
 1) Reboot to apply staged rpm-ostree layer (Docker).
 2) Enable Docker daemon: `sudo systemctl enable --now docker`.
