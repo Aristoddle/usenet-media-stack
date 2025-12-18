@@ -2,6 +2,7 @@
 
 Generated: 18Dec25 @ 06:28:59 -0500 (rerun `scripts/komga-corrupt-scan.sh docs/komga-corrupt-cbz.md` after any library changes)
 Validated: 18Dec25 @ 13:12:56 -0500 (script reported all listed files OK; Komga still logs errors → likely real corruption despite zip validation)
+Quarantined: 18Dec25 @ 13:14:12 -0500 (all listed files moved to /var/mnt/fast8tb/Local/quarantine/komga; Komga library now missing these until replaced)
 
 Source: Komga task logs (ZipException/EOFException) mapped to Komga DB book URLs.
 
