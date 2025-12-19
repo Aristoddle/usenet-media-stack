@@ -18,7 +18,7 @@ volumes:
 services:
   samba:
     <<: *network_tweaks
-    image: dperson/samba:latest
+    image: ghcr.io/servercontainers/samba:smbd-only-latest
     container_name: samba
     logging: *id001
     hostname: media-server
@@ -27,17 +27,13 @@ services:
       - 445:445
     environment:
       - TZ=Etc/UTC
-      - USERID=1000
-      - GROUPID=1000
-    command: '-u "joe;joe;1000"  -s "Media;/media;yes;no;no;joe;joe;joe"  -s "Downloads;/downloads;yes;no;no;joe;joe;joe" -s "TV;/tv;yes;no;no;joe;joe;joe" -s "Movies;/movies;yes;no;no;joe;joe;joe" -s "Books;/books;yes;no;no;joe;joe;joe" -s "Comics;/comics;yes;no;no;joe;joe;joe" -s "Config;/config;yes;no;no;joe;joe;joe" -p -w "WORKGROUP" -n
-
-'
+      - ACCOUNT_joe=joe
+      - UID_joe=1000
+      - SAMBA_VOLUME_CONFIG_downloads=[Downloads]; path = /shares/downloads; browseable = yes; writeable = yes; guest ok = no; valid users = joe; force user = joe; force group = joe
+      - SAMBA_VOLUME_CONFIG_media=[Media]; path = /shares/media; browseable = yes; writeable = yes; guest ok = no; valid users = joe; force user = joe; force group = joe
     volumes:
-      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}:/config:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,Z
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/shares/media:rw,Z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/shares/downloads:rw,Z
     restart: unless-stopped
     deploy:
       mode: replicated
