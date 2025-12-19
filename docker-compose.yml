@@ -29,7 +29,7 @@ services:
       - TZ=Etc/UTC
       - USERID=1000
       - GROUPID=1000
-    command: '-u "joe;joe"  -s "Media;/media;yes;no;no;joe;joe;joe"  -s "Downloads;/downloads;yes;no;no;joe;joe;joe" -s "TV;/tv;yes;no;no;joe;joe;joe" -s "Movies;/movies;yes;no;no;joe;joe;joe" -s "Books;/books;yes;no;no;joe;joe;joe" -s "Comics;/comics;yes;no;no;joe;joe;joe" -s "Config;/config;yes;no;no;joe;joe;joe" -p -w "WORKGROUP" -n
+    command: '-u "joe;joe;1000"  -s "Media;/media;yes;no;no;joe;joe;joe"  -s "Downloads;/downloads;yes;no;no;joe;joe;joe" -s "TV;/tv;yes;no;no;joe;joe;joe" -s "Movies;/movies;yes;no;no;joe;joe;joe" -s "Books;/books;yes;no;no;joe;joe;joe" -s "Comics;/comics;yes;no;no;joe;joe;joe" -s "Config;/config;yes;no;no;joe;joe;joe" -p -w "WORKGROUP" -n
 
 '
     volumes:
