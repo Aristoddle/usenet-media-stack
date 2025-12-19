@@ -32,8 +32,8 @@ services:
       - SAMBA_VOLUME_CONFIG_downloads=[Downloads]; path = /shares/downloads; browseable = yes; writeable = yes; guest ok = no; valid users = joe; force user = joe; force group = joe
       - SAMBA_VOLUME_CONFIG_media=[Media]; path = /shares/media; browseable = yes; writeable = yes; guest ok = no; valid users = joe; force user = joe; force group = joe
     volumes:
-      - ${MEDIA_ROOT:-/srv/usenet/media}:/shares/media:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/shares/downloads:rw,Z
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/shares/media:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/shares/downloads:rw,z
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -76,9 +76,9 @@ services:
       - SYS_ADMIN
     privileged: true
     volumes:
-      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}:/config:rw,Z
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}:/config:rw,z
     environment:
       - SHARED_DIRECTORY=/media
       - SHARED_DIRECTORY_2=/downloads
@@ -155,7 +155,7 @@ services:
     environment:
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/uptime-kuma:/app/data:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/uptime-kuma:/app/data:rw,z
     ports:
       - 3001:3001
     restart: unless-stopped
@@ -182,8 +182,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/sabnzbd:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/sabnzbd:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
     ports:
       - 8080:8080
     restart: unless-stopped
@@ -222,9 +222,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/transmission:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/watch:/watch:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/transmission:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/watch:/watch:rw,z
     ports:
       - 9091:9091
     restart: unless-stopped
@@ -255,9 +255,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/sonarr:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/sonarr:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -290,9 +290,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/radarr:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/radarr:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -325,8 +325,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/bazarr:/config:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/bazarr:/config:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
     ports:
       - 6767:6767
     restart: unless-stopped
@@ -359,7 +359,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/prowlarr:/config:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/prowlarr:/config:rw,z
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -389,10 +389,10 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/whisparr:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/whisparr:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
     ports:
       - 6969:6969
     restart: unless-stopped
@@ -419,8 +419,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/lidarr:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/lidarr:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
       - ${MUSIC_ROOT:-/srv/usenet/media/music}:/music:rw
     ports:
       - 8686:8686
@@ -445,9 +445,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/mylar:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
-      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/mylar:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
     ports:
       - 8090:8090
     restart: unless-stopped
@@ -473,12 +473,12 @@ services:
       - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM:-}
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/plex:/config:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/music:/music:rw,Z
-      - ${BOOKS_ROOT:-/srv/usenet/books}:/books:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/plex:/config:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/music:/music:rw,z
+      - ${BOOKS_ROOT:-/srv/usenet/books}:/books:rw,z
     ports:
       - 32400:32400
     restart: unless-stopped
@@ -505,7 +505,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/overseerr:/config:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/overseerr:/config:rw,z
     ports:
       - 5055:5055
     restart: unless-stopped
@@ -529,7 +529,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/recyclarr:/config:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/recyclarr:/config:rw,z
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -557,13 +557,13 @@ services:
       - internalNode=true
       - nodeID=MainNode
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/server:/app/server:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/configs:/app/configs:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/logs:/app/logs:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/tdarr_transcode:/temp:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/server:/app/server:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/configs:/app/configs:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/logs:/app/logs:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/tdarr_transcode:/temp:rw,z
     ports:
       - 8265:8265
       - 8266:8266
@@ -631,13 +631,13 @@ services:
       - STASH_PORT=9999
     volumes:
       - /etc/localtime:/etc/localtime:rw
-      - ${CONFIG_ROOT:-/srv/usenet/config}/stash:/root/.stash:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/adult:/data:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/metadata:/metadata:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/cache:/cache:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/blobs:/blobs:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/generated:/generated:rw,Z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash:/root/.stash:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/adult:/data:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/metadata:/metadata:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/cache:/cache:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/blobs:/blobs:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/stash/generated:/generated:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
     ports:
       - 9998:9999
     restart: unless-stopped
@@ -670,9 +670,9 @@ services:
       - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
       - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
     volumes:
-      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,Z
-      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics_mirror:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/komga:/config:rw,Z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics_mirror:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/komga:/config:rw,z
     ports:
       - 8081:25600
     restart: unless-stopped
@@ -691,8 +691,8 @@ services:
       - KOMF_ANILIST_CLIENT_ID=${KOMF_ANILIST_CLIENT_ID:-}
       - KOMF_ANILIST_CLIENT_SECRET=${KOMF_ANILIST_CLIENT_SECRET:-}
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/komf:/config:rw,Z
-      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/komf:/config:rw,z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
     depends_on:
       - komga
     ports:
@@ -705,10 +705,10 @@ services:
     environment:
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/kavita:/kavita/config:rw,Z
-      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,Z
-      - ${EBOOKS_ROOT:-/srv/usenet/books/Ebooks}:/books:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/kavita:/kavita/config:rw,z
+      - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
+      - ${EBOOKS_ROOT:-/srv/usenet/books/Ebooks}:/books:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
     ports:
       - 5000:5000
     restart: unless-stopped
@@ -721,8 +721,8 @@ services:
     volumes:
       # Downloads go to staging folder, NOT directly into collection
       # A reorganizer script moves them to collection with proper naming
-      - ${SUWAYOMI_DOWNLOADS:-/srv/usenet/downloads/suwayomi-chapters}:/home/suwayomi/.local/share/Tachidesk/downloads:rw,Z
-      - ${CONFIG_ROOT:-/srv/usenet/config}/suwayomi:/home/suwayomi/.local/share/Tachidesk:rw,Z
+      - ${SUWAYOMI_DOWNLOADS:-/srv/usenet/downloads/suwayomi-chapters}:/home/suwayomi/.local/share/Tachidesk/downloads:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/suwayomi:/home/suwayomi/.local/share/Tachidesk:rw,z
     ports:
       - 4567:4567
     restart: unless-stopped
@@ -736,8 +736,8 @@ services:
       - TZ=Etc/UTC
       - ARIA2_SECRET=${ARIA2_SECRET}
     volumes:
-      - ${CONFIG_ROOT:-/srv/usenet/config}/aria2:/config:rw,Z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,Z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/aria2:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
     ports:
       - 6800:6800
     restart: unless-stopped
