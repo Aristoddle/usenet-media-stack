@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-COMPOSE_FILES := docker-compose.yml docker-compose.override.yml docker-compose.traefik.yml docker-compose.vpn-mullvad.yml
+COMPOSE_FILES := docker-compose.yml docker-compose.override.yml
 COMPOSE := docker compose $(foreach f,$(COMPOSE_FILES),-f $(f))
 
 .PHONY: up down restart logs ps health docs-build

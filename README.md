@@ -54,6 +54,10 @@ Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick mat
 
 **Result**: Core automation online (Prowlarr + Sonarr/Radarr + SABnzbd), requests (Overseerr), transcoding (tdarr), comics/books (Komga/Komf/Mylar/Whisparr), management (Portainer/Netdata). Streaming via Plex (claim pending). Traefik not deployed.
 
+### Compose files (canonical)
+- Supported: `docker-compose.yml` (main stack) and `docker-compose.reading.yml` (optional reading stack).
+- Legacy/special variants (vpn, swarm, tunnel, monitoring, portable, optimized, komga-only, recyclarr, etc.) have been archived to `archive/compose/` and are no longer maintained. Scripts now use only the canonical files.
+
 ### Quick one-off access (Samba)
 - SMB share is already exposed via the `samba` container.
 - Username/password: `joe` / `joe`.

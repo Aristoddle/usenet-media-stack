@@ -5,8 +5,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 files=(
   docker-compose.yml
   docker-compose.override.yml
-  docker-compose.traefik.yml
-  docker-compose.vpn-mullvad.yml
 )
 
 echo "Using compose files:"
@@ -15,6 +13,4 @@ printf '  - %s\n' "${files[@]}"
 sudo docker compose \
   -f "${files[0]}" \
   -f "${files[1]}" \
-  -f "${files[2]}" \
-  -f "${files[3]}" \
   down
