@@ -148,6 +148,30 @@ services:
     logging:
       driver: json-file
       options: *id002
+  uptime-kuma:
+    <<: *network_tweaks
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - ${CONFIG_ROOT:-/srv/usenet/config}/uptime-kuma:/app/data:rw,Z
+    ports:
+      - 3001:3001
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: json-file
+      options: *id002
   sabnzbd:
     <<: *network_tweaks
     image: docker.io/linuxserver/sabnzbd:latest
