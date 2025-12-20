@@ -1,23 +1,23 @@
 # 🎬 Beppe's Arr Stack
 
-> Current, tested snapshot (Dec 18, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Kavita + Suwayomi + Audiobookshelf + Portainer/Netdata. Plex is primary for streaming (claim pending). Transmission/Aria2 exposed on host; **Traefik is not deployed yet** (LAN/loopback only).
+> Current, tested snapshot (Dec 20, 2025): Prowlarr + Sonarr/Radarr + SABnzbd + Transmission + Aria2 + Overseerr + Tdarr + Komga/Komf + Mylar/Whisparr + Kavita + Suwayomi + Audiobookshelf + Portainer/Netdata + Uptime Kuma monitors. Plex is primary for streaming (claim pending). Transmission/Aria2 exposed on host; **Traefik is not deployed yet** (LAN/loopback only).
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 [![Services](https://img.shields.io/badge/Working%20Services-see%20docs%2FSERVICES-green.svg)](docs/SERVICES.md)
 [![Platform](https://img.shields.io/badge/Platform-Linux-green.svg)](https://github.com/Aristoddle/usenet-media-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Validated](https://img.shields.io/badge/Tested-2025--12--16-green.svg)](docs/SERVICES.md) *(docs site currently stale; see repo docs for truth)*
+[![Validated](https://img.shields.io/badge/Tested-2025--12--20-green.svg)](docs/SERVICES.md) *(docs site now deployed; repo is source of truth)*
 
 **Real functionality over aspirational claims. Tested and validated working services on the Bazzite seed node (see docs/SERVICES.md for the current count; downloader endpoints summarized in [`downloaders_readme.md`](downloaders_readme.md)).**  
 Project memory/KG conventions: [`MEMORY_SPEC.md`](MEMORY_SPEC.md).
 
-> **State of the stack (Dec 18, 2025)**  
-> - Comics library now at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics` (copy complete)  
-> - Traefik **not deployed**; services are reachable on localhost/LAN only; Transmission exposed on host 9091  
-> - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy  
-> - Plex primary (pending claim; set `PLEX_CLAIM` and bring up the Plex service)
+> **State of the stack (Dec 20, 2025)**  
+> - Comics library at `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`  
+> - Traefik **not deployed**; services are reachable on localhost/LAN; Transmission exposed on host 9091  
+> - Sonarr/Radarr/SABnzbd/Prowlarr wired; Overseerr, Tdarr, Komga/Komf, Mylar/Whisparr, Portainer, Netdata healthy; Uptime Kuma monitors preloaded  
+> - Plex primary (pending claim; set `PLEX_CLAIM` and restart Plex)
 
-## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)** _(site currently stale; see docs/ and README notes for up-to-date paths & services)_
+## 📖 **[🌟 VIEW FULL DOCUMENTATION 🌟](https://beppesarrstack.net)** _(live site deployed Dec 20, 2025; repo remains source of truth)_
 
 <div align="center">
 
@@ -69,7 +69,7 @@ Need to pick the right compose file? See `docs/COMPATIBILITY.md` for a quick mat
 - `docker-compose.yml` → full stack (Arrs, downloaders, Plex, comics stack, ops tools)
 - `docker-compose.reading.yml` → reading stack (Kavita/Komga/Komf/Audiobookshelf/Suwayomi) as a separate project
 
-### **What Actually Works (Dec 18, 2025)** ✅
+### **What Actually Works (Dec 20, 2025)** ✅
 ```bash
 # Core automation
 prowlarr     (9696)  # indexers
@@ -97,12 +97,13 @@ docs         (local build only; hosted site is stale)
 ```
 
 **📊 Current status**
-- ✅ Automation online (Sonarr/Radarr/SAB/Prowlarr) with indexers wired
-- ✅ Requests, comics/books services healthy
+- ✅ Automation online (Sonarr/Radarr/SAB/Prowlarr) with indexers wired; RSS/search toggles per indexer UI may still need a click
+- ✅ Requests, comics/books services healthy; Komga/Kavita up; Mylar/Suwayomi running
 - ⚠️ Traefik not deployed; all services LAN/localhost only
 - ✅ Path normalization complete; set `.env` paths (CONFIG_ROOT/MEDIA_ROOT/DOWNLOADS_ROOT/BOOKS_ROOT)
 - ⚙️ Plex primary; pending claim (`PLEX_CLAIM`) + first-run setup
 - 🎧 Clients: Plexamp for audio, Plex HTPC for TVs/consoles (plus native Plex apps)
+- 📈 Monitoring: Uptime Kuma preloaded with monitors for all services (using container DNS names)
 
 **📸 [View Service Screenshots](docs/SERVICES.md)** | **🔧 [See Service Status](docs/SERVICES.md)**
 

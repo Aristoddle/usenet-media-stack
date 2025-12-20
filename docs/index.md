@@ -13,7 +13,7 @@ hero:
       text: Local Endpoints
       link: /local-endpoints/
     - theme: alt
-      text: Service Status (17/23)
+      text: Services & Status
       link: /SERVICES/
 features:
   - icon: ⚙️
@@ -24,25 +24,25 @@ features:
     details: Komga + Komf + Mylar + Kavita + Suwayomi; library path set by COMICS_ROOT.
   - icon: 📊
     title: Ops & visibility
-    details: Overseerr, Bazarr, Portainer, Netdata. Clickable localhost URLs on the endpoints page.
+    details: Overseerr, Bazarr, Portainer, Netdata, Uptime Kuma monitors preloaded for all services.
   - icon: 🚀
     title: Deploy pipeline
-    details: GitHub Actions → Cloudflare Pages (site previously stale; repo docs are current as of Dec 17, 2025).
+    details: GitHub Actions → Cloudflare Pages (deployed Dec 20, 2025 to beppesarrstack-net).
   - icon: 🌐
     title: Networking
-    details: Traefik present; host rules/TLS pending. Loopback/LAN-only today.
+    details: Traefik pending; services exposed on localhost/LAN. Use Samba share for quick file access.
   - icon: 🔒
     title: Secrets hygiene
-    details: CF token needs rotation/scrub; add gitleaks/pre-commit. .env kept local.
+    details: CF token rotated; keep .env local; add gitleaks/pre-commit for future commits.
 ---
 
-## Live status (Dec 17, 2025)
+## Live status (Dec 20, 2025)
 
-- Core: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr; SABnzbd + Transmission (no VPN), Aria2 RPC.
+- Core: Prowlarr → Sonarr/Radarr/Whisparr/Lidarr; SABnzbd + Transmission; Aria2 RPC. SAB/Prowlarr writes fixed with `:rw,z` binds.
 - Comics/books: Komga + Komf + Mylar + Kavita + Suwayomi; library path `${COMICS_ROOT}`.
-- Ops: Overseerr, Bazarr, Portainer, Netdata. Clickable URLs: [Local endpoints](/local-endpoints/).
-- Deploy: GitHub Actions → Cloudflare Pages (site needs redeploy to reflect current docs).
-- In flight: Traefik routes; secret scrub (git history + gitleaks); optional nfs-server removal; verify Aria2 test in Prowlarr.
+- Ops: Overseerr, Bazarr, Portainer, Netdata, **Uptime Kuma** (preloaded monitors). Clickable URLs: [Local endpoints](/local-endpoints/).
+- Deploy: GitHub Actions → Cloudflare Pages (current site deployed Dec 20, 2025).
+- In flight: Traefik host rules/TLS; Plex claim token; Prowlarr RSS/Search toggles per indexer UI; optional Mullvad VPN tests.
 
 ## Run locally (safe during copy)
 
