@@ -101,3 +101,4 @@ config/*/db/
 config/*/*.db*
 config/*/logs/
 config/recyclarr/secrets.yml
+CREDENTIALS_INVENTORY.md
