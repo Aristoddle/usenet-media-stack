@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "capturedAt": "2025-12-18T08:03:07.382088+00:00",
-    "workingServices": 20,
-    "totalServices": 20,
+    "capturedAt": "2025-12-20T22:30:00.000000+00:00",
+    "workingServices": 23,
+    "totalServices": 23,
     "successRate": "100%"
   },
   "services": [
@@ -36,6 +36,14 @@
       "url": "http://localhost:7878",
       "desc": "Movie Automation",
       "features": "Automatically manage movie downloads",
+      "status": "documented"
+    },
+    {
+      "service": "lidarr",
+      "title": "Lidarr",
+      "url": "http://localhost:8686",
+      "desc": "Music Automation",
+      "features": "Automatically manage music downloads and organization",
       "status": "documented"
     },
     {
@@ -83,15 +91,15 @@
       "title": "Transmission",
       "url": "http://localhost:9091",
       "desc": "Torrent Client",
-      "features": "BitTorrent downloads with VPN",
+      "features": "BitTorrent downloads",
       "status": "documented"
     },
     {
-      "service": "jackett",
-      "title": "Jackett",
-      "url": "http://localhost:9117",
-      "desc": "Indexer Proxy",
-      "features": "Legacy torrent/usenet indexer aggregator",
+      "service": "aria2",
+      "title": "Aria2",
+      "url": "http://localhost:6800/jsonrpc",
+      "desc": "Download Manager",
+      "features": "Multi-protocol download utility (HTTP/FTP/BitTorrent/Metalink)",
       "status": "documented"
     },
     {
@@ -105,17 +113,41 @@
     {
       "service": "recyclarr",
       "title": "Recyclarr",
-      "url": "http://localhost:3000",
-      "desc": "Automation",
-      "features": "TRaSH Guide quality automation",
+      "url": null,
+      "desc": "Quality Profiles",
+      "features": "TRaSH Guide quality automation (CLI, no web UI)",
       "status": "documented"
     },
     {
-      "service": "unpackerr",
-      "title": "Unpackerr",
-      "url": "http://localhost:5657",
-      "desc": "Extractor",
-      "features": "Automated extraction of completed downloads",
+      "service": "komga",
+      "title": "Komga",
+      "url": "http://localhost:8081",
+      "desc": "Comics/Manga Server",
+      "features": "Media server for comics and manga with OPDS support",
+      "status": "documented"
+    },
+    {
+      "service": "komf",
+      "title": "Komf",
+      "url": "http://localhost:8085",
+      "desc": "Metadata Fetcher",
+      "features": "Automatic metadata fetching for Komga libraries",
+      "status": "documented"
+    },
+    {
+      "service": "kavita",
+      "title": "Kavita",
+      "url": "http://localhost:5000",
+      "desc": "Reading Server",
+      "features": "Digital library for manga, comics, and ebooks",
+      "status": "documented"
+    },
+    {
+      "service": "suwayomi",
+      "title": "Suwayomi",
+      "url": "http://localhost:4567",
+      "desc": "Manga Downloader",
+      "features": "Tachidesk server for manga sources and downloads",
       "status": "documented"
     },
     {
@@ -135,11 +167,19 @@
       "status": "documented"
     },
     {
+      "service": "uptime-kuma",
+      "title": "Uptime Kuma",
+      "url": "http://localhost:3001",
+      "desc": "Uptime Monitoring",
+      "features": "Service uptime monitoring with notifications",
+      "status": "documented"
+    },
+    {
       "service": "samba",
       "title": "Samba",
       "url": "smb://localhost",
       "desc": "File Sharing",
-      "features": "Windows file sharing",
+      "features": "Windows file sharing for media and downloads",
       "status": "documented"
     },
     {
@@ -147,23 +187,7 @@
       "title": "Stash",
       "url": "http://localhost:9998",
       "desc": "Media Organizer",
-      "features": "Video library management",
-      "status": "documented"
-    },
-    {
-      "service": "tautulli",
-      "title": "Tautulli",
-      "url": "http://localhost:8181",
-      "desc": "Usage Analytics",
-      "features": "Monitor Plex stream statistics",
-      "status": "documented"
-    },
-    {
-      "service": "usenet-docs",
-      "title": "Documentation",
-      "url": "http://localhost:4173",
-      "desc": "Documentation Site",
-      "features": "VitePress-based docs",
+      "features": "Video library management and organization",
       "status": "documented"
     }
   ]
