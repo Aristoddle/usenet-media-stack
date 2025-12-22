@@ -44,14 +44,14 @@ tailscale:
 
 ## 🔐 Credential Management
 
-### Current Issues
+### Current State
 
-The following files contain hardcoded credentials:
-- `update-api-keys.sh`
-- `scripts/configure-services.sh`
-- `modules/credentials.sh`
-- `configure-prowlarr.sh`
-- `lib/commands/configure.zsh`
+Credentials are managed via environment variables in `.env`. The configuration module
+`lib/commands/configure.zsh` reads API keys from service config files (not hardcoded).
+
+Configuration files that contain generated API keys (gitignored):
+- `config/*/config.xml` (ARR services)
+- `config/sabnzbd/sabnzbd.ini`
 
 ### Making it Public-Ready
 

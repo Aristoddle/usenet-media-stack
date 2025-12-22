@@ -302,4 +302,119 @@ if sonarr.is_healthy():
 
 ---
 
+## Session Handoff (2025-12-21)
+
+This section captures everything a new agent needs to pick up where we left off.
+
+### What Just Happened
+
+We completed a comprehensive codebase cleanup in two waves:
+
+1. **Deep Analysis**: Ran 8 parallel agents to audit the entire stack
+2. **Wave 5**: Created API libraries, fixed configs, cleaned 150+ stale files
+3. **Wave 6**: Adopted API libraries in scripts, added health checks, tests
+4. **Documentation**: Consolidated TODOs, archived stale docs, fixed references
+
+**Commits from this session**:
+- `bbdbb83` - Wave 5: comprehensive stack cleanup
+- `0405273` - Wave 6: API library adoption
+- `e2d1821` - Documentation consolidation
+
+### Current System State
+
+**Hardware**: Bazzite (Fedora Atomic) on Steam Deck / gaming PC
+**Runtime**: Docker Engine (rootful, requires sudo)
+**Storage**: Primary on `/var/mnt/fast8tb/` with OneDrive sync
+
+**Running Services** (24 containers):
+```
+Prowlarr:9696  Sonarr:8989  Radarr:7878  Lidarr:8686  Whisparr:6969
+SABnzbd:8080   Transmission:9091  Aria2:6800
+Komga:8081     Komf:8085    Kavita:5000  Mylar:8090  Suwayomi:4567
+Plex:32400     Overseerr:5055  Tdarr:8265  Bazarr:6767
+Stash:9998     Audiobookshelf:13378
+Portainer:9000 Netdata:19999  Uptime-Kuma:3001  Samba:445
+```
+
+### Known Path Reality
+
+Your actual content is here (based on prior sessions):
+```
+/var/mnt/fast8tb/Cloud/OneDrive/
+├── Books/
+│   ├── Comics/           # Manga collection (79 series, ~17k files)
+│   ├── eBooks/           # Ebooks
+│   └── Audiobooks/       # Audiobookshelf content
+├── Media/
+│   ├── TV/               # TV shows (Sonarr target)
+│   ├── Movies/           # Movies (Radarr target)
+│   └── Music/            # Music (Lidarr target)
+└── ...
+```
+
+The compose file defaults to `/srv/usenet/...` which doesn't exist. The `.env` file
+needs to be populated with the real paths above.
+
+### Blocking Issue
+
+**ARR services can't see your media** because `.env` has placeholder paths.
+
+Fix: Update `.env` with real paths, then configure root folders in each service.
+
+### Files You'll Touch Most
+
+| File | Purpose |
+|------|---------|
+| `.env` | Environment variables (paths, API keys) |
+| `docker-compose.yml` | Service definitions |
+| `lib/core/arr-api.zsh` | API wrappers for ARR services |
+| `lib/python/api_client.py` | Python API clients |
+| `docs/TODO.md` | This file - update as you work |
+
+### Git State
+
+```
+Branch: main (clean working tree after final commit)
+Recent commits: Wave 5, Wave 6, Doc consolidation
+Nothing to push (local only)
+```
+
+### Pre-Reboot Checklist
+
+Before this reboot, we:
+- [x] Cleaned stale docs and files
+- [x] Consolidated TODO documentation
+- [x] Fixed SECURITY.md stale references
+- [x] Committed all changes
+- [x] Wrote this handoff section
+
+### Post-Reboot First Steps
+
+1. **Verify Docker is running**: `sudo systemctl status docker`
+2. **Check containers**: `sudo docker ps`
+3. **If services down**: `cd /path/to/usenet-media-stack && sudo docker compose up -d`
+4. **Resume work**: Start with `.env` path configuration
+
+### Quick Commands for New Agent
+
+```bash
+# Where we are
+cd /var/home/deck/Documents/Code/media-automation/usenet-media-stack
+
+# Git status
+git log --oneline -5
+git status
+
+# See running services
+sudo docker ps --format "table {{.Names}}\t{{.Status}}"
+
+# Check service health
+sudo docker compose ps
+
+# Read a specific service log
+sudo docker logs sonarr --tail 50
+```
+
+---
+
 **Next Session**: Start with `.env` audit and volume wiring. Map your actual disk paths to compose variables. Then bring up Plex.
