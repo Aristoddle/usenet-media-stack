@@ -185,7 +185,7 @@ services:
       - ${CONFIG_ROOT:-/srv/usenet/config}/sabnzbd:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
     ports:
-      - 8080:8080
+      - "192.168.6.167:8080:8080"  # External IP only - leaves localhost:8080 free for Steam CEF/DeckyLoader
     restart: unless-stopped
     deploy:
       mode: replicated
