@@ -43,7 +43,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/kavita:/kavita/config:rw,Z
       - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,Z
-      - ${EBOOKS_ROOT:-/srv/usenet/books/Ebooks}:/books:rw,Z
+      - ${EBOOKS_ROOT:-/srv/usenet/books/eBooks}:/books:rw,Z
     ports:
       - "${KAVITA_PORT:-5000}:5000"
     restart: unless-stopped

@@ -1,0 +1,163 @@
+{
+  "audit_timestamp": "2025-12-21T00:00:00Z",
+  "collection_path": "/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics",
+  "target_patterns": {
+    "volumes": "Series Name v## (Year) (Digital) (Source).cbz",
+    "chapters": "Series Name c### (Year) (Digital) (Source).cbz"
+  },
+  "summary": {
+    "total_series": 79,
+    "total_files": 15412,
+    "files_need_rename": 14956,
+    "rename_percentage": 97.0,
+    "total_duplicates": 159,
+    "compliant_series": ["GTO"],
+    "new_series_added": ["Ichi the Witch (Viz) [EN]"],
+    "duplicates_resolved": {
+      "Chainsaw Man ch220": "2 of 3 removed",
+      "Dungeon Meshi v06/v09/v12": "3 duplicates removed",
+      "Kagurabachi ch47-103": "57 generic duplicates removed"
+    }
+  },
+  "workers": [
+    {
+      "id": "worker_01",
+      "task_id": "a7171ec",
+      "series": ["20th Century Boys", "Berserk", "Choujin X", "Eyeshield 21", "Hellsing", "Liar Game", "Pluto", "Sunny"],
+      "files": 200,
+      "need_rename": 172,
+      "duplicates": 7
+    },
+    {
+      "id": "worker_02",
+      "task_id": "a3b1b1b",
+      "series": ["Akame ga kill", "Black Clover", "Claymore", "Fire Punch", "Hell's Paradise", "Made in Abyss", "Rurouni Kenshin", "Tekkonkinkreet"],
+      "files": 671,
+      "need_rename": 623,
+      "duplicates": 15
+    },
+    {
+      "id": "worker_03",
+      "task_id": "ac9922f",
+      "series": ["Akane-banashi", "Blade of the Immortal", "Dai Dark", "Fist of the North Star", "Hunter X Hunter", "Mob Psycho 100", "Sakamoto Days", "The Eminence in Shadow"],
+      "files": 1126,
+      "need_rename": 1082,
+      "duplicates": 2
+    },
+    {
+      "id": "worker_04",
+      "task_id": "a174268",
+      "series": ["Akira", "Bleach", "Dandadan", "Frieren", "JoJo's Bizarre Adventure", "Monster", "Sand Land", "Tokyo Ghoul"],
+      "files": 2330,
+      "need_rename": 2216,
+      "duplicates": 96
+    },
+    {
+      "id": "worker_05",
+      "task_id": "a41c2b0",
+      "series": ["Ashita no Joe", "Blue Box", "Deadpool", "Fullmetal Alchemist", "Jujutsu Kaisen", "Naruto", "Shokugeki no Soma", "Toriko"],
+      "files": 2574,
+      "need_rename": 2572,
+      "duplicates": 2
+    },
+    {
+      "id": "worker_06",
+      "task_id": "ae24b37",
+      "series": ["A Silent Voice", "Blue Lock", "Demon Slayer", "GACHIAKUTA", "Kagurabachi", "One Piece", "Slam Dunk", "Tower of God"],
+      "files": 1663,
+      "need_rename": 1663,
+      "duplicates": 62
+    },
+    {
+      "id": "worker_07",
+      "task_id": "ab929b0",
+      "series": ["Assassination Classroom", "Blue Period", "Dorohedoro", "Gantz", "Kaguya-sama", "Onepunch-Man", "Smoking Behind the Supermarket", "Vagabond"],
+      "files": 1403,
+      "need_rename": 1352,
+      "duplicates": 5
+    },
+    {
+      "id": "worker_08",
+      "task_id": "a4e74b8",
+      "series": ["Baki", "Boku no Hero Academia", "Dragon Ball", "GTO", "Kaiji", "One-Shots", "Soul Eater", "Vinland Saga"],
+      "files": 3082,
+      "need_rename": 3027,
+      "duplicates": 7
+    },
+    {
+      "id": "worker_09",
+      "task_id": "ae861e4",
+      "series": ["Bakuman", "Bug Ego", "Dr. Stone", "Haikyu!!", "Kaiju No. 8", "Oshi no Ko", "Spirit Circle"],
+      "files": 467,
+      "need_rename": 453,
+      "duplicates": 21
+    },
+    {
+      "id": "worker_10",
+      "task_id": "a2efb53",
+      "series": ["Barakamon", "Chainsaw Man", "Dungeon Meshi", "Hajime no Ippo", "Kakegurui", "SPY x FAMILY"],
+      "files": 1958,
+      "need_rename": 1958,
+      "duplicates": 4
+    }
+  ],
+  "critical_duplicates": [
+    {
+      "series": "JoJo's Bizarre Adventure",
+      "count": 89,
+      "type": "volume_chapter_overlap",
+      "priority": "high",
+      "status": "EVALUATED_ACCEPTABLE",
+      "note": "Intentional format duality - both volumes and chapters preserved for user preference"
+    },
+    {
+      "series": "Kagurabachi",
+      "count": 61,
+      "type": "chapter_duplicates",
+      "range": "47-103",
+      "priority": "high",
+      "status": "RESOLVED",
+      "note": "57 generic Chapter XXX.cbz trashed, keeping properly-named releases"
+    },
+    {
+      "series": "Kaiju No. 8",
+      "count": 20,
+      "type": "chapter_duplicates",
+      "priority": "medium"
+    },
+    {
+      "series": "Chainsaw Man",
+      "count": 3,
+      "type": "triple_duplicate",
+      "file": "ch220",
+      "priority": "critical",
+      "status": "RESOLVED"
+    },
+    {
+      "series": "Dungeon Meshi",
+      "count": 3,
+      "type": "volume_duplicates",
+      "files": ["v06", "v09", "v12"],
+      "priority": "critical",
+      "status": "RESOLVED"
+    }
+  ],
+  "action_plan": {
+    "phase_1_critical": [
+      "Remove Chainsaw Man ch220 triple duplicate (keep highest quality)",
+      "Remove Dungeon Meshi volume duplicates v06, v09, v12"
+    ],
+    "phase_2_high": [
+      "Deduplicate JoJo's Bizarre Adventure (89 overlapping files)",
+      "Deduplicate Kagurabachi chapters 47-103 (61 files)"
+    ],
+    "phase_3_rename": [
+      "Generate batch rename scripts per-series",
+      "Apply target naming pattern to 15,018 files"
+    ],
+    "phase_4_metadata": [
+      "Validate ComicInfo.xml presence",
+      "Enrich missing metadata via Komf"
+    ]
+  }
+}

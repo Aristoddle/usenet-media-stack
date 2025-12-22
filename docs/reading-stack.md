@@ -10,7 +10,7 @@
 ## Paths (set via `.env`)
 - `BOOKS_ROOT` (default `/srv/usenet/books`)
 - `COMICS_ROOT` (default `/srv/usenet/books/Comics`)
-- `EBOOKS_ROOT` (default `/srv/usenet/books/Ebooks`)
+- `EBOOKS_ROOT` (default `/srv/usenet/books/eBooks`)
 - `AUDIOBOOKS_ROOT` (default `/srv/usenet/books/Audiobooks`)
 - `PODCASTS_ROOT` (default `/srv/usenet/books/Podcasts`)
 - `AUDIOBOOKSHELF_CONFIG` (default `/srv/usenet/config/audiobookshelf`)
@@ -18,7 +18,7 @@
 
 Example (fast8tb + OneDrive):
 - Comics: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`
-- Ebooks: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Ebooks`
+- Ebooks: `/var/mnt/fast8tb/Cloud/OneDrive/Books/eBooks`
 - Audiobooks: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks`
 - Podcasts: `/var/mnt/fast8tb/Cloud/OneDrive/Books/Podcasts`
 
@@ -35,7 +35,7 @@ Example (fast8tb + OneDrive):
 3. Komf handles metadata once Komga is reachable.
 4. Kavita library paths should follow the finalized `/Books/Ebooks` layout.
 5. Kavita uses the official image; config bind is `${CONFIG_ROOT}/kavita` → `/kavita/config`.
-5. Books reorg plan: see `docs/books-reorg-plan.md`.
+5. Books schema: see `docs/BOOKS_SCHEMA_SPECIFICATION.md`.
 
 ## OPDS / Clients
 - Komga OPDS: `http://<host>:8081/opds/v1.2` (Panels, Marvin, etc.)

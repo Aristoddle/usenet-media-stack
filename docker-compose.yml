@@ -707,7 +707,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/kavita:/kavita/config:rw,z
       - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
-      - ${EBOOKS_ROOT:-/srv/usenet/books/Ebooks}:/books:rw,z
+      - ${EBOOKS_ROOT:-/srv/usenet/books/eBooks}:/books:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
     ports:
       - 5000:5000

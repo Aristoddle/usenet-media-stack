@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="${1:-/mnt/fast8tb/Cloud/OneDrive/Books}"
+ROOT="${1:-/var/mnt/fast8tb/Cloud/OneDrive/Books}"
 
 if [[ ! -d "$ROOT" ]]; then
   echo "Books root not found: $ROOT" >&2
@@ -19,8 +19,9 @@ import os
 import sys
 from collections import Counter
 
-root = os.environ.get("BOOKS_ROOT", "/mnt/fast8tb/Cloud/OneDrive/Books")
-targets = ["Audiobooks", "Default", "Real Books", "Calibre", "Readarr", "Spoken", "eBooks"]
+root = os.environ.get("BOOKS_ROOT", "/var/mnt/fast8tb/Cloud/OneDrive/Books")
+# Current canonical structure (Dec 2025)
+targets = ["Audiobooks", "eBooks", "Comics"]
 for name in targets:
     path = os.path.join(root, name)
     if not os.path.isdir(path):

@@ -84,12 +84,15 @@ volumes/
 !docs/
 docs/node_modules/
 docs/.vitepress/cache/
+docs/.vitepress/dist/
 
-# Keep intelligence data but ignore temporary files
-!.intelligence/
-!.intelligence/*.log
-!.intelligence/*.md
-.intelligence/*.tmp
+# Ephemeral CI/validation outputs
+validation-results.json
+triage-results.json
+validation-screenshots/
+
+# Legacy intelligence directory (removed)
+.intelligence/
 
 # Node.js dependencies
 node_modules/
