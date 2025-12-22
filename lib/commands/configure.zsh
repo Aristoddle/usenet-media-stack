@@ -25,6 +25,12 @@ source "${SCRIPT_DIR:h}/core/common.zsh" || {
     exit 1
 }
 
+# Load API wrappers
+source "${SCRIPT_DIR:h}/core/arr-api.zsh" || {
+    print -u2 "ERROR: Cannot load arr-api.zsh"
+    exit 1
+}
+
 # Load configuration (includes PROVIDERS and INDEXERS from env)
 # This is already done in common.zsh which loads config.zsh
 
@@ -184,9 +190,7 @@ configure_sabnzbd() {
         data+="&password=$password&connections=$connections"
         data+="&ssl=1&enable=1&priority=0"
         
-        if curl -s -X POST "${url}/api" \
-            -d "apikey=$api_key" \
-            -d "$data" | grep -q "ok"; then
+        if sab_api_post "$url" "$api_key" "$data" >/dev/null 2>&1; then
             log_success "Added $provider"
         else
             log_warning "Failed to add $provider"
@@ -233,9 +237,7 @@ configure_sabnzbd_categories() {
     for cat path in ${(kv)categories}; do
         local data="mode=set_cat&name=$cat&pp=3&script=None&dir=$path"
         
-        if curl -s -X POST "${url}/api" \
-            -d "apikey=$api_key" \
-            -d "$data" | grep -q "ok"; then
+        if sab_api_post "$url" "$api_key" "$data" >/dev/null 2>&1; then
             log_success "Created category: $cat"
         else
             log_warning "Failed to create category: $cat"
@@ -300,10 +302,7 @@ configure_prowlarr() {
 EOF
 )
         
-        if curl -s -X POST "${url}/api/v1/indexer" \
-            -H "X-Api-Key: $api_key" \
-            -H "Content-Type: application/json" \
-            -d "$json" | grep -q "id"; then
+        if arr_api_post "$url" "$api_key" "/api/v1/indexer" "$json" >/dev/null 2>&1; then
             log_success "Added $indexer"
         else
             log_warning "Failed to add $indexer"
@@ -368,10 +367,7 @@ configure_prowlarr_apps() {
 EOF
 )
         
-        if curl -s -X POST "${url}/api/v1/applications" \
-            -H "X-Api-Key: $api_key" \
-            -H "Content-Type: application/json" \
-            -d "$json" | grep -q "id"; then
+        if arr_api_post "$url" "$api_key" "/api/v1/applications" "$json" >/dev/null 2>&1; then
             log_success "Added $app"
         else
             log_warning "Failed to add $app"
@@ -471,10 +467,7 @@ configure_arr_app() {
 EOF
 )
         
-        if curl -s -X POST "${url}/api/v3/downloadclient" \
-            -H "X-Api-Key: $api_key" \
-            -H "Content-Type: application/json" \
-            -d "$json" | grep -q "id"; then
+        if arr_api_post "$url" "$api_key" "/api/v3/downloadclient" "$json" >/dev/null 2>&1; then
             log_success "Added SABnzbd to $app"
         else
             log_warning "Failed to add SABnzbd to $app"
@@ -494,10 +487,7 @@ EOF
 EOF
 )
     
-    if curl -s -X POST "${url}/api/v3/rootfolder" \
-        -H "X-Api-Key: $api_key" \
-        -H "Content-Type: application/json" \
-        -d "$folder_json" | grep -q "id"; then
+    if arr_api_post "$url" "$api_key" "/api/v3/rootfolder" "$folder_json" >/dev/null 2>&1; then
         log_success "Added root folder to $app"
     else
         log_warning "Failed to add root folder to $app"
@@ -624,7 +614,10 @@ main() {
     log_info "Checking service availability..."
     local all_running=true
     for service url in ${(kv)SERVICE_URLS}; do
-        if curl -s -o /dev/null -w "%{http_code}" "$url" | grep -q "200\|301\|302"; then
+        local api_key=$(get_api_key "$service" 2>/dev/null || true)
+        if [[ -n "$api_key" ]] && arr_health_check "$url" "$api_key"; then
+            log_success "$service is available"
+        elif curl -s -o /dev/null -w "%{http_code}" "$url" 2>/dev/null | grep -q "200\|301\|302"; then
             log_success "$service is available"
         else
             log_warning "$service is not accessible"

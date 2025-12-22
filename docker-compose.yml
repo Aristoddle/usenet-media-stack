@@ -242,6 +242,15 @@ services:
         reservations:
           cpus: '0.5'
           memory: 256M
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:9091/transmission/web/
+      interval: 30s
+      timeout: 10s
+      retries: 3
     logging:
       driver: json-file
       options: *id002
@@ -376,6 +385,15 @@ services:
         reservations:
           cpus: '0.25'
           memory: 256M
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:9696/ping
+      interval: 30s
+      timeout: 10s
+      retries: 3
     logging:
       driver: json-file
       options: *id002
@@ -421,7 +439,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/lidarr:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
-      - ${MUSIC_ROOT:-/srv/usenet/media/music}:/music:rw
+      - ${MUSIC_ROOT:-/srv/usenet/media/music}:/music:rw,z
     ports:
       - 8686:8686
     restart: unless-stopped
@@ -630,7 +648,7 @@ services:
       - STASH_CACHE=/cache/
       - STASH_PORT=9999
     volumes:
-      - /etc/localtime:/etc/localtime:rw
+      - /etc/localtime:/etc/localtime:ro
       - ${CONFIG_ROOT:-/srv/usenet/config}/stash:/root/.stash:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/adult:/data:rw,z
       - ${CONFIG_ROOT:-/srv/usenet/config}/stash/metadata:/metadata:rw,z
