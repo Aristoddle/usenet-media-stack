@@ -40,9 +40,11 @@ The codebase is now clean, with consistent patterns and reusable API libraries.
 **Why**: Sonarr, Radarr, Lidarr, etc. need paths to your actual media libraries to manage content. Currently the compose file has placeholders/defaults that don't match your real disk layout.
 
 **Current State**:
-- Docker Compose uses `${MEDIA_ROOT:-/srv/usenet/media}` and similar defaults
-- Your actual media is on OneDrive-synced paths like `/var/mnt/fast8tb/Cloud/OneDrive/...`
-- `.env.example` has placeholder paths, but `.env` needs real paths
+- Docker Compose uses `${MEDIA_ROOT:-/srv/usenet/media}` with fallback defaults
+- `.env` IS configured with real paths (verified 2025-12-21):
+  - `MEDIA_ROOT=/var/mnt/fast8tb/Local/media`
+  - `COMICS_ROOT=/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics`
+- **TODO**: Verify each ARR service has root folders added pointing to container paths
 
 **What Needs to Happen**:
 ```
@@ -352,14 +354,25 @@ Your actual content is here (based on prior sessions):
 └── ...
 ```
 
-The compose file defaults to `/srv/usenet/...` which doesn't exist. The `.env` file
-needs to be populated with the real paths above.
+The `.env` file IS populated with real paths. The compose file uses these via
+variable substitution (e.g., `${MEDIA_ROOT:-/srv/usenet/media}`).
 
-### Blocking Issue
+**Verify mounts match**: Ensure Sonarr/Radarr/Lidarr have root folders pointing
+to their mounted paths (`/tv`, `/movies`, `/music` inside containers).
 
-**ARR services can't see your media** because `.env` has placeholder paths.
+### Current .env State
 
-Fix: Update `.env` with real paths, then configure root folders in each service.
+**Good news**: `.env` already has real paths configured:
+```
+MEDIA_ROOT=/var/mnt/fast8tb/Local/media
+CONFIG_ROOT=/var/mnt/fast8tb/config
+DOWNLOADS_ROOT=/var/mnt/fast8tb/Local/downloads
+BOOKS_ROOT=/var/mnt/fast8tb/Cloud/OneDrive/Books
+COMICS_ROOT=/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics
+```
+
+**Remaining work**: Verify ARR services have root folders configured pointing to these paths.
+Each service needs root folders added via web UI or API (e.g., Sonarr needs `/tv`, Radarr needs `/movies`).
 
 ### Files You'll Touch Most
 
