@@ -104,6 +104,8 @@ export default defineConfig({
           text: '🏗️ Architecture',
           items: [
             { text: 'System Overview', link: '/architecture/' },
+            { text: 'Design Philosophy', link: '/architecture/design-philosophy' },
+            { text: 'Volume Safety', link: '/architecture/volume-safety' },
             { text: 'CLI Design', link: '/architecture/cli-design' },
             { text: 'Service Architecture', link: '/architecture/services' },
             { text: 'Storage System', link: '/architecture/storage' },
