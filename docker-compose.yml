@@ -499,6 +499,8 @@ services:
       - ${BOOKS_ROOT:-/srv/usenet/books}:/books:rw,z
     ports:
       - 32400:32400
+    devices:
+      - /dev/dri:/dev/dri
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -585,6 +587,8 @@ services:
     ports:
       - 8265:8265
       - 8266:8266
+    devices:
+      - /dev/dri:/dev/dri
     restart: unless-stopped
     deploy:
       mode: replicated
@@ -658,6 +662,8 @@ services:
       - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
     ports:
       - 9998:9999
+    devices:
+      - /dev/dri:/dev/dri
     restart: unless-stopped
     logging:
       driver: json-file
