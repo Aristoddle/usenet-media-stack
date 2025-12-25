@@ -267,7 +267,7 @@ services:
       - ${CONFIG_ROOT:-/srv/usenet/config}/sonarr:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
-      - /var/mnt/pool:/pool:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -303,7 +303,7 @@ services:
       - ${CONFIG_ROOT:-/srv/usenet/config}/radarr:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
-      - /var/mnt/pool:/pool:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -339,6 +339,7 @@ services:
       - ${CONFIG_ROOT:-/srv/usenet/config}/bazarr:/config:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 6767:6767
     restart: unless-stopped
@@ -443,6 +444,7 @@ services:
       - ${CONFIG_ROOT:-/srv/usenet/config}/lidarr:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
       - ${MUSIC_ROOT:-/srv/usenet/media/music}:/music:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 8686:8686
     restart: unless-stopped
@@ -500,7 +502,7 @@ services:
       - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/music:/music:rw,z
       - ${BOOKS_ROOT:-/srv/usenet/books}:/books:rw,z
-      - /var/mnt/pool:/pool:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 32400:32400
     devices:
@@ -588,6 +590,7 @@ services:
       - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/tdarr_transcode:/temp:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 8265:8265
       - 8266:8266
