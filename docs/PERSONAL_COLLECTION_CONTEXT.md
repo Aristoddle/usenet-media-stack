@@ -19,6 +19,28 @@ The collection exists to:
 
 ---
 
+## The Throughline: Artists Who Commit
+
+There is a thread connecting the works that matter most. It is not genre. It is not era. It is this:
+
+**Artists who gave everything without hedging. Who committed fully. Who didn't apologize for caring too much.**
+
+| Work | The Commitment |
+|------|----------------|
+| **Redline** | Seven years of hand-drawn animation when the industry had moved to CG. Takeshi Koike didn't hedge. He committed until it nearly killed the studio. |
+| **La Grande Bellezza** | Jep Gambardella stopped writing because he couldn't be honest. The film itself IS the honesty he couldn't produce. It doesn't apologize for being about beauty and loss. |
+| **Rubber** | A tire that kills people. No explanation offered. No wink to the audience. Just commits to the bit completely. |
+| **Porco Rosso** | "I'd rather be a pig than a fascist." Choosing to be seen as lesser — as absurd, as uncommercial, as a cartoon pig — rather than compromise. |
+| **Fujimoto (Chainsaw Man, Fire Punch, Goodbye Eri)** | Unhinged. Brutal. Emotionally devastating. No safety nets. No hedging. He gives you everything and doesn't protect himself. |
+
+This is the philosophy: **commit fully, don't hedge, don't apologize for caring.**
+
+The collection is proof that this way of making art exists. That it's possible. That you can give everything.
+
+This is also how he wants to live. The collection is an anchor to that intention during a period where life has demanded compromise and caregiving and waiting.
+
+---
+
 ## Films With Personal Significance
 
 ### Tier 0: Life-Defining
