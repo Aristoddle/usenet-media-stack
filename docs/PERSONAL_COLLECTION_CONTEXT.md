@@ -2,7 +2,7 @@
 
 > **Purpose**: Semantic context for media acquisition. This isn't a list of titles — it's the *why* behind the collection. Future agents MUST read this to understand acquisition decisions.
 >
-> **Last Updated**: 2025-12-27
+> **Last Updated**: 2025-12-27 (added Event Films section)
 > **Critical**: Do not compress or summarize this document. The personal details ARE the data.
 
 ---
@@ -111,6 +111,30 @@ When evaluating a film, ask: Did the honesty survive? Or was it defended into sa
 - **Comedy Store proximity** — lived walkable, watched every performer including unknowns
 
 The collection is preparation to rebuild this life.
+
+---
+
+## Event Films (Movie Night Criteria)
+
+Not every film works for group viewing. Some are too introspective, too slow, too demanding.
+
+**"Event films with proper heartbeat"** — works that reward sharing:
+
+| Category | Examples | Why They Work |
+|----------|----------|---------------|
+| **Horror-themed (not scary)** | Evil Dead trilogy, Ash vs Evil Dead | Fun, quotable, bonding through absurdity |
+| **Action maximalism** | Redline, The Raid, Beat Takeshi | Craft visible on screen, conversation starters |
+| **Crowd-pleasers with depth** | Cornetto Trilogy, Hot Fuzz | Rewatchable, layered, always reveal something new |
+| **Auteur spectacles** | Kurosawa jidaigeki, Wong Kar-wai | Introduce friends to masters |
+| **Cult traditions** | Rubber | "Just trust me" energy |
+
+**Anti-patterns for movie nights**:
+- Sad dramas (save for solo viewing)
+- Slow burns without payoff (lose the room)
+- Actually scary horror (limits audience)
+- Dense subtitles + complex plot (hard to track with snacks)
+
+The collection serves **both** private contemplation and social curation. A good movie night requires having the right films loaded and ready.
 
 ---
 
