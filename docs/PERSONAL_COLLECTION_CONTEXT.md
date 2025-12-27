@@ -41,6 +41,21 @@ This is also how he wants to live. The collection is an anchor to that intention
 
 ---
 
+## The Second Axis: Soul Over Polish
+
+Not everything that matters is technically perfect. Some films matter because **the people who made them meant it**, even when the result is flawed.
+
+| Work | Why It Has Soul |
+|------|-----------------|
+| **The Unbearable Weight of Massive Talent** | Cage being honest about himself. The meta-commentary isn't ironic distance — it's vulnerability. Saw it at the Village/Bruin in Westwood, private screening with best friend and his A-list actress girlfriend who dragged them there because Cage had always been kind to her. She was so happy for him. |
+| **Watching the Detectives** | A flop. But Cillian Murphy — one of the most intense actors working — chose to try being a rom-com lead. Lucy Liu — fresh off O-Ren Ishii — chose to be the manic pixie dream girl. They weren't there for the paycheck. Something about that script called to them. |
+
+This is different from "technically excellent." The signal is: *the people who made this meant it.*
+
+Some films that "shouldn't work" have more soul than polished products made by committee. Recognize that. Don't filter purely on craft metrics.
+
+---
+
 ## Films With Personal Significance
 
 ### Tier 0: Life-Defining
