@@ -1,0 +1,183 @@
+# PERSONAL_COLLECTION_CONTEXT.md
+
+> **Purpose**: Semantic context for media acquisition. This isn't a list of titles — it's the *why* behind the collection. Future agents MUST read this to understand acquisition decisions.
+>
+> **Last Updated**: 2025-12-27
+> **Critical**: Do not compress or summarize this document. The personal details ARE the data.
+
+---
+
+## The Philosophy
+
+This is not a hard drive. It's a philosophy made material.
+
+The collection exists to:
+1. **Preserve connection** — to friends, family, and a life temporarily on hold
+2. **Enable sharing** — Plex lifetime pass means loved ones can watch even from afar
+3. **Prepare for return** — "having my guns loaded" for when LA is possible again
+4. **Honor craft** — max-bitrate, better-than-streaming, world-class masters
+
+---
+
+## Films With Personal Significance
+
+### Tier 0: Life-Defining
+
+| Film | Why It Matters |
+|------|----------------|
+| **Porco Rosso (1992)** | Favorite film. "I'd rather be a pig than a fascist." Political resonance. Ghibli masterwork. |
+| **La Grande Bellezza (2013)** | Favorite film. The fiancée who left was like Jep Gambardella. Four years together, moved out on his birthday. This film is processing that loss. |
+| **Ponyo (2008)** | Saw 70mm world premiere at LA museum with girlfriend (third date). Fell asleep on her shoulder from overwork. Watched it over and over together. |
+
+### Tier 1: Personal History
+
+| Film | Why It Matters |
+|------|----------------|
+| **Rubber (2010)** | College tradition. Would throw movie nights, then just show Rubber to mess with everyone. Social bonding through absurdist horror. |
+| **Repo Man (1984)** | Watched with dad. That same dad had a stroke — why he's now in Georgia instead of LA. Connection to father. |
+| **Watching the Detectives (2007)** | Cillian Murphy as rom-com lead, Lucy Liu as manic pixie dream girl post-Kill Bill. Personally moving story. |
+
+### Tier 2: Social Identity
+
+| Film | Why It Matters |
+|------|----------------|
+| **All Ghibli** | Complete collection required. Studio defined his animation appreciation. Museum premiere experience. |
+| **Redline (2009)** | Explicitly "love it" in taste profile. Maximum craft animation. |
+
+---
+
+## The LA Era
+
+- **$4,000 projector** — heart of social world
+- **Regular screenings** — friends, loved ones, their friends
+- **Chinese Theatre red carpet** — girlfriend awarded for voice work recorded in his bedroom closet
+- **Comedy Store proximity** — lived walkable, watched every performer including unknowns
+
+The collection is preparation to rebuild this life.
+
+---
+
+## Family Context
+
+### For Mom
+- **Rikki-Tikki-Tavi** — specifically requested for her
+
+### Connection to Dad
+- **Repo Man** — watched together
+- Dad had stroke — reason for Georgia relocation
+- Media collection is anchor to identity during caregiving period
+
+---
+
+## The Breakup
+
+Fiancée of 4 years left after series of family tragedies. Moved out on his birthday. Couldn't handle the cost of caring for someone whose parents got sick.
+
+**Films that process this:**
+- La Grande Bellezza — direct parallel to Jep Gambardella
+- Ponyo — memory of early relationship, third date
+
+---
+
+## Animation Priorities
+
+### Bakshi (Ralph Bakshi)
+- Wizards
+- Fire and Ice (with Frazetta)
+- Lord of the Rings (1978)
+- American Pop
+- Heavy Traffic
+- Fritz the Cat
+
+### Fleischer (Max Fleischer)
+- Superman 1941-1942 (foundational)
+- Gulliver's Travels
+- Mr. Bug Goes to Town
+- Betty Boop collection
+- Popeye collection
+
+### Rankin/Bass
+- The Hobbit (1977)
+- The Return of the King
+- The Last Unicorn
+- The Flight of Dragons
+
+**Why these matter**: Audio-first appreciation (blind ages 11-16). Animation that relies on craft, not visual spectacle. Foundational American animation history.
+
+---
+
+## Translation Nuances (Manga/Anime)
+
+| Series | Best Translation | Why |
+|--------|------------------|-----|
+| **One Piece** | Viz official | Oda copy-checks the translation personally |
+| **JoJo's Bizarre Adventure** | JoJo's Colored Adventure fan translation | Official translation mangles Stand names due to copyright fears (Dirty Deeds Done Dirt Cheap → "Filthy Acts at a Reasonable Price") |
+| **Most anime** | Original Japanese + subs | Auteur work demands original audio |
+
+---
+
+## ROM/Emulation Context
+
+When acquiring ROMs for EmuDeck:
+- Include all mods, shader packs, texture packs
+- Organize into proper EmuDeck structure
+- Verify against No-Intro/Redump for authenticity
+- Usenet-first via Prowlarr → SABnzbd, torrent fallback
+
+---
+
+## Acquisition Philosophy
+
+### Auto-Acquire
+- Creator already in collection (+3)
+- Maximalist visual craft (+2)
+- Moral complexity (+2)
+- Anti-authoritarian themes (+2)
+- Audio/soundtrack excellence (+1)
+- Score ≥5 = yes
+
+### Hard Exclusions
+- Bo Burnham (-∞) — negative personal experience at Sundance
+- Generic isekai
+- Ironic distance/hedging
+- Hollow sequels
+
+---
+
+## Current Status Flags
+
+### Monitored But Missing Files (trigger searches)
+- [ ] Rikki-Tikki-Tavi (for mom)
+- [ ] Bakshi collection (Wizards, Fire and Ice)
+- [ ] Fleischer collection
+- [ ] Ponyo, Spirited Away, Mononoke, Howl's
+
+### Just Added (2025-12-27)
+- [x] Porco Rosso
+- [x] La Grande Bellezza
+- [x] Repo Man
+- [x] Rubber
+- [x] Watching the Detectives
+- [x] Castle in the Sky
+- [x] Kiki's Delivery Service
+- [x] Grave of the Fireflies
+- [x] The Wind Rises
+- [x] When Marnie Was There
+- [x] Whisper of the Heart
+- [x] The Boy and the Heron
+
+---
+
+## Future Agents: Read This First
+
+Before any acquisition decision, ask:
+1. Does this connect to personal history documented above?
+2. Does this complete an auteur's filmography?
+3. Does this serve the sharing/preparation philosophy?
+4. Would he be embarrassed to not have this?
+
+The goal is not volume. The goal is a curated curriculum — proof of craft, connection to loved ones, preparation for return to the life that was interrupted.
+
+---
+
+*"You collect proof of craft... artists who gave a shit... You're curating a curriculum."*
