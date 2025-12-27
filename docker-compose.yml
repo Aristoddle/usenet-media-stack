@@ -415,6 +415,7 @@ services:
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
+      - ${MEDIA_ROOT:-/srv/usenet/media}/adult:/adult:rw,z
     ports:
       - 6969:6969
     restart: unless-stopped
@@ -458,6 +459,43 @@ services:
     logging:
       driver: json-file
       options: *id002
+  readarr:
+    <<: *network_tweaks
+    image: linuxserver/readarr:develop-0.4.18.2805-ls157
+    container_name: readarr
+    hostname: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ${CONFIG_ROOT:-/srv/usenet/config}/readarr:/config:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+      - ${EBOOKS_ROOT:-/srv/usenet/books/eBooks}:/books:rw,z
+      - ${BOOKS_ROOT:-/srv/usenet/books}:/books-all:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    depends_on:
+      - sabnzbd
+      - transmission
+    logging:
+      driver: json-file
+      options: *id002
   mylar:
     <<: *network_tweaks
     image: docker.io/linuxserver/mylar3:latest
@@ -485,7 +523,8 @@ services:
       driver: json-file
       options: *id002
   plex:
-    <<: *network_tweaks
+    # Using host network for proper remote access (UPnP/NAT-PMP)
+    network_mode: host
     image: docker.io/linuxserver/plex:latest
     container_name: plex
     hostname: plex
@@ -503,8 +542,8 @@ services:
       - ${MEDIA_ROOT:-/srv/usenet/media}/music:/music:rw,z
       - ${BOOKS_ROOT:-/srv/usenet/books}:/books:rw,z
       - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
-    ports:
-      - 32400:32400
+      - ${POOL_ROOT:-/var/mnt/pool}/christmas:/christmas:rw,z
+    # No ports needed with host network mode
     devices:
       - /dev/dri:/dev/dri
     restart: unless-stopped
@@ -668,7 +707,7 @@ services:
       - ${CONFIG_ROOT:-/srv/usenet/config}/stash/generated:/generated:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
     ports:
-      - 9998:9999
+      - 9999:9999
     devices:
       - /dev/dri:/dev/dri
     restart: unless-stopped
