@@ -160,61 +160,162 @@ Overseerr
 
 Tdarr transcodes media to HEVC/AV1 to save 30-50% storage. With 28TB of media and only 12TB free, this is critical.
 
-### Current Status
+### Current Status ✅ OPERATIONAL
 
-| Component | Status |
-|-----------|--------|
-| MainNode | ✅ GPU workers: 2, CPU health: 1 |
-| SecondaryNode | ✅ GPU workers: 2, CPU health: 1 |
-| Libraries | ⚠️ **Must be created via UI** |
+| Component | Status | Details |
+|-----------|--------|---------|
+| MainNode | ✅ Active | GPU workers: 2, CPU health: 1 |
+| SecondaryNode | ✅ Active | GPU workers: 2, CPU health: 1 |
+| Movies | ✅ Configured | ID: `qRHd4dcGk`, `/media/movies` |
+| TV | ✅ Configured | ID: `FKnGmlxBT`, `/media/tv` |
+| Anime | ✅ Configured | ID: `08QZ-saXn`, `/media/anime` |
+| Files Queued | **5,026** | GPU transcoding with HEVC |
 
-### Initial Setup (Required - UI Only)
+### Library Configuration
 
-**⚠️ WARNING**: Tdarr's API for library creation is broken/undocumented. Libraries MUST be created via the web UI at http://localhost:8265. API-created libraries cause `RangeError: interval NaN` errors.
+Libraries are configured with the **Migz1FFMPEG GPU plugin** for hardware-accelerated HEVC encoding:
 
-#### Step 1: Create Libraries
+| Plugin | Status | Purpose |
+|--------|--------|---------|
+| `MigzImageRemoval` | ✅ | Remove embedded images |
+| `Reorder_Streams` | ✅ | Optimize stream order |
+| `Migz1FFMPEG_CPU` | ❌ OFF | CPU encoding (disabled) |
+| `Migz1FFMPEG` | ✅ ON | **GPU VAAPI encoding** |
+| `New_file_size_check` | ✅ | Verify compression worked |
 
-1. Click **Libraries** in sidebar
-2. Click **+ Library** for each:
+### AMD Radeon 780M VAAPI Configuration
 
-| Library | Source Folder | Transcode Cache |
-|---------|---------------|-----------------|
-| Movies | `/media/movies` | `/temp` |
-| TV | `/media/tv` | `/temp` |
-| Anime | `/media/anime` | `/temp` |
+Your GPU uses VCN4 (Video Core Next 4.0) with RDNA3 architecture.
 
-3. For each library, enable:
-   - ✅ Transcode
-   - ✅ Health check
-   - ✅ Scan on start
+**Optimal FFmpeg flags:**
+```bash
+# HEVC (recommended for compatibility)
+-vaapi_device /dev/dri/renderD128 \
+-vf 'format=nv12,hwupload' \
+-c:v hevc_vaapi \
+-qp 20 \
+-profile:v main
 
-#### Step 2: Enable Workers
+# For 10-bit HDR content
+-vf 'format=p010,hwupload' \
+-profile:v main10
 
-1. Click **Nodes** in sidebar
-2. For **MainNode**:
-   - Set **Transcode GPU**: `2`
-   - Set **Health Check CPU**: `1`
-3. For **SecondaryNode**:
-   - Set **Transcode GPU**: `2`
-   - Set **Health Check CPU**: `1`
-
-#### Step 3: Add Transcode Plugin
-
-1. Go to **Libraries** → select a library → **Transcode options**
-2. Click **+ Add plugin**
-3. Search for: `Tdarr_Plugin_MC93_Migz1FFMPEG` or `Tdarr_Plugin_00td_action_re_encode_to_hevc_ffmpeg`
-4. Configure:
-   - Target codec: **HEVC/H.265**
-   - Hardware: **VAAPI** (for AMD GPU)
-
-#### VAAPI Settings for AMD Radeon 780M
-
-When configuring HEVC encoding, use these FFmpeg arguments:
-```
--vaapi_device /dev/dri/renderD128 -vf 'format=nv12,hwupload' -c:v hevc_vaapi -qp 22
+# AV1 (better compression, newer)
+-c:v av1_vaapi -qp 24
 ```
 
-**Important**: Use `-qp` or `-global_quality`, NOT `-crf` (VAAPI doesn't support CRF).
+**Quality Settings (QP scale: 0-51, lower = better):**
+
+| Content Type | HEVC QP | AV1 QP | Notes |
+|--------------|---------|--------|-------|
+| 4K HDR | 18 | 22 | Preserve quality |
+| 4K SDR | 20 | 24 | Standard high quality |
+| 1080p | 22 | 26 | Good compression |
+| 720p/480p | 24 | 28 | Maximum compression |
+| Anime | 18 | 22 | Preserve line art |
+
+**CRITICAL**: VAAPI does NOT support CRF mode. Use `-qp` or `-global_quality` only!
+
+### Tdarr API Reference
+
+Libraries must be created via UI (API-created libraries cause `RangeError: interval NaN`), but configuration can be done via API:
+
+```bash
+# Get all libraries
+curl -s -X POST http://localhost:8265/api/v2/cruddb \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"collection":"LibrarySettingsJSONDB","mode":"getAll"}}'
+
+# Update library settings
+curl -s -X POST http://localhost:8265/api/v2/cruddb \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "collection": "LibrarySettingsJSONDB",
+      "mode": "update",
+      "docID": "LIBRARY_ID",
+      "obj": {
+        "processLibrary": true,
+        "processTranscodes": true,
+        "processHealthChecks": true
+      }
+    }
+  }'
+
+# Trigger library scan
+curl -s -X POST http://localhost:8265/api/v2/scan-files \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"scanConfig":{"dbID":"LIBRARY_ID","arrayOrPath":"/media/movies","mode":"scanFindNew"}}}'
+
+# Check file queue status
+curl -s -X POST http://localhost:8265/api/v2/cruddb \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"collection":"FileJSONDB","mode":"getAll"}}' | \
+  jq '[.[] | .TranscodeDecisionMaker] | group_by(.) | map({decision: .[0], count: length})'
+```
+
+### Initial Setup (UI Only Required)
+
+**⚠️ WARNING**: Libraries MUST be created via the web UI at http://localhost:8265. API-created libraries lack proper `schedule` arrays and cause runtime errors.
+
+#### Step 1: Create Libraries (UI)
+
+1. Click **Libraries** → **+ Library**
+2. Create three libraries:
+
+| Library | Source Folder | Cache | Priority |
+|---------|---------------|-------|----------|
+| Movies | `/media/movies` | `/temp` | Normal |
+| TV | `/media/tv` | `/temp` | Normal |
+| Anime | `/media/anime` | `/temp` | Normal |
+
+**Note**: Container paths differ from host! Host `/var/mnt/pool/movies` maps to container `/media/movies`.
+
+#### Step 2: Enable Workers (UI or API)
+
+```bash
+# Via API - update node worker limits
+curl -s -X POST http://localhost:8265/api/v2/cruddb \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "collection": "NodeJSONDB",
+      "mode": "update",
+      "docID": "NODE_ID",
+      "obj": {
+        "workerLimits": {
+          "transcodegpu": 2,
+          "healthcheckcpu": 1,
+          "transcodecpu": 0
+        }
+      }
+    }
+  }'
+```
+
+#### Step 3: Configure Plugins (API)
+
+```bash
+# Enable GPU plugin, disable CPU plugin
+curl -s -X POST http://localhost:8265/api/v2/cruddb \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "collection": "LibrarySettingsJSONDB",
+      "mode": "update",
+      "docID": "LIBRARY_ID",
+      "obj": {
+        "pluginIDs": [
+          {"_id": "plugin1", "id": "Tdarr_Plugin_MC93_MigzImageRemoval", "checked": true, "source": "Community", "priority": 0, "InputsDB": {}},
+          {"_id": "plugin2", "id": "Tdarr_Plugin_lmg1_Reorder_Streams", "checked": true, "source": "Community", "priority": 1, "InputsDB": {}},
+          {"_id": "plugin3", "id": "Tdarr_Plugin_MC93_Migz1FFMPEG_CPU", "checked": false, "source": "Community", "priority": 2, "InputsDB": {}},
+          {"_id": "plugin4", "id": "Tdarr_Plugin_MC93_Migz1FFMPEG", "checked": true, "source": "Community", "priority": 3, "InputsDB": {}},
+          {"_id": "plugin5", "id": "Tdarr_Plugin_a9he_New_file_size_check", "checked": true, "source": "Community", "priority": 4, "InputsDB": {}}
+        ]
+      }
+    }
+  }'
+```
 
 ---
 
@@ -265,12 +366,11 @@ When configuring HEVC encoding, use these FFmpeg arguments:
 | Tautulli | Plex analytics | ✅ Running at :8181 |
 | Komf | Manga metadata | ✅ Connected to Komga & Kavita |
 | Audiobookshelf | Audiobooks | ✅ 1 library |
+| **Tdarr** | Storage optimization | ✅ **5,026 files queued**, GPU VAAPI active |
 
-### Needs Setup
+### All Core Services Operational ✅
 
-| Tool | What's Missing |
-|------|----------------|
-| **Tdarr** | Libraries not created, workers at 0 |
+All essential media stack services are now configured and running.
 
 ### Worth Adding Later
 
@@ -330,4 +430,4 @@ When configuring HEVC encoding, use these FFmpeg arguments:
 
 Everything else is automation that runs in the background. You shouldn't need to touch Radarr/Sonarr/Prowlarr/SABnzbd unless troubleshooting.
 
-**Priority action**: Configure Tdarr libraries and workers at http://localhost:8265 to start saving storage space!
+**Tdarr Status**: ✅ Active - 5,026 files queued for GPU transcoding. Monitor progress at http://localhost:8265
