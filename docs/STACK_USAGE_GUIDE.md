@@ -4,6 +4,25 @@
 
 ---
 
+## ⚠️ CRITICAL: Docker Commands Require sudo
+
+**On Bazzite/Fedora, ALL docker commands require sudo:**
+
+```bash
+# WRONG - will fail with permission denied
+docker compose up -d
+docker logs tdarr
+
+# CORRECT - always use sudo
+sudo docker compose up -d
+sudo docker logs tdarr
+sudo docker compose restart tdarr
+```
+
+This is a Bazzite/SELinux security requirement, not a misconfiguration.
+
+---
+
 ## Stack Hierarchy: What Talks to What
 
 ```
@@ -139,11 +158,19 @@ Overseerr
 
 ## Tdarr: Storage Optimization
 
-Tdarr transcodes media to HEVC (H.265) to save 30-50% storage. With 28TB of media and only 12TB free, this is critical.
+Tdarr transcodes media to HEVC/AV1 to save 30-50% storage. With 28TB of media and only 12TB free, this is critical.
+
+### Current Status
+
+| Component | Status |
+|-----------|--------|
+| MainNode | ✅ GPU workers: 2, CPU health: 1 |
+| SecondaryNode | ✅ GPU workers: 2, CPU health: 1 |
+| Libraries | ⚠️ **Must be created via UI** |
 
 ### Initial Setup (Required - UI Only)
 
-Tdarr libraries and workers must be configured via the web UI at http://localhost:8265.
+**⚠️ WARNING**: Tdarr's API for library creation is broken/undocumented. Libraries MUST be created via the web UI at http://localhost:8265. API-created libraries cause `RangeError: interval NaN` errors.
 
 #### Step 1: Create Libraries
 
