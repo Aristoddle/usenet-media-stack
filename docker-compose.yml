@@ -197,7 +197,7 @@ services:
       resources:
         limits:
           cpus: '2.0'
-          memory: 2G
+          memory: 6G
         reservations:
           cpus: '0.5'
           memory: 512M
@@ -280,7 +280,7 @@ services:
       resources:
         limits:
           cpus: '1.0'
-          memory: 1G
+          memory: 4G
         reservations:
           cpus: '0.25'
           memory: 256M
@@ -316,7 +316,7 @@ services:
       resources:
         limits:
           cpus: '1.0'
-          memory: 1G
+          memory: 4G
         reservations:
           cpus: '0.25'
           memory: 256M
@@ -352,7 +352,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 2G
         reservations:
           cpus: '0.1'
           memory: 128M
@@ -385,7 +385,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 1G
         reservations:
           cpus: '0.25'
           memory: 256M
@@ -580,7 +580,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 2G
     logging:
       driver: json-file
       options: *id002
@@ -608,7 +608,7 @@ services:
       options: *id002
   tdarr:
     <<: *network_tweaks
-    image: ghcr.io/haveagitgat/tdarr:latest
+    image: ghcr.io/haveagitgat/tdarr:2.26.01
     container_name: tdarr
     hostname: tdarr
     environment:
@@ -642,10 +642,10 @@ services:
       resources:
         limits:
           cpus: '4.0'
-          memory: 4G
+          memory: 16G
         reservations:
           cpus: '1.0'
-          memory: 1G
+          memory: 4G
     logging:
       driver: json-file
       options: *id002
@@ -738,7 +738,8 @@ services:
     environment:
       - JAVA_OPTS=-Xms4g -Xmx8g -Djava.io.tmpdir=/config/tmp
       - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
-      - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085
+      # CORS: Allow Komf from all access points (localhost, 127.0.0.1, LAN IP)
+      - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085,http://127.0.0.1:8085,http://192.168.6.167:8085
     volumes:
       - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
       - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics_mirror:rw,z
@@ -752,8 +753,16 @@ services:
     container_name: komf
     logging: *id001
     environment:
+      # Komga connection (container-to-container uses internal port 25600)
       - KOMGA_BASE_URI=http://komga:25600
-      - KOMF_COMICVINE_API_KEY=${KOMF_COMICVINE_API_KEY:-}
+      - KOMF_KOMGA_USER=${KOMF_KOMGA_USER:-j3lanzone@gmail.com}
+      - KOMF_KOMGA_PASSWORD=${KOMF_KOMGA_PASSWORD:-fishing123}
+      # Kavita connection
+      - KOMF_KAVITA_BASE_URI=http://kavita:5000
+      - KOMF_KAVITA_API_KEY=${KOMF_KAVITA_API_KEY:-2a0679fc-1ad7-414e-8ca1-e3f12d9164bf}
+      # Metadata providers
+      - KOMF_MAL_CLIENT_ID=${KOMF_MAL_CLIENT_ID:-7a9302bb7cc5f51d379ed81fea86a723}
+      - KOMF_COMICVINE_API_KEY=${KOMF_COMICVINE_API_KEY:-174ed363d12baf12bc3b136a2f49e0a16cff5559}
       - KOMF_MANGAUPDATES_USERNAME=${KOMF_MANGAUPDATES_USERNAME:-}
       - KOMF_MANGAUPDATES_PASSWORD=${KOMF_MANGAUPDATES_PASSWORD:-}
       - KOMF_MANGADEX_CLIENT_ID=${KOMF_MANGADEX_CLIENT_ID:-}
@@ -765,6 +774,7 @@ services:
       - ${COMICS_ROOT:-/srv/usenet/books/Comics}:/comics:rw,z
     depends_on:
       - komga
+      - kavita
     ports:
       - 8085:8085
     restart: unless-stopped
@@ -796,6 +806,51 @@ services:
     ports:
       - 4567:4567
     restart: unless-stopped
+  audiobookshelf:
+    <<: *network_tweaks
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    hostname: audiobookshelf
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ${AUDIOBOOKSHELF_CONFIG:-/var/mnt/fast8tb/config/audiobookshelf}:/config:rw,z
+      - ${AUDIOBOOKSHELF_CONFIG:-/var/mnt/fast8tb/config/audiobookshelf}/metadata:/metadata:rw,z
+      - ${AUDIOBOOKS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks}:/audiobooks:rw,z
+      - ${EBOOKS_ROOT:-/srv/usenet/books/eBooks}:/ebooks:rw,z
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
+    ports:
+      - 13378:80
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --quiet
+        - --tries=1
+        - --spider
+        - http://localhost:80/healthcheck
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: json-file
+      options: *id002
   aria2:
     <<: *network_tweaks
     build: ./aria2
@@ -811,3 +866,30 @@ services:
     ports:
       - 6800:6800
     restart: unless-stopped
+  tautulli:
+    <<: *network_tweaks
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    hostname: tautulli
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tautulli:/config:rw,z
+    ports:
+      - 8181:8181
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    logging:
+      driver: json-file
+      options: *id002

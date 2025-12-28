@@ -1,0 +1,88 @@
+# Tdarr Transcoding Stack for AMD VAAPI Hardware Encoding
+# Usage: docker compose -f docker-compose.tdarr.yml up -d
+#
+# This config enables:
+# - VAAPI hardware encoding (AMD Radeon 780M)
+# - HEVC/H.265 transcoding for 40-50% storage savings
+# - Automatic quality-based transcoding rules
+# - Movies, TV, AND Anime libraries included
+
+networks:
+  media_network:
+    external: true
+
+services:
+  tdarr:
+    container_name: tdarr
+    image: ghcr.io/haveagitgat/tdarr:latest
+    restart: unless-stopped
+    networks:
+      - media_network
+    ports:
+      - 8265:8265  # Web UI
+      - 8266:8266  # Server port
+    environment:
+      - TZ=America/Los_Angeles
+      - PUID=1000
+      - PGID=1000
+      - UMASK_SET=002
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - inContainer=true
+      - ffmpegVersion=7
+      - nodeName=MainNode
+    volumes:
+      - /var/home/deck/Documents/Code/media-automation/usenet-media-stack/config/tdarr/server:/app/server:z
+      - /var/home/deck/Documents/Code/media-automation/usenet-media-stack/config/tdarr/configs:/app/configs:z
+      - /var/home/deck/Documents/Code/media-automation/usenet-media-stack/config/tdarr/logs:/app/logs:z
+      - /var/mnt/pool/movies:/media/movies:z
+      - /var/mnt/pool/anime:/media/anime:z
+      - /var/mnt/pool/tv:/media/tv:z
+      - /tmp/tdarr_transcode:/temp:z
+    # AMD GPU passthrough for VAAPI
+    devices:
+      - /dev/dri:/dev/dri
+    deploy:
+      resources:
+        limits:
+          cpus: '6.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 2G
+
+  # Optional: Additional Tdarr node for parallel processing
+  tdarr-node:
+    container_name: tdarr-node
+    image: ghcr.io/haveagitgat/tdarr_node:latest
+    restart: unless-stopped
+    networks:
+      - media_network
+    environment:
+      - TZ=America/Los_Angeles
+      - PUID=1000
+      - PGID=1000
+      - UMASK_SET=002
+      - nodeName=SecondaryNode
+      - serverIP=tdarr
+      - serverPort=8266
+      - inContainer=true
+      - ffmpegVersion=7
+    volumes:
+      - /var/home/deck/Documents/Code/media-automation/usenet-media-stack/config/tdarr/configs:/app/configs:z
+      - /var/home/deck/Documents/Code/media-automation/usenet-media-stack/config/tdarr/logs:/app/logs:z
+      - /var/mnt/pool/movies:/media/movies:z
+      - /var/mnt/pool/anime:/media/anime:z
+      - /var/mnt/pool/tv:/media/tv:z
+      - /tmp/tdarr_transcode:/temp:z
+    devices:
+      - /dev/dri:/dev/dri
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+    depends_on:
+      - tdarr
