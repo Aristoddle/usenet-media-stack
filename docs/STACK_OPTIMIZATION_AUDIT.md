@@ -38,7 +38,7 @@ These are the brain of the operation - highest priority.
 
 | Service | Port | Status | Audit Date | Notes |
 |---------|------|--------|------------|-------|
-| Prowlarr | 9696 | ⬜ Pending | - | Indexer aggregation, syncs to all *arrs |
+| Prowlarr | 9696 | ✅ Complete | 2025-12-28 | Priorities staggered, fullSync verified |
 | Radarr | 7878 | ⬜ Pending | - | Movies, quality profiles, custom formats |
 | Sonarr | 8989 | ⬜ Pending | - | TV shows, anime profiles |
 | Lidarr | 8686 | ⬜ Pending | - | Music management |
@@ -51,7 +51,7 @@ The hands that grab content.
 
 | Service | Port | Status | Audit Date | Notes |
 |---------|------|--------|------------|-------|
-| SABnzbd | 8080 | ⬜ Pending | - | Primary Usenet, par2/unrar optimization |
+| SABnzbd | 8080 | ✅ Complete | 2025-12-28 | par2-turbo 16T, 4 servers, direct_unpack |
 | Transmission | 9091 | ⬜ Pending | - | Torrent fallback, seeding ratios |
 | Aria2 | 6800 | ⬜ Pending | - | Direct downloads, metalink support |
 
@@ -291,8 +291,8 @@ Keep everything running.
 Based on user impact and complexity:
 
 ### Phase 1: Core Pipeline (High Impact)
-1. ⬜ **Prowlarr** - Indexer health affects everything downstream
-2. ⬜ **SABnzbd** - Download performance critical
+1. ✅ **Prowlarr** - Indexer health affects everything downstream
+2. ✅ **SABnzbd** - Download performance critical
 3. ⬜ **Radarr** - Movie quality profiles
 4. ⬜ **Sonarr** - TV/Anime quality profiles
 5. ⬜ **Recyclarr** - TRaSH Guides sync
@@ -328,6 +328,34 @@ Based on user impact and complexity:
 ---
 
 ## Completed Audits
+
+### Prowlarr (2025-12-28) ✅
+- **Status**: Fully operational
+- **Indexers**: 4 Usenet (NZBgeek, NZBPlanet, NZBFinder, NZB.su)
+- **Configuration**: Staggered priorities (10/15/20/25), fullSync to 5 apps
+- **Optimizations Applied**:
+  - Priority staggering: NZBgeek=10, NZBPlanet=15, NZBFinder=20, NZB.su=25
+  - Equal priority causes first-added indexer to always win tiebreakers
+- **Learnings**:
+  - API: GET/PUT `/api/v1/indexer/{id}` for indexer management
+  - Full Sync recommended over Add and Remove Only
+  - 4 indexers is optimal for coverage
+  - Priority affects tiebreaker scenarios only
+
+### SABnzbd (2025-12-28) ✅
+- **Status**: Fully operational (1,826 items queued, 20.6 TB)
+- **Servers**: 4 (Newshosting, UsenetExpress, Frugal x2) with 85 connections
+- **Configuration**: par2-turbo 16 threads, direct_unpack enabled
+- **Verified Settings**:
+  - par2cmdline-turbo with 16-thread detection
+  - direct_unpack = 1, direct_unpack_threads = 3
+  - 4 servers with proper priority (0, 0, 2, 3)
+  - Categories: movies, tv, comics, audio, software, whisparr, books
+- **Learnings**:
+  - Article cache max is 4G (hard-coded limit)
+  - Unrar is single-threaded (disk I/O bound)
+  - par2 -t+ enables full multicore on Linux
+  - 12-20 connections per server is usually sufficient
 
 ### Tdarr (2025-12-28) ✅
 - **Status**: Fully operational
