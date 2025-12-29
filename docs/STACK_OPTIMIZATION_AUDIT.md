@@ -539,6 +539,174 @@ Based on user impact and complexity:
 
 ---
 
+## Phase 2 Deep Audit - Exhaustive Review (2025-12-28)
+
+This section documents an exhaustive fine-toothed comb review performed by deep-thinker agent.
+
+### Plex Hardware Transcoding - Root Cause Analysis
+
+**CRITICAL FINDING: amdgpu.ids Missing in Plex Container**
+
+Plex logs reveal a deeper issue beyond settings:
+```
+/home/runner/_work/plex-conan/plex-conan/.conan/data/libdrm/2.4.120-4/plex/main/build/.../amdgpu.ids: No such file or directory
+decoder error: 254 (repeated)
+```
+
+**Root Cause**: Plex ships with outdated Mesa/libdrm (2.4.120) that predates AMD RDNA3 (gfx1103/780M). Even with HW acceleration enabled, the container's bundled `radeonsi_drv_video.so` cannot recognize the GPU.
+
+**Host VAAPI vs Container VAAPI**:
+| Aspect | Host | Plex Container |
+|--------|------|----------------|
+| Mesa Version | 25.3.0 | ~23.x (outdated) |
+| libva Version | 2.22.0 | ~2.19 (outdated) |
+| gfx1103 Support | Yes | NO |
+| AV1 Encode | Yes | NO |
+
+**Workaround Solutions**:
+1. [plex-vaapi-amdgpu-mod](https://github.com/jefflessard/plex-vaapi-amdgpu-mod) - LinuxServer.io mod that copies host drivers
+2. [plex-amdgpu](https://github.com/naonak/plex-amdgpu) - Custom Docker with AMD GPU Pro
+3. Manual `/usr/lib/dri/radeonsi_drv_video.so` bind mount from host
+
+### Bazarr Provider Deep Dive
+
+**All Available Providers (Not Just Enabled)**:
+
+| Provider | Account Needed | API Limit | Best For |
+|----------|---------------|-----------|----------|
+| OpenSubtitles.com | Yes (free OK) | 20/day free | General |
+| Podnapisi | No | None | Slovenian, fallback |
+| Subscene | User-agent only | None | Asian languages |
+| SubDL | API key | 500/day | Hearing impaired |
+| TVSubtitles | No | None | TV shows |
+| YifySubtitles | No | None | Movies |
+| Supersubtitles | No | None | Hungarian |
+| Addic7ed | Yes | Limited | TV (quality) |
+| Animetosho | No | None | Anime |
+| Jimaku | API key | None | Japanese |
+| Whisper AI | Local | None | Any (generation) |
+
+**TRaSH Guides Recommendations (2025)**:
+- Minimum movie score: 80 (current: 70 - too low)
+- Minimum series score: 90 (current: 90 - correct)
+- Enable hash matching first (current: yes)
+- Use ffsubsync for timing (current: disabled)
+
+**Whisper AI Local Generation**:
+- Endpoint configurable: `whisperai.endpoint`
+- Requires separate Whisper container
+- Can generate subtitles for any language
+- Resource intensive (GPU recommended)
+
+### Tautulli Integration Options
+
+**Prometheus/Grafana Integration**:
+
+1. **Plexporters** (Recommended)
+   - Native Prometheus metrics
+   - Exports: `play_seconds_total`, `plays_total`, `transcodes_total`
+   - [Grafana Blog](https://grafana.com/blog/2023/04/28/plexporters-energize-how-we-monitor-plex-with-grafana/)
+
+2. **tautulli-exporter**
+   - Scrapes Tautulli API
+   - GitHub: `nwalke/tautulli-exporter`
+
+3. **Varken** (InfluxDB)
+   - Requires: Varken + InfluxDB + Grafana
+   - [Dashboard 11289](https://grafana.com/grafana/dashboards/11289-unraid-plex-dash/)
+
+### Overseerr API Complete Reference
+
+**Key Endpoints**:
+```bash
+BASE="http://localhost:5055/api/v1"
+KEY="X-Api-Key: MTc2NTg0ODk0NTIzNWZmOTk0NmRjLTE5NWItNDA0Mi04ZTk2LWQ1YjI1NWEyMDM1Mw=="
+
+# Status & Health
+GET $BASE/status
+GET $BASE/settings/main
+GET $BASE/settings/plex
+GET $BASE/settings/radarr
+GET $BASE/settings/sonarr
+
+# Request Management
+GET $BASE/request?take=10&skip=0&filter=pending
+POST $BASE/request/{id}/approve
+POST $BASE/request/{id}/decline
+DELETE $BASE/request/{id}
+
+# Media Search
+GET $BASE/search?query=term&page=1
+GET $BASE/movie/{tmdbId}
+GET $BASE/tv/{tmdbId}
+
+# User Management
+GET $BASE/user
+GET $BASE/user/{id}/requests
+
+# Swagger: https://api-docs.overseerr.dev/
+```
+
+### Plex Database Optimization
+
+**Current State**:
+- Main DB: 59MB + 106MB WAL
+- Blobs DB: 155MB + 1.2MB WAL
+- WAL size indicates fragmentation
+
+**[ChuckPa's DBRepair](https://github.com/ChuckPa/DBRepair) Commands**:
+```bash
+# Automatic (check + repair + reindex)
+./DBRepair.sh automatic
+
+# Individual operations
+./DBRepair.sh check    # Integrity check
+./DBRepair.sh vacuum   # Reclaim space
+./DBRepair.sh reindex  # Rebuild indexes
+```
+
+**Built-in Optimization**:
+```bash
+# Via API
+curl -X PUT "http://localhost:32400/library/optimize?X-Plex-Token=TOKEN"
+
+# Via Scheduled Tasks (already enabled weekly)
+# Recommendation: Run after large library changes
+```
+
+### Anti-Pattern Summary
+
+| Pattern | Service | Severity | Finding |
+|---------|---------|----------|---------|
+| Silent GPU Fallback | Plex | HIGH | Container Mesa outdated for RDNA3 |
+| Throttled Providers | Bazarr | MEDIUM | opensubtitlescom, subf2m disabled |
+| Orphan Paths | Bazarr | LOW | Some media paths no longer exist |
+| Large WAL | Plex | MEDIUM | 106MB WAL indicates fragmentation |
+| No Notifications | Tautulli | LOW | Discord/email not configured |
+
+### Consolidated Action Items
+
+**Priority 1 - Critical**:
+1. Apply [plex-vaapi-amdgpu-mod](https://github.com/jefflessard/plex-vaapi-amdgpu-mod) to docker-compose
+2. Enable HW acceleration in Plex UI after mod applied
+
+**Priority 2 - High**:
+3. Create OpenSubtitles.com account and configure in Bazarr
+4. Configure user-agent for subf2m in Bazarr
+5. Enable additional free providers (TVSubtitles, YifySubtitles)
+
+**Priority 3 - Medium**:
+6. Run Plex database VACUUM
+7. Enable ffsubsync in Bazarr for timing correction
+8. Configure Tautulli Discord notification
+
+**Priority 4 - Low**:
+9. Consider Prometheus exporter for Grafana
+10. Set up Whisper AI for subtitle generation
+11. Review Bazarr orphan paths
+
+---
+
 ## Notes
 
 - **sudo docker**: All docker commands require sudo on Bazzite/Fedora
