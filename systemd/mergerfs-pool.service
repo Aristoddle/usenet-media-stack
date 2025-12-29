@@ -1,0 +1,29 @@
+[Unit]
+Description=MergerFS Pool Mount
+Documentation=file:///var/home/deck/Documents/Code/media-automation/usenet-media-stack/docs/STORAGE_AND_REMOTE_ACCESS.md
+After=local-fs.target
+After=var-mnt-Fast_4TB_1.mount var-mnt-Fast_4TB_2.mount var-mnt-Fast_4TB_3.mount
+After=var-mnt-Fast_4TB_4.mount var-mnt-Fast_4TB_5.mount
+After=var-mnt-Fast_8TB_1.mount var-mnt-Fast_8TB_2.mount var-mnt-Fast_8TB_3.mount
+Wants=var-mnt-Fast_4TB_1.mount var-mnt-Fast_4TB_2.mount var-mnt-Fast_4TB_3.mount
+Wants=var-mnt-Fast_4TB_4.mount var-mnt-Fast_4TB_5.mount
+Wants=var-mnt-Fast_8TB_1.mount var-mnt-Fast_8TB_2.mount var-mnt-Fast_8TB_3.mount
+
+[Service]
+Type=forking
+# MergerFS with optimized caching (fixes 286% CPU issue)
+ExecStart=/usr/bin/mergerfs -o defaults,allow_other,use_ino,cache.files=auto-full,dropcacheonclose=false,category.create=mfs,moveonenospc=true,minfreespace=50G,fsname=mergerfs-pool \
+  /var/mnt/Fast_4TB_1:/var/mnt/Fast_4TB_2:/var/mnt/Fast_4TB_3:/var/mnt/Fast_4TB_4:/var/mnt/Fast_4TB_5:/var/mnt/Fast_8TB_1:/var/mnt/Fast_8TB_2:/var/mnt/Fast_8TB_3 \
+  /var/mnt/pool
+
+# After mount completes, restart Docker containers to fix stale FUSE references
+ExecStartPost=/bin/sleep 5
+ExecStartPost=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/restart-pool-containers.sh
+
+ExecStop=/usr/bin/umount /var/mnt/pool
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

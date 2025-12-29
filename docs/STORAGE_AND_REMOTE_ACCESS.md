@@ -229,14 +229,27 @@ ls -la /var/mnt/pool/
 
 **Fix**: Ensure `allow_other` is in mount options.
 
-### Tdarr Socket Errors After Pool Remount
+### Stale FUSE Mounts After Pool Remount
 
-**Symptom**: `ENOTCONN: socket is not connected` errors
+**Symptom**: `ENOTCONN: socket is not connected` or `Transport endpoint is not connected` errors
 
-**Fix**: Restart Tdarr containers:
+**Cause**: Containers started before MergerFS was mounted, or pool was remounted while containers were running. The containers have "zombie" references to the old mount point.
+
+**Fix**: Use the restart script to fix all affected containers:
 ```bash
-docker compose restart tdarr tdarr-node
+# Check which containers have stale mounts
+./scripts/restart-pool-containers.sh --check
+
+# Restart all pool-dependent containers
+./scripts/restart-pool-containers.sh
 ```
+
+The script will:
+1. Verify MergerFS is mounted
+2. Restart SABnzbd, Transmission, Tdarr, *arr apps, Plex, Komga, etc.
+3. Verify all mounts are healthy after restart
+
+**Prevention**: The systemd service (`systemd/mergerfs-pool.service`) includes an ExecStartPost that automatically restarts containers after MergerFS mounts.
 
 ---
 
@@ -265,7 +278,7 @@ tailscale status
 
 | File | Purpose |
 |------|---------|
-| `/etc/systemd/system/mergerfs-pool.service` | Boot persistence |
-| `~/.local/bin/mount-mergerfs-pool.sh` | Manual mount script |
+| `systemd/mergerfs-pool.service` | Boot persistence (copy to `/etc/systemd/system/`) |
+| `scripts/restart-pool-containers.sh` | Fix stale mounts after pool remount |
 | `docker-compose.yml` | Container volume mappings |
 | `.env` | Pool path variables |
