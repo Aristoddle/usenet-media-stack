@@ -3,8 +3,8 @@ layout: home
 title: "Beppe's Arr Stack"
 hero:
   name: "Beppe's Arr Stack"
-  text: "41TB Media Homelab"
-  tagline: "MergerFS + SVT-AV1 + Tailscale + EmuDeck on Bazzite"
+  text: "41TB MergerFS Media Homelab"
+  tagline: "24 Docker containers • SVT-AV1 transcoding • Tailscale remote access • EmuDeck gaming"
   actions:
     - theme: brand
       text: Quick Start
@@ -13,7 +13,7 @@ hero:
       text: Services Status
       link: /SERVICES
     - theme: alt
-      text: Storage Architecture
+      text: Storage Guide
       link: /STORAGE_AND_REMOTE_ACCESS
 features:
   - icon: ⚙️
@@ -21,15 +21,15 @@ features:
     details: Prowlarr, Sonarr, Radarr, Lidarr, Whisparr with SABnzbd + Transmission. Full *arr stack.
   - icon: 💾
     title: 41TB MergerFS Pool
-    details: 8 NVMe drives unified into single pool. RAM caching enabled. 96GB memory for page cache.
+    details: 8 NVMe drives unified. RAM caching enabled (cache.files=auto-full). 96GB memory.
   - icon: 🎬
     title: SVT-AV1 Transcoding
-    details: CPU-based encoding for 60-70% compression. Tdarr with threading optimization.
+    details: CPU-based encoding for 60-70% compression. Tdarr with lp=2 pin=0 threading.
   - icon: 🌐
     title: Tailscale Remote Access
     details: Fixed IP 100.115.21.9. Plex, Sonarr, Tdarr accessible from anywhere.
   - icon: 📚
-    title: Books and Manga Stack
+    title: Books & Manga Stack
     details: Komga + Komf + Kavita + Audiobookshelf + Mylar. 718GB comics, 25GB audiobooks.
   - icon: 🎮
     title: EmuDeck Gaming
