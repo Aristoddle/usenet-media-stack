@@ -60,7 +60,7 @@ User-facing services.
 
 | Service | Port | Status | Audit Date | Notes |
 |---------|------|--------|------------|-------|
-| Plex | 32400 | ⬜ Pending | - | Primary media server, hardware transcode |
+| Plex | 32400 | ✅ Complete | 2025-12-28 | VAAPI enabled, GPU access verified |
 | Audiobookshelf | 13378 | ⬜ Pending | - | Audiobooks + podcasts |
 | Komga | 8081 | ⬜ Pending | - | Comics/manga reader |
 | Kavita | 5000 | ⬜ Pending | - | eBooks/manga reader |
@@ -73,11 +73,11 @@ Improve the core experience.
 | Service | Port | Status | Audit Date | Notes |
 |---------|------|--------|------------|-------|
 | Tdarr | 8265 | ✅ Complete | 2025-12-28 | GPU VAAPI transcoding, 5699 files queued |
-| Bazarr | 6767 | ⬜ Pending | - | Subtitle management |
-| Tautulli | 8181 | ⬜ Pending | - | Plex analytics |
+| Bazarr | 6767 | ⚠️ Partial | 2025-12-28 | Providers need credentials |
+| Tautulli | 8181 | ✅ Complete | 2025-12-28 | Plex connected, DB 233KB |
 | Komf | 8085 | ⬜ Pending | - | Manga metadata enrichment |
-| Recyclarr | - | ⬜ Pending | - | TRaSH Guides sync |
-| Overseerr | 5055 | ⬜ Pending | - | Request management |
+| Recyclarr | - | ✅ Complete | 2025-12-28 | TRaSH Guides syncing to Radarr/Sonarr |
+| Overseerr | 5055 | ✅ Complete | 2025-12-28 | Radarr/Sonarr connected, 42 requests |
 
 ### Tier 5: Infrastructure
 Keep everything running.
@@ -298,10 +298,10 @@ Based on user impact and complexity:
 5. ✅ **Recyclarr** - TRaSH Guides sync verified
 
 ### Phase 2: User Experience (Medium Impact)
-6. ⬜ **Plex** - Hardware transcoding
-7. ⬜ **Overseerr** - Request flow
-8. ⬜ **Bazarr** - Subtitles
-9. ⬜ **Tautulli** - Analytics
+6. ✅ **Plex** - VAAPI hardware transcoding verified
+7. ✅ **Overseerr** - Radarr/Sonarr connections healthy
+8. ⚠️ **Bazarr** - Providers need credentials (user action required)
+9. ✅ **Tautulli** - Plex connected, analytics working
 
 ### Phase 3: Reading Stack (Medium Impact)
 10. ⬜ **Komga** - Comics
@@ -401,6 +401,44 @@ Based on user impact and complexity:
   - Container paths differ from host paths
   - API: POST /api/v2/cruddb with collection/mode/docID pattern
 - **Commit**: 051dfa0
+
+### Plex (2025-12-28) ✅
+- **Status**: Fully operational
+- **Version**: 1.42.2.10156-f737b826c
+- **Hardware Transcoding**: ENABLED
+  - `HardwareAcceleratedCodecs=1`
+  - `HardwareAcceleratedEncoders=1`
+  - GPU: `/dev/dri/renderD128` (AMD 780M, RDNA3)
+- **Quality**: TranscoderQuality=3 ("Make my CPU hurt")
+- **Libraries**: Christmas, Movies, Anime, TV Shows
+- **Temp Directory**: Uses container overlay (797GB available)
+- **Verified**: Plex token valid, API responding
+
+### Overseerr (2025-12-28) ✅
+- **Status**: Fully operational
+- **Version**: 1.34.0
+- **Connections**:
+  - Radarr: `radarr:7878` (Default + Anime profiles)
+  - Sonarr: `sonarr:8989`
+- **Request Stats**: 42 approved, 0 pending
+- **Verified**: API responding, connections healthy
+
+### Bazarr (2025-12-28) ⚠️ Partial
+- **Status**: Running but providers not configured
+- **Version**: 1.5.3
+- **Enabled Providers**: opensubtitlescom, podnapisi, subdivx, subf2m
+- **Issue**: All providers have empty credentials
+- **Required Action**: User must configure:
+  - OpenSubtitles.com account (username/password)
+  - Subf2m user-agent configuration
+- **Connections**: Radarr 6.0.4.10291, Sonarr 4.0.16.2944 verified
+
+### Tautulli (2025-12-28) ✅
+- **Status**: Fully operational
+- **Plex Connection**: steambox (Plex 1.42.2.10156)
+- **Database Size**: 233KB (healthy)
+- **API**: Responding correctly
+- **Note**: "No token" log errors were startup race condition (connection works)
 
 ---
 
