@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 01:45 EST)
+## Date: 2025-12-29 (Updated: 01:52 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -210,6 +210,24 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Complete EOL/deprecated tools audit (found: Readarr RETIRED)
 - [x] Fix Prowlarr category for Mylar (7030→7000)
 - [x] Analyze Doctor Who collection organization issues
+- [x] Create Suwayomi chapter organizer script (tools/suwayomi-organizer.sh)
+- [x] Create Readarr → Bookshelf migration script (tools/migrate-readarr-to-bookshelf.sh)
+- [x] Research and document manga collection topology (MANGA_COLLECTION_TOPOLOGY.md)
+- [ ] Deep thinker adversarial review of topology (IN PROGRESS)
+
+---
+
+## Active Git Commits (This Session)
+
+```
+77c9a97 docs(manga): researched topology with Komga constraints
+53f91fc docs(manga): add collection topology for two-track system
+d50fddb feat(tools): add Suwayomi chapter organizer script
+73282cf feat(tools): add Readarr to Bookshelf migration script
+4a6a7ff audit(stack): EOL tools analysis, Readarr retired, Prowlarr fix
+fcba0c4 docs: strategic roadmap, archive stale docs, create INDEX
+cd8ac90 fix(tdarr): GPU-only config, monitoring tools, error recovery
+```
 
 ---
 
