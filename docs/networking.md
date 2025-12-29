@@ -485,3 +485,110 @@ services:
 ---
 
 **Summary: Your media automation stack now uses modern Docker networking best practices with universal compatibility and zero maintenance overhead. This foundation scales from single-node deployment to enterprise multi-host orchestration without architectural changes.**
+
+---
+
+## Remote Access with Tailscale
+
+### Why Tailscale (Configured: 2025-12-29)
+
+**Problem**: ISP (Live Oak Fiber) rotates external IPs aggressively, breaking Plex remote access and any port-forwarding-based solutions.
+
+**Solution**: Tailscale provides a stable mesh VPN with fixed IP addresses regardless of ISP changes.
+
+### How Tailscale Works
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Tailscale Network                       │
+│                                                             │
+│   ┌──────────────┐         ┌──────────────┐                │
+│   │ Media Server │◄───────►│ Phone/Laptop │                │
+│   │ 100.x.x.x    │         │ 100.y.y.y    │                │
+│   │ (Bazzite)    │ WireGuard│ (Any device) │                │
+│   └──────────────┘  tunnel └──────────────┘                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+         │                           │
+         ▼                           ▼
+   ┌──────────┐               ┌──────────┐
+   │ ISP #1   │               │ ISP #2   │
+   │ Dynamic  │               │ Different│
+   │ IP       │               │ Network  │
+   └──────────┘               └──────────┘
+```
+
+**Key Benefits**:
+- **Stable IPs**: Each device gets a fixed `100.x.x.x` address
+- **Zero port forwarding**: No router configuration needed
+- **ISP-agnostic**: Works across any network (home, mobile, coffee shop)
+- **Encrypted**: WireGuard end-to-end encryption
+- **More secure than port forwarding**: No exposed services to the internet
+
+### Current Configuration
+
+| Device | Tailscale IP | Purpose |
+|--------|-------------|---------|
+| Media Server (Bazzite) | `100.115.21.9` | Hosts all services |
+| Additional devices | Join network via `tailscale up` | Access services |
+
+### Accessing Services via Tailscale
+
+Once connected to your Tailscale network, access all services using the Tailscale IP:
+
+```bash
+# From any Tailscale-connected device:
+http://100.115.21.9:8989    # Sonarr
+http://100.115.21.9:7878    # Radarr
+http://100.115.21.9:8080    # SABnzbd
+http://100.115.21.9:32400   # Plex
+http://100.115.21.9:9696    # Prowlarr
+http://100.115.21.9:8265    # Tdarr
+```
+
+### Plex Configuration for Tailscale
+
+In Plex Settings → Network:
+
+1. **Custom server access URLs**: Add `http://100.115.21.9:32400`
+2. **LAN Networks**: Add `100.64.0.0/10` (Tailscale CGNAT range)
+3. **Secure connections**: Set to "Preferred" (Tailscale handles encryption)
+4. **Remote access**: Can disable port forwarding entirely if using Tailscale exclusively
+
+### Security Model
+
+**Tailscale vs Port Forwarding**:
+
+| Aspect | Port Forwarding | Tailscale |
+|--------|-----------------|-----------|
+| Attack surface | Exposed to internet | Only Tailscale network |
+| Authentication | Service-level only | Network-level + service |
+| IP exposure | Public IP visible | Private `100.x.x.x` only |
+| Brute force risk | High (internet-facing) | Low (must join network first) |
+| ISP dependency | Requires static IP or DDNS | None |
+
+**Best Practice**: Keep services bound to `localhost` or Tailscale IP only. No need to expose ports publicly.
+
+### Adding New Devices
+
+```bash
+# On any device you want to connect:
+# 1. Install Tailscale
+# 2. Authenticate with same account
+tailscale up
+
+# Device automatically joins your network and can access services
+```
+
+### Troubleshooting
+
+```bash
+# Check Tailscale status
+tailscale status
+
+# Verify connectivity to media server
+ping 100.115.21.9
+
+# Check if services are reachable
+curl -s http://100.115.21.9:8989/api/v3/system/status  # Sonarr
+```

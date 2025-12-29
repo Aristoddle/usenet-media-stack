@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 03:45 EST)
+## Date: 2025-12-29 (Updated: 14:15 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -29,21 +29,43 @@ Major infrastructure overhaul completed:
 
 ## Current System State
 
-### Conservative Mode (Active)
+### CPU-Dominant SVT-AV1 Mode (Active - 2025-12-29 14:00)
 
-Tdarr is running in conservative mode while Plex completes first-run library analysis:
-- Plex is generating: chapter thumbnails, intro/outro detection, audio fingerprints
-- This is one-time work; after completion, Tdarr can scale up
+Tdarr switched from GPU encoding to **CPU-based SVT-AV1** for maximum compression:
+- SVT-AV1 produces ~3x smaller files than GPU encoding
+- Estimated 9-14TB savings on 28TB library
+- "Let it cook" strategy - slower but much more storage-efficient
 
 ```bash
-# Current conservative settings in .env
-TDARR_TRANSCODE_GPU_WORKERS=4
-TDARR_HEALTHCHECK_GPU_WORKERS=1
+# Current CPU-dominant settings in .env
+TDARR_TRANSCODE_GPU_WORKERS=1      # Keep 1 GPU for quick wins
+TDARR_TRANSCODE_CPU_WORKERS=4      # Main CPU workload
+TDARR_HEALTHCHECK_GPU_WORKERS=2    # GPU file validation (fast)
+TDARR_HEALTHCHECK_CPU_WORKERS=0
 
-# Aggressive settings for later (documented in docs/TDARR_TUNING.md)
-TDARR_TRANSCODE_GPU_WORKERS=6
-TDARR_HEALTHCHECK_GPU_WORKERS=2
+# Secondary node - all CPU
+TDARR_NODE_TRANSCODE_GPU_WORKERS=0
+TDARR_NODE_TRANSCODE_CPU_WORKERS=4
+TDARR_NODE_HEALTHCHECK_GPU_WORKERS=2
+TDARR_NODE_HEALTHCHECK_CPU_WORKERS=0
 ```
+
+### MergerFS RAM Caching (Fixed - 2025-12-29 13:45)
+
+MergerFS CPU usage fixed from **286% to 0-34%** by enabling aggressive caching:
+
+```bash
+# Before (BAD): cache.files=off, dropcacheonclose=true
+# After (GOOD): cache.files=auto-full, dropcacheonclose=false
+MOUNT_OPTS="defaults,allow_other,use_ino,cache.files=auto-full,dropcacheonclose=false,category.create=mfs,moveonenospc=true,minfreespace=50G,fsname=mergerfs-pool"
+```
+
+### Tailscale Remote Access (Configured - 2025-12-29 13:30)
+
+Tailscale enabled for stable remote access despite ISP IP rotation:
+- Server Tailscale IP: `100.115.21.9`
+- Access all services via Tailscale from anywhere
+- More secure than port forwarding (no internet exposure)
 
 ### File Queue Status (as of 03:15)
 - **Queued**: 2,252 files ready for processing
@@ -268,7 +290,14 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Apply Plex CPU optimizations (ScannerLowPriority, BackgroundPreset, AnalysisBehavior)
 - [x] Discover and document USB drive content (5 drives, 3TB+ valuable content)
 - [x] Create manga pipeline scripts (mylar-post-processor, komga-collection-sync, flatten-manga)
-- [ ] Deep thinker system optimization analysis (IN PROGRESS)
+- [x] Deep thinker system optimization analysis (SVT-AV1 vs GPU decision)
+- [x] Create SVT-AV1 Production v3 flow with adversarial review fixes
+- [x] Fix MergerFS CPU spike (286% → 0-34%) with RAM caching
+- [x] Configure Tailscale for stable remote access (IP: 100.115.21.9)
+- [x] Create mergerfs mount script and systemd service
+- [x] Update docs/advanced/performance.md with SVT-AV1 and MergerFS sections
+- [x] Update docs/networking.md with Tailscale configuration
+- [x] Create tdarr-flows/README.md with flow documentation
 - [ ] USB content deduplication analysis (PENDING)
 - [ ] Lidarr bootstrap with 235 artists (PENDING)
 
@@ -351,12 +380,14 @@ cd8ac90 fix(tdarr): GPU-only config, monitoring tools, error recovery
 ## Next Steps
 
 ### Immediate (Priority Order)
-1. Create missing manga pipeline scripts:
-   - `mylar-post-processor.sh` - SABnzbd post-processing hook
-   - `komga-collection-sync.sh` - Cross-library collection linking
-   - `flatten-manga-directories.sh` - Migration helper for nested folders
-2. Create Manga-Weekly directory structure for two-library topology
-3. Scale Tdarr to aggressive settings (Plex analysis complete)
+1. Install mergerfs systemd service for boot persistence:
+   ```bash
+   sudo cp ~/.local/bin/mergerfs-pool.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable mergerfs-pool.service
+   ```
+2. Configure Plex network settings for Tailscale (custom URLs, LAN networks)
+3. Verify SVT-AV1 encoding is producing expected 65-80% size reductions
 
 ### Short-Term
 1. Replace Readarr with Bookshelf fork (see `docs/decisions/2025-12-29-stack-health-audit.md`)
