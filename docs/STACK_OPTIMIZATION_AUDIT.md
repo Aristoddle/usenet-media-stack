@@ -39,8 +39,8 @@ These are the brain of the operation - highest priority.
 | Service | Port | Status | Audit Date | Notes |
 |---------|------|--------|------------|-------|
 | Prowlarr | 9696 | ✅ Complete | 2025-12-28 | Priorities staggered, fullSync verified |
-| Radarr | 7878 | ⬜ Pending | - | Movies, quality profiles, custom formats |
-| Sonarr | 8989 | ⬜ Pending | - | TV shows, anime profiles |
+| Radarr | 7878 | ✅ Complete | 2025-12-28 | 35 CF via Recyclarr, UHD+WEB profile |
+| Sonarr | 8989 | ✅ Complete | 2025-12-28 | 33 CF via Recyclarr, WEB-2160p profile |
 | Lidarr | 8686 | ⬜ Pending | - | Music management |
 | Readarr | 8787 | ⬜ Pending | - | eBooks/audiobooks |
 | Whisparr | 6969 | ⬜ Pending | - | Adult content automation |
@@ -293,9 +293,9 @@ Based on user impact and complexity:
 ### Phase 1: Core Pipeline (High Impact)
 1. ✅ **Prowlarr** - Indexer health affects everything downstream
 2. ✅ **SABnzbd** - Download performance critical
-3. ⬜ **Radarr** - Movie quality profiles
-4. ⬜ **Sonarr** - TV/Anime quality profiles
-5. ⬜ **Recyclarr** - TRaSH Guides sync
+3. ✅ **Radarr** - Movie quality profiles (via Recyclarr)
+4. ✅ **Sonarr** - TV/Anime quality profiles (via Recyclarr)
+5. ✅ **Recyclarr** - TRaSH Guides sync verified
 
 ### Phase 2: User Experience (Medium Impact)
 6. ⬜ **Plex** - Hardware transcoding
@@ -356,6 +356,26 @@ Based on user impact and complexity:
   - Unrar is single-threaded (disk I/O bound)
   - par2 -t+ enables full multicore on Linux
   - 12-20 connections per server is usually sufficient
+
+### Radarr (2025-12-28) ✅
+- **Status**: Fully operational via Recyclarr sync
+- **Custom Formats**: 35 (TRaSH Guides complete set)
+- **Quality Profiles**: UHD Bluray + WEB (AV1 +100, HEVC +50)
+- **Root Folders**: /pool/movies, /pool/anime (11.3 TB free)
+- **Verified**: No health issues, Prowlarr sync working
+
+### Sonarr (2025-12-28) ✅
+- **Status**: Fully operational via Recyclarr sync
+- **Custom Formats**: 33 (TRaSH Guides complete set)
+- **Quality Profiles**: WEB-2160p, Anime (with dual audio preference)
+- **Configuration**: AV1 preferred (+100), HEVC fallback (+50)
+- **Minor Issue**: NZB.su transient failures (indexer still enabled)
+
+### Recyclarr (2025-12-28) ✅
+- **Status**: Syncing successfully to Radarr and Sonarr
+- **Templates**: TRaSH Guides UHD Bluray + WEB, Anime profiles
+- **Configuration**: recyclarr.yml with AV1/HEVC scoring
+- **Verified**: "All custom formats are already up to date!"
 
 ### Tdarr (2025-12-28) ✅
 - **Status**: Fully operational
