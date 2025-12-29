@@ -317,3 +317,85 @@ Migration script for Readarr to Bookshelf fork (Readarr is EOL as of June 2025).
 ```
 
 See [docs/decisions/2025-12-29-stack-health-audit.md](../docs/decisions/2025-12-29-stack-health-audit.md) for details.
+
+---
+
+## USB/External Media Import Tools
+
+### lidarr-bootstrap.sh
+
+Bootstrap Lidarr with artists from USB/external music directories.
+
+```bash
+# Preview what would be added
+./lidarr-bootstrap.sh /run/media/deck/Slow_3TB_HD/Music --dry-run
+
+# Add all artists to Lidarr
+LIDARR_API_KEY=xxx ./lidarr-bootstrap.sh /run/media/deck/Slow_3TB_HD/Music
+
+# List current Lidarr artists
+LIDARR_API_KEY=xxx ./lidarr-bootstrap.sh --list
+```
+
+**Features:**
+- Scans directory for artist folders
+- Queries MusicBrainz via Lidarr API for artist metadata
+- Adds artists to Lidarr with monitoring enabled
+- Skips artists already in Lidarr
+- Reports unmatched artists for manual review
+- Rate-limited to respect MusicBrainz (1 req/sec)
+
+**Environment:**
+- `LIDARR_URL` - Lidarr server URL (default: http://localhost:8686)
+- `LIDARR_API_KEY` - Lidarr API key (required)
+- `MUSIC_ROOT` - Target music root path in Lidarr (default: /pool/music)
+
+**Use Case:** Bootstrap Lidarr with 235 artists from USB drive collection.
+
+---
+
+### usb-movie-importer.sh
+
+Analyze and import movies from USB/external drive to Radarr.
+
+```bash
+# Analyze USB movies (report only)
+RADARR_API_KEY=xxx ./usb-movie-importer.sh /run/media/deck/Slow_4TB_2/Movies
+
+# Preview import
+RADARR_API_KEY=xxx ./usb-movie-importer.sh /run/media/deck/Slow_4TB_2/Movies --import --dry-run
+
+# Import unique movies
+RADARR_API_KEY=xxx ./usb-movie-importer.sh /run/media/deck/Slow_4TB_2/Movies --import
+```
+
+**Features:**
+- Scans USB movie folders
+- Parses folder names (supports "Movie Name (2023)" and scene naming)
+- Queries TMDB via Radarr API for matches
+- Reports: unique movies, duplicates (with quality comparison), not found
+- Optional: imports unique movies to Radarr library
+- Rate-limited for API stability
+
+**Environment:**
+- `RADARR_URL` - Radarr server URL (default: http://localhost:7878)
+- `RADARR_API_KEY` - Radarr API key (required)
+- `POOL_MOVIES` - Target movies root path (default: /pool/movies)
+
+**Use Case:** Import 555 movies from USB drive, identifying duplicates vs pool.
+
+---
+
+## Tool Index
+
+| Tool | Purpose | Status |
+|------|---------|--------|
+| `sysinfo-snapshot` | System monitoring | Production |
+| `metrics-collector` | Time-series metrics storage | Production |
+| `suwayomi-organizer.sh` | Manga chapter -> CBZ | Production |
+| `mylar-post-processor.sh` | SABnzbd post-processing | Production |
+| `komga-collection-sync.sh` | Cross-library collections | Production |
+| `flatten-manga-directories.sh` | Manga directory cleanup | Production |
+| `migrate-readarr-to-bookshelf.sh` | Readarr migration | Ready |
+| `lidarr-bootstrap.sh` | Music library bootstrap | Ready |
+| `usb-movie-importer.sh` | Movie dedup/import | Ready |
