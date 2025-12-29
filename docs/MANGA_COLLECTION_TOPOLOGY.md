@@ -1,188 +1,268 @@
 # Manga Collection Topology
 
-How to organize manga across two acquisition tracks for optimal Komga/Komf serving.
+A carefully considered approach to organizing manga across two acquisition tracks for optimal Komga/Komf serving.
+
+**Decision Date**: 2025-12-29
+**Research Sources**: [Komga Libraries Docs](https://komga.org/docs/guides/libraries/), [Komga Discussion #1295](https://github.com/gotson/komga/discussions/1295), [MangaHelpers Organization Thread](https://mangahelpers.com/forum/threads/how-do-you-organize-your-downloaded-manga.56760/)
 
 ---
 
-## Two-Track System Overview
+## The Problem
 
-| Track | Source | Format | Delay | Quality | Use Case |
-|-------|--------|--------|-------|---------|----------|
-| **Tankobon** | Mylar → Prowlarr → Usenet | Vol. XX | 3-6 months | Archival (official EN) | Collecting, rereading |
-| **Weeklies** | Suwayomi → staging | cXXX | Same-day | Current (scanlation) | Staying current |
+We have two fundamentally different manga acquisition tracks:
+
+| Track | Source | Format | Delay | Use Case |
+|-------|--------|--------|-------|----------|
+| **Tankobon** | Mylar → Usenet | Official volumes | 3-6 months | Archival, rereading |
+| **Weeklies** | Suwayomi | Scanlation chapters | Same-day | Staying current |
+
+Mixing these in one folder creates problems:
+- `v01.cbz` and `c125.cbz` sort weirdly together
+- Different quality/source expectations
+- Different update frequencies
+- Confusing reading experience
 
 ---
 
-## Recommended Folder Structure
+## Komga Constraints (From Research)
+
+1. **No nested series**: Subfolders within a series folder become separate series
+2. **Flat is best**: Files directly in series folder, not in `Volumes/` or `Chapters/`
+3. **No official structure**: Komga doesn't mandate organization
+4. **Collections for grouping**: Use Komga Collections to link related content
+
+---
+
+## Recommended Architecture
+
+### Two Separate Komga Libraries
 
 ```
-Comics/
-├── [Official Releases]/                   # Tankobon from Mylar
+/var/mnt/fast8tb/Cloud/OneDrive/Books/
+├── Comics/                    # Existing manga collection (tankobon)
 │   ├── Chainsaw Man (Viz) [EN]/
 │   │   ├── Chainsaw Man v01.cbz
-│   │   ├── Chainsaw Man v02.cbz
-│   │   └── ...
-│   ├── Kagurabachi (Viz) [EN]/
-│   │   └── ...
-│   └── ...
+│   │   └── Chainsaw Man v02.cbz
+│   └── One Piece (Viz) [EN]/
+│       └── ...
 │
-├── [Weekly Chapters]/                     # Scanlations from Suwayomi
-│   ├── Chainsaw Man/
-│   │   ├── Chainsaw Man c125.cbz
-│   │   ├── Chainsaw Man c126.cbz
-│   │   └── ...
-│   ├── Kagurabachi/
-│   │   ├── Kagurabachi c001.cbz
-│   │   └── ...
-│   └── ...
+└── Manga-Weekly/              # NEW: Scanlation chapters
+    ├── Chainsaw Man/
+    │   ├── Chainsaw Man c125.cbz
+    │   └── Chainsaw Man c126.cbz
+    └── Kagurabachi/
+        └── ...
 ```
 
-**Rationale**:
-- Top-level separation prevents mixing official and scanlation in Komga views
-- Each series appears in **both** locations if you track both editions
-- Clear namespace: `v01` = volume, `c001` = chapter
-- Komga can configure separate libraries or combined with smart filtering
+### Komga Configuration
+
+| Library Name | Root Path | Scan Frequency | Description |
+|--------------|-----------|----------------|-------------|
+| `Manga (Collected)` | `/comics/` | Daily | Official tankobon from Mylar |
+| `Manga (Weekly)` | `/manga-weekly/` | Hourly | Scanlation chapters from Suwayomi |
+
+### Why This Works
+
+1. **Clear separation**: User picks "mode" - archival or current
+2. **No sorting conflicts**: Each library has consistent naming
+3. **Independent scanning**: Weeklies need frequent scans, tankobon don't
+4. **Komga Collections**: Can link "Chainsaw Man" across both libraries
+5. **Simple automation**: Mylar → Comics/, Suwayomi → Manga-Weekly/
 
 ---
 
 ## Naming Conventions
 
-### Tankobon (Mylar)
+### Tankobon (Official Volumes)
 
+Already in Comics/ with existing naming:
 ```
-{Series Name} v{Volume:02d}.cbz
-```
-
-Examples:
-- `Chainsaw Man v01.cbz`
-- `Chainsaw Man v02.cbz`
-- `One Piece v107.cbz`
-
-### Weekly Chapters (Suwayomi)
-
-```
-{Series Name} c{Chapter:03d}[.{Part}].cbz
+{Series} ({Publisher}) [{Language}]/
+    └── {Series} v{volume:02d}.cbz
 ```
 
 Examples:
-- `Chainsaw Man c125.cbz`
-- `Chainsaw Man c126.cbz`
-- `One Piece c1135.1.cbz` (for split chapters)
+- `Chainsaw Man (Viz) [EN]/Chainsaw Man v01.cbz`
+- `One Piece (Viz) [EN]/One Piece v107.cbz`
 
-### Why This Naming?
+### Weeklies (Scanlation Chapters)
 
-1. **Sorting**: `c001` always sorts after `v99` alphabetically
-2. **Parsing**: Komga/Komf can detect chapter vs volume patterns
-3. **Disambiguation**: Clear which is official vs scanlation
-4. **Zero-padding**: Ensures proper ordering (c001 < c010 < c100)
+New structure in Manga-Weekly/:
+```
+{Series}/
+    └── {Series} c{chapter:04d}[.{part}].cbz
+```
 
----
+Examples:
+- `Chainsaw Man/Chainsaw Man c0125.cbz`
+- `Chainsaw Man/Chainsaw Man c0126.cbz`
+- `One Piece/One Piece c1135.1.cbz` (split chapter)
 
-## Komga Configuration
-
-### Option A: Separate Libraries (Recommended)
-
-| Library | Root Path | Description |
-|---------|-----------|-------------|
-| `Manga (Official)` | `/comics/[Official Releases]` | Tankobon only |
-| `Manga (Weekly)` | `/comics/[Weekly Chapters]` | Scanlations only |
-
-**Benefits**:
-- Clear separation in UI
-- Different scan frequencies (weekly library scans hourly, official scans daily)
-- Users can bookmark both libraries for same series
-
-### Option B: Single Library with Collections
-
-| Library | Root Path | Collections |
-|---------|-----------|-------------|
-| `Manga` | `/comics/` | Auto-detect via folder name pattern |
-
-Use Komga collections to group by edition type.
-
-### Option C: Flat Structure (Not Recommended)
-
-Mixing all content in one folder. Causes:
-- Sorting issues (c125 appears before v01)
-- Confusion between editions
-- Metadata conflicts in Komf
+**Why 4-digit padding?**
+- Ongoing manga can exceed 1000 chapters (One Piece, Detective Conan)
+- Prevents sorting issues: c0099 < c0100 < c1000
 
 ---
 
-## Komf Metadata Strategy
+## Implementation Steps
 
-### For Tankobon (Official)
+### Step 1: Create Weekly Directory
 
-- **Primary**: MangaUpdates (volume info)
-- **Fallback**: AniList, MyAnimeList
-- Metadata tends to be complete and accurate for official releases
-
-### For Weeklies (Scanlation)
-
-- **Primary**: MangaDex (chapter metadata)
-- **Note**: Chapter-level metadata less reliable; series-level should work
-- Consider disabling auto-metadata for weeklies if noise is high
-
----
-
-## Suwayomi Organizer Integration
-
-The `suwayomi-organizer.sh` script should be updated to:
-
-1. Output to `[Weekly Chapters]/` subdirectory
-2. Use `c{chapter:03d}` naming convention
-3. Preserve source series name from Suwayomi
-
-Configuration in `.env`:
 ```bash
-# Where Suwayomi organizer places chapters
-SUWAYOMI_OUTPUT_DIR="${COMICS_ROOT}/[Weekly Chapters]"
+mkdir -p "/var/mnt/fast8tb/Cloud/OneDrive/Books/Manga-Weekly"
 ```
 
+### Step 2: Update Suwayomi Organizer
+
+In `.env`:
+```bash
+SUWAYOMI_OUTPUT_DIR=/var/mnt/fast8tb/Cloud/OneDrive/Books/Manga-Weekly
+```
+
+### Step 3: Add Komga Library
+
+Via Komga UI or API:
+```bash
+curl -X POST -u "$KOMGA_USER:$KOMGA_PASS" \
+  "$KOMGA_URL/api/v1/libraries" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Manga (Weekly)",
+    "root": "/manga-weekly",
+    "scanForceModifiedTime": true,
+    "scanInterval": "HOURLY"
+  }'
+```
+
+### Step 4: Create Komga Collections (Optional)
+
+Link related series across libraries:
+- Collection: "Chainsaw Man (All Editions)"
+  - Series from Manga (Collected)
+  - Series from Manga (Weekly)
+
 ---
 
-## Example: Following "Chainsaw Man"
+## Reading Workflow
 
-### What You Have
+### "I want to read from the beginning"
+1. Open Manga (Collected) library
+2. Find series (e.g., "Chainsaw Man (Viz)")
+3. Start from volume 1
 
-| Location | Source | Format | Content |
-|----------|--------|--------|---------|
-| `Comics/Chainsaw Man (Viz) [EN]/` | Mylar | v01-v17 | Official volumes |
-| `Comics/[Weekly Chapters]/Chainsaw Man/` | Suwayomi | c125-c195 | Current scanlations |
+### "I want to read the latest chapter"
+1. Open Manga (Weekly) library
+2. Find series (e.g., "Chainsaw Man")
+3. Continue from last read chapter
 
-### In Komga
-
-- **Manga (Official)** library shows: Chainsaw Man with 17 volumes
-- **Manga (Weekly)** library shows: Chainsaw Man with 70+ chapters
-- User reads current chapters in Weekly, rereads in Official
-
-### Transition Path
-
-When a new tankobon releases (e.g., v18 covering c125-c140):
-1. Mylar downloads `Chainsaw Man v18.cbz`
-2. User can optionally delete weekly chapters c125-c140
-3. Or keep both for different reading experiences
+### "I want both for the same series"
+1. Track via Mylar for tankobon releases
+2. Track via Suwayomi for weekly chapters
+3. Use Komga Collection to see all editions together
 
 ---
 
-## Migration for Existing Collection
+## When New Tankobon Releases
 
-If current collection has mixed content:
+Scenario: Volume 18 releases, covering chapters 125-140.
 
-1. Identify scanlation vs official by folder naming:
-   - `(Viz)`, `(Kodansha)`, `(Dark Horse)` = Official
-   - `(MangaDex)`, `(Suwayomi)`, no publisher = Scanlation
+**Option A: Keep Both** (Recommended)
+- Official v18 for quality rereads
+- Keep chapters for reference/different translation
 
-2. Move scanlation folders to `[Weekly Chapters]/`
+**Option B: Replace**
+- Download v18 via Mylar
+- Delete c125-c140 from Manga-Weekly/
+- (Manual curation, but cleaner)
 
-3. Update Suwayomi organizer to use new output path
+---
 
-4. Reconfigure Komga libraries
+## Volume → Chapter Mapping
+
+For series you follow in both tracks, maintain a mapping:
+
+| Series | Latest Volume | Chapters Covered | Weekly Start |
+|--------|---------------|------------------|--------------|
+| Chainsaw Man | v17 | c001-c124 | c125 |
+| Kagurabachi | v01 | c001-c009 | c010 |
+| One Piece | v107 | c001-c1086 | c1087 |
+
+This helps know when to clean up chapters after tankobon release.
+
+---
+
+## Why Not Other Approaches?
+
+### ❌ Single Folder, Mixed Naming
+
+```
+Chainsaw Man/
+├── Chainsaw Man v01.cbz
+└── Chainsaw Man c125.cbz  # Sorts after v99!
+```
+- Confusing sort order
+- Mixed quality expectations
+- No way to distinguish editions in Komga
+
+### ❌ Nested Subfolders
+
+```
+Chainsaw Man/
+├── Volumes/
+└── Chapters/
+```
+- Komga treats Volumes/ and Chapters/ as separate series
+- Breaks Komga's design assumptions
+
+### ❌ Complex Naming Prefixes
+
+```
+Chainsaw Man/
+├── [Official] Chainsaw Man v01.cbz
+└── [Scan] Chainsaw Man c125.cbz
+```
+- Harder to parse/automate
+- Still mixed in one series
+- Prefixes look ugly in UI
+
+---
+
+## Migration Path
+
+If existing Comics/ has scanlation content mixed in:
+
+1. **Identify scanlation series**:
+   - No publisher in folder name
+   - Contains chapter files (c###.cbz vs v##.cbz)
+
+2. **Move to Manga-Weekly/**:
+   ```bash
+   mv "Comics/Series (Scanlation)" "Manga-Weekly/Series/"
+   ```
+
+3. **Trigger Komga rescan** on both libraries
+
+4. **Update organizer config** to use new output path
 
 ---
 
 ## Related Documentation
 
-- [MANGA_ACQUISITION_PIPELINE.md](./MANGA_ACQUISITION_PIPELINE.md) - Two-track system details
-- [MANGA_INTEGRATION_STATUS.md](./MANGA_INTEGRATION_STATUS.md) - Current integration gaps
-- [STRATEGIC_ROADMAP.md](./STRATEGIC_ROADMAP.md) - T2 manga pipeline tasks
+- [MANGA_ACQUISITION_PIPELINE.md](./MANGA_ACQUISITION_PIPELINE.md) - Two-track system
+- [MANGA_INTEGRATION_STATUS.md](./MANGA_INTEGRATION_STATUS.md) - Current gaps
+- [STRATEGIC_ROADMAP.md](./STRATEGIC_ROADMAP.md) - T2 manga tasks
+
+---
+
+## Decision Rationale
+
+This topology was chosen because:
+
+1. **Respects Komga's design** - Separate libraries, flat series folders
+2. **Enables automation** - Clear paths for Mylar and Suwayomi
+3. **Supports different reading modes** - Archival vs current
+4. **Allows coexistence** - Same series in both tracks
+5. **Minimizes tech debt** - Simple, obvious structure
+6. **Scales well** - Works for 10 series or 1000 series
+
+The key insight: **Don't fight the tool. Use separate Komga libraries to represent different edition types, then use Collections to link them.**
