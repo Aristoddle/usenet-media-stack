@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 03:15 EST)
+## Date: 2025-12-29 (Updated: 03:45 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -296,18 +296,22 @@ User handed off control for overnight autonomous operation. Directives:
    - 9 Blood Lad files with FFprobe failures (German dubs)
 4. **Updated SESSION_STATE.md** with all findings
 
-### Overnight Work Queue (Remaining)
-1. [ ] Reset 2,131 recoverable Tdarr errors
-2. [ ] Create usb-movie-importer.sh tool
-3. [ ] Create lidarr-bootstrap.sh tool
-4. [ ] Commit documentation updates
-5. [ ] Deep thinker results integration
+### Overnight Work Queue (Status)
+1. [x] Analyze Tdarr errors - 2,131 recoverable identified
+2. [x] Create usb-movie-importer.sh tool - DONE (commit b1e7c1d)
+3. [x] Create lidarr-bootstrap.sh tool - DONE (commit b1e7c1d)
+4. [x] Create USB_CONTENT_INVENTORY.md - DONE (commit 2911ca9)
+5. [x] Commit and push to origin - DONE
+6. [ ] Reset 2,131 recoverable Tdarr errors (requires Docker running)
+7. [ ] Deep thinker results integration (still processing)
 
 ---
 
 ## Active Git Commits (This Session)
 
 ```
+b1e7c1d feat(tools): add USB import tools for Lidarr and Radarr
+2911ca9 docs: overnight session - USB inventory and Tdarr error analysis
 a7452e9 docs(manga): adversarial review - edge cases, 4-digit padding, migration phases
 5af26e2 docs: update SESSION_STATE with manga topology work
 77c9a97 docs(manga): researched topology with Komga constraints

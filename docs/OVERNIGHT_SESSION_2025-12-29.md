@@ -163,17 +163,42 @@ Create script to bootstrap Lidarr with USB music collection.
 
 ## Execution Log
 
-*(Updated as work progresses)*
-
 ### 02:45 EST - Session Start
 - Gathered comprehensive system state
 - Created overnight work plan document
 - Identified USB content and priorities
 
-### Next Steps
-1. Analyze Tdarr errors
-2. Create USB content inventory
-3. Begin tool development
+### 03:00 EST - Tdarr Error Analysis Complete
+- Queried Tdarr database for error patterns
+- Found 2,140 errors in Error state
+- **Key Finding**: 2,131 files have FFprobe success but stuck in Error
+- Root cause: `TranscodeDecisionMaker = "Not required"` - timeout recovery artifacts
+- 9 Blood Lad files have actual FFprobe failures (German dubs)
+- Documented recovery SQL in SESSION_STATE.md
+
+### 03:10 EST - USB Content Inventory Complete
+- Created `docs/USB_CONTENT_INVENTORY.md` with comprehensive listing:
+  - Slow_3TB_HD: 235 artists (129GB), 416GB Books (349GB Comics)
+  - Slow_4TB_2: 555 movies (1.7TB)
+  - Slow_2TB_2: 64 anime series (854GB)
+  - Slow_2TB_1: Emulation/ROMs backup
+  - JoeTerabyte: 465GB trash (repurpose)
+- Committed: `2911ca9`
+
+### 03:30 EST - Import Tools Created
+- Created `tools/lidarr-bootstrap.sh`:
+  - Scans USB for artist folders
+  - Queries MusicBrainz via Lidarr API
+  - Adds artists with monitoring
+  - Rate-limited (1 req/sec)
+- Created `tools/usb-movie-importer.sh`:
+  - Parses movie folder names
+  - Queries TMDB via Radarr
+  - Reports unique/duplicates/not-found
+  - Optional --import mode
+- Updated `tools/README.md` with documentation
+- Committed: `b1e7c1d`
+- Pushed both commits to origin/main
 
 ---
 
@@ -193,4 +218,20 @@ Create script to bootstrap Lidarr with USB music collection.
 ---
 
 *This document is the authoritative record of the overnight session.*
-*Last Updated: 2025-12-29 02:45 EST*
+*Last Updated: 2025-12-29 03:40 EST*
+
+---
+
+## Summary of Deliverables
+
+| Deliverable | Status | Commit |
+|-------------|--------|--------|
+| OVERNIGHT_SESSION_2025-12-29.md | Complete | 2911ca9 |
+| USB_CONTENT_INVENTORY.md | Complete | 2911ca9 |
+| Tdarr error analysis | Complete | (documented in SESSION_STATE) |
+| tools/lidarr-bootstrap.sh | Complete | b1e7c1d |
+| tools/usb-movie-importer.sh | Complete | b1e7c1d |
+| SESSION_STATE.md updates | Complete | 2911ca9 |
+| Git push to origin | Complete | b1e7c1d |
+
+**Total New Content**: ~1,500 lines of documentation and tooling
