@@ -346,12 +346,18 @@ Based on user impact and complexity:
 - **Status**: Fully operational (1,826 items queued, 20.6 TB)
 - **Servers**: 4 (Newshosting, UsenetExpress, Frugal x2) with 85 connections
 - **Configuration**: par2-turbo 16 threads, direct_unpack enabled
-- **Applied Settings** (persisted to sabnzbd.ini):
+- **Correct Variable Names** (in sabnzbd.ini):
   ```ini
-  extra_par2_parameters = -t+
-  article_cache_limit = 4G
+  par_option = -t+           # NOT extra_par2_parameters
+  cache_limit = 4G           # NOT article_cache_limit
   direct_unpack = 1
   direct_unpack_threads = 3
+  ```
+- **API Configuration** (correct approach):
+  ```bash
+  # Use mode=set_config (NOT set_config_default)
+  curl "http://192.168.6.167:8080/api?apikey=KEY&mode=set_config&section=misc&keyword=par_option&value=-t%2B&output=json"
+  curl "http://192.168.6.167:8080/api?apikey=KEY&mode=set_config&section=misc&keyword=cache_limit&value=4G&output=json"
   ```
 - **Verified Settings**:
   - par2cmdline-turbo with 16-thread detection
@@ -360,8 +366,9 @@ Based on user impact and complexity:
 - **Learnings**:
   - Article cache max is 4G (hard-coded limit)
   - Unrar is single-threaded (disk I/O bound)
-  - par2 -t+ enables full multicore on Linux
-  - API `set_config_default` doesn't work - must edit sabnzbd.ini directly
+  - par2 `-t+` enables full multicore on Linux
+  - `set_config_default` RESETS to defaults; use `set_config` to SET values
+  - Variable names differ from UI labels (par_option vs "Extra PAR2 Parameters")
 - **Persistence**: ✅ Verified survives container restart
 
 ### Radarr (2025-12-28) ✅
