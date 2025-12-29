@@ -1,22 +1,43 @@
 # Media Library Architecture
 
 > **Purpose:** Document the intentional separation and organization of media collections
-> **Last Updated:** 2025-12-27
+> **Last Updated:** 2025-12-29
+
+---
+
+## Current Pool Structure
+
+The media pool uses MergerFS to present multiple NVMe drives as a unified filesystem:
+
+```
+/var/mnt/pool/
+├── movies/              # 691 films (classic, art-house, life-changing)
+├── tv/                  # 29 essential TV series
+├── anime-movies/        # 25 anime films (Ghibli, standalone)
+├── anime-tv/            # 75 anime TV series
+├── christmas-movies/    # Seasonal movies
+├── christmas-tv/        # Seasonal TV
+├── downloads/           # Staging area
+└── music/               # Music library (Lidarr)
+```
+
+**Total Pool**: 41TB (8 NVMe drives), ~30TB used, ~11TB free
 
 ---
 
 ## Design Philosophy
 
-### The Three-Library Split
+### The Multi-Library Split
 
-The media pool is intentionally organized into three distinct libraries:
+Media is intentionally separated for audience filtering and sharing:
 
-```
-/var/mnt/pool/
-├── movies/     # Classic, foundational, life-changing films (non-anime)
-├── tv/         # Essential TV series (non-anime)
-└── anime/      # All anime content (films AND TV series)
-```
+| Library | Purpose | Plex Library |
+|---------|---------|--------------|
+| `movies/` | Classic, foundational, life-changing films (non-anime) | Movies |
+| `tv/` | Essential TV series (non-anime) | TV Shows |
+| `anime-movies/` | Anime films (Ghibli, standalone, collections) | Anime Movies |
+| `anime-tv/` | Anime TV series | Anime TV |
+| `christmas-*` | Seasonal content for December | Separate Plex libs |
 
 ### Rationale
 
@@ -45,7 +66,7 @@ The media pool is intentionally organized into three distinct libraries:
 - Noir, neo-noir, and genre-defining works
 
 **Excludes:**
-- Anime films (even Ghibli - these go in `/anime/`)
+- Anime films (these go in `anime-movies/`)
 - Content that's "good but not life-changing"
 
 ### `/var/mnt/pool/tv/`
@@ -59,34 +80,40 @@ The media pool is intentionally organized into three distinct libraries:
 - Doctor Who (1963 + 2005)
 
 **Excludes:**
-- Anime TV series (these go in `/anime/`)
+- Anime TV series (these go in `anime-tv/`)
 - Casual/disposable content
 
-### `/var/mnt/pool/anime/`
-**Purpose:** ALL anime content - films AND TV series
+### `/var/mnt/pool/anime-movies/`
+**Purpose:** Anime films separate from live-action movies
 
 **Organization:**
 ```
-/var/mnt/pool/anime/
-├── [Series Name]/
-│   ├── Season 01/
-│   ├── Season 02/
-│   └── ...
-├── [Film Collection Name]/          # e.g., "One Piece Films"
-│   ├── Film 1/
-│   ├── Film 2/
-│   └── ...
-├── Studio Ghibli Films/             # Collected Ghibli works
+/var/mnt/pool/anime-movies/
+├── Studio Ghibli Films/
 │   ├── Spirited Away (2001)/
 │   ├── Princess Mononoke (1997)/
 │   └── ...
-└── [Standalone Films]/              # Individual anime films
+├── One Piece Films/
+│   ├── One Piece Film - Red (2022)/
+│   └── ...
+└── [Standalone Films]/
+    └── Akira (1988)/
 ```
 
-**Collections Strategy:**
-- Group related films into collections (One Piece Films, Dragon Ball Movies)
-- Keep Studio Ghibli as a distinct collection (brand recognition)
-- Standalone films remain at top level with proper (Year) naming
+### `/var/mnt/pool/anime-tv/`
+**Purpose:** Anime TV series
+
+**Organization:**
+```
+/var/mnt/pool/anime-tv/
+├── Chainsaw Man (2022)/
+│   └── Season 01/
+├── Attack on Titan (2013)/
+│   ├── Season 01/
+│   ├── Season 02/
+│   └── ...
+└── ...
+```
 
 ---
 
@@ -107,7 +134,7 @@ Movie Name (Year)/
 
 ### Anime TV
 ```
-Anime Name (Year)/               # Or Anime Name if year is unknown
+Anime Name (Year)/
   Season 01/
     [ReleaseGroup] Anime Name - S01E01 [Quality].mkv
 ```
@@ -134,9 +161,22 @@ Some releases use ROT13 encoding (e.g., "Ubhfr bs Pneqf" = "House of Cards")
 - Recommend scanning for non-ASCII patterns periodically
 
 ### Anime films in wrong location
-- One Piece films → should be in `/anime/One Piece Films/`
-- Ghibli films → should be in `/anime/Studio Ghibli Films/`
+- One Piece films -> should be in `/anime-movies/`
+- Ghibli films -> should be in `/anime-movies/Studio Ghibli Films/`
 - NOT in `/movies/` despite being "movies"
+
+---
+
+## Sonarr/Radarr Configuration
+
+| App | Root Folder | Quality Profile |
+|-----|-------------|-----------------|
+| Radarr (movies) | `/pool/movies` | Ultra-HD or HD-1080p |
+| Radarr (anime) | `/pool/anime-movies` | Anime profile |
+| Sonarr (TV) | `/pool/tv` | HD-1080p |
+| Sonarr (anime) | `/pool/anime-tv` | Anime profile |
+
+**Note**: Container paths use `/pool/` which maps to host `/var/mnt/pool/`
 
 ---
 
@@ -150,8 +190,15 @@ Some releases use ROT13 encoding (e.g., "Ubhfr bs Pneqf" = "House of Cards")
 
 ### Sonarr/Radarr configuration
 - Ensure anime series use anime quality profiles
-- Keep anime root folder pointed to `/anime/`
-- Movies root folder → `/movies/` (no anime)
+- Keep anime root folders pointed to `anime-*` directories
+- Movies root folder -> `/pool/movies` (no anime)
+
+---
+
+## Related Documentation
+
+- [Storage Architecture](./storage/architecture.md) - MergerFS configuration
+- [STORAGE_AND_REMOTE_ACCESS.md](./STORAGE_AND_REMOTE_ACCESS.md) - Quick reference
 
 ---
 
@@ -159,6 +206,8 @@ Some releases use ROT13 encoding (e.g., "Ubhfr bs Pneqf" = "House of Cards")
 
 | Date | Change |
 |------|--------|
+| 2025-12-29 | Updated to reflect actual pool structure (anime-movies/anime-tv split) |
+| 2025-12-29 | Added current file counts and pool stats |
 | 2025-12-27 | Initial architecture documentation |
 | 2025-12-27 | Documented anime separation rationale |
 | 2025-12-27 | Added contamination cleanup procedures |

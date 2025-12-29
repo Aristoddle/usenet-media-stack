@@ -6,7 +6,7 @@
 Before diving into the technical details, read [Design Philosophy](/architecture/design-philosophy) to understand **why** this system uses JBOD over ZFS pools, native gaming over VM passthrough, and btrfs per drive. It explains the trade-offs and who this system is built for.
 :::
 
-<SystemArchitecture />
+<!-- SystemArchitecture component disabled for build compatibility -->
 
 Three core principles make this system work reliably across any hardware setup:
 

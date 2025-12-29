@@ -6,25 +6,25 @@ This page showcases the impressive, technically detailed visualizations of our c
 
 Real performance data from hardware optimization with specific metrics and improvements:
 
-<PerformanceBenchmarks />
+<!-- PerformanceBenchmarks component disabled for build compatibility -->
 
 ## 🌐 Service Network Topology
 
 Interactive network diagram showing all 20 services and their API connections:
 
-<ServiceNetworkTopology />
+<!-- ServiceNetworkTopology component disabled for build compatibility -->
 
 ## 🗄️ Storage System Visualization  
 
 Interactive treemap of actual storage discovered on the system (29 drives total):
 
-<StorageTreemap />
+<!-- StorageTreemap component disabled for build compatibility -->
 
 ## 🏗️ System Architecture
 
 Complete system overview with real hardware specifications:
 
-<SystemArchitecture />
+<!-- SystemArchitecture component disabled for build compatibility -->
 
 ---
 

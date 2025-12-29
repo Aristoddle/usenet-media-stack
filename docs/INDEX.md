@@ -2,6 +2,8 @@
 
 Comprehensive table of contents for the Usenet Media Stack documentation.
 
+**Last Updated**: 2025-12-29 (Post-Audit)
+
 ---
 
 ## Getting Started
@@ -29,7 +31,7 @@ Understand how the stack is designed.
 | [Media Library Architecture](LIBRARY_ARCHITECTURE.md) | Library structure and organization |
 | [Media Acquisition Architecture](MEDIA_ACQUISITION_ARCHITECTURE.md) | How media flows through the system |
 | [Volume Safety Model](architecture/volume-safety.md) | Docker volume design for safety |
-| [Docker Networking Solution](networking.md) | Network configuration for containers |
+| [Docker Networking Solution](networking.md) | Network + Tailscale configuration |
 
 ---
 
@@ -41,6 +43,7 @@ Storage architecture and management.
 |----------|-------------|
 | [Storage Management](storage/index.md) | Storage overview and CLI commands |
 | [Storage Architecture](storage/architecture.md) | mergerfs + btrfs for travel-ready server |
+| [Storage Quick Reference](STORAGE_AND_REMOTE_ACCESS.md) | Pool paths and remote access summary |
 | [btrfs Migration Plan](storage/BTRFS_MIGRATION_PLAN.md) | 10-drive architecture migration |
 
 ---
@@ -57,6 +60,7 @@ Day-to-day operational guides.
 | [Service Logs Reference](SERVICE_LOGS.md) | Logs and status monitoring |
 | [Audit Methodology](AUDIT_METHODOLOGY.md) | How to audit the stack |
 | [Stack Optimization Audit](STACK_OPTIMIZATION_AUDIT.md) | Performance audit checklist |
+| [Strategic Roadmap](STRATEGIC_ROADMAP.md) | 5-tier action plan and priorities |
 
 ---
 
@@ -72,6 +76,13 @@ Individual service configuration and guides.
 | [Local Endpoints](local-endpoints.md) | Loopback and LAN endpoints |
 | [Downloader Endpoints](COMPATIBILITY.md) | Compose file compatibility matrix |
 
+### Video Processing
+
+| Document | Description |
+|----------|-------------|
+| [Tdarr Guide](TDARR.md) | Transcoding configuration and troubleshooting |
+| [ISO Re-encoding Workflow](ISO_REENCODING_WORKFLOW.md) | Disc image processing |
+
 ### Reading Stack
 
 | Document | Description |
@@ -86,15 +97,9 @@ Individual service configuration and guides.
 | Document | Description |
 |----------|-------------|
 | [Manga Acquisition Pipeline](MANGA_ACQUISITION_PIPELINE.md) | Two-track manga acquisition system |
+| [Manga Collection Topology](MANGA_COLLECTION_TOPOLOGY.md) | Folder structure and organization |
+| [Manga Integration Status](MANGA_INTEGRATION_STATUS.md) | Current gaps and next steps |
 | [Collection Gap-Fill Strategy](COLLECTION_GAP_FILL_STRATEGY.md) | Filling collection gaps |
-
-### Video Processing
-
-| Document | Description |
-|----------|-------------|
-| [Tdarr Tuning Guide](TDARR_TUNING.md) | Video transcoding optimization |
-| [ISO Re-encoding Workflow](ISO_REENCODING_WORKFLOW.md) | Disc image processing |
-| [TV Reorganization Plan](TV_REORGANIZATION_PLAN.md) | TV folder structure remediation |
 
 ---
 
@@ -109,7 +114,7 @@ Power user documentation.
 | [Backup Strategies](advanced/backup-strategies.md) | Data backup approaches |
 | [Custom Configurations](advanced/custom-configs.md) | Custom configuration patterns |
 | [Hot-Swap Procedures](advanced/hot-swap.md) | Drive hot-swap operations |
-| [Performance Optimisation](advanced/performance.md) | Tuning for performance |
+| [Performance Optimisation](advanced/performance.md) | SVT-AV1 and system tuning |
 | [Troubleshooting Playbook](advanced/troubleshooting.md) | Debugging common issues |
 | [Migration Log](advanced/migration-log.md) | Advanced docs migration history |
 
@@ -120,11 +125,11 @@ Power user documentation.
 | [CLI Reference](cli/index.md) | Command-line interface guide |
 | [Storage CLI](cli/storage.md) | Storage management commands |
 
-### Networking
+### Networking & Security
 
 | Document | Description |
 |----------|-------------|
-| [Tailscale Setup](TAILSCALE_SETUP.md) | Remote access via Tailscale |
+| [Docker Networking](networking.md) | Network config + Tailscale remote access |
 | [Security Guide](SECURITY.md) | Security best practices |
 | [Secrets Layout](secrets.md) | Environment and secrets management |
 
@@ -146,7 +151,13 @@ Supplementary and reference documentation.
 | [User Taste Profile](USER_TASTE_PROFILE.md) | Personal collection context |
 | [Personal Collection Context](PERSONAL_COLLECTION_CONTEXT.md) | Collection preferences |
 | [Visualizations](visualizations.md) | Advanced system visualizations |
-| [vNext Cluster Plan](vnext-cluster-plan.md) | Future cluster architecture |
+| [USB Content Inventory](USB_CONTENT_INVENTORY.md) | USB drive content for import |
+
+### Future Planning
+
+| Document | Description |
+|----------|-------------|
+| [vNext Cluster Plan](vnext-cluster-plan.md) | **ASPIRATIONAL** - Future 13-node cluster architecture |
 
 ### Runbook
 
@@ -161,6 +172,8 @@ Architecture decision records.
 
 | Document | Description |
 |----------|-------------|
+| [Stack Health Audit](decisions/2025-12-29-stack-health-audit.md) | Readarr retirement, service status |
+| [Manga Topology Review](decisions/2025-12-29-manga-topology-adversarial-review.md) | Manga folder structure decision |
 | [ROM Acquisition Pipeline](decisions/2025-12-18-rom-acquisition-pipeline.md) | ROM pipeline architecture decision |
 | [ROM Pipeline Test Cases](decisions/2025-12-18-rom-pipeline-test-cases.md) | ROM pipeline E2E test cases |
 
@@ -179,7 +192,15 @@ Architecture decision records.
 
 | Document | Description |
 |----------|-------------|
-| [TODO](TODO.md) | Active task list |
+| [TODO](TODO.md) | Active task list (check STRATEGIC_ROADMAP.md for current priorities) |
+
+---
+
+## Audits
+
+| Document | Description |
+|----------|-------------|
+| [Audit Results 2025-12-29](AUDIT_RESULTS_2025-12-29.md) | Documentation audit and cleanup |
 
 ---
 
@@ -200,3 +221,28 @@ Historical and completed project documentation.
 |----------|-------------|
 | [Manga Remediation Swarm](archive/projects/MANGA_REMEDIATION_SWARM.md) | Multi-agent manga collection remediation |
 | [Post-Migration Plan](archive/projects/POST_MIGRATION_PLAN.md) | mergerfs migration (completed) |
+
+### Session Notes
+
+| Document | Description |
+|----------|-------------|
+| [Overnight Session 2025-12-29](archive/sessions/OVERNIGHT_SESSION_2025-12-29.md) | USB inventory and tools session |
+
+---
+
+## Quick Links
+
+**Most Used**:
+- [Stack Usage Guide](STACK_USAGE_GUIDE.md) - Daily usage
+- [Working Services](SERVICES.md) - All service URLs and ports
+- [Tdarr Guide](TDARR.md) - Transcoding
+- [Strategic Roadmap](STRATEGIC_ROADMAP.md) - Current priorities
+
+**Troubleshooting**:
+- [Troubleshooting Playbook](advanced/troubleshooting.md)
+- [Tdarr Guide](TDARR.md) (recovery procedures)
+- [Komga Corrupt CBZ](komga-corrupt-cbz.md)
+
+---
+
+*Last audit: 2025-12-29 - See [AUDIT_RESULTS_2025-12-29.md](AUDIT_RESULTS_2025-12-29.md) for details*

@@ -2,8 +2,8 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: "Beppe's Arr Stack",
-  description: "Beppe's Arr: opinionated Usenet+torrent homelab stack with hot-swappable storage, GPU assist, and honest docs.",
-  
+  description: "Beppe's Arr: opinionated Usenet+torrent homelab stack with 41TB MergerFS pool, SVT-AV1 transcoding, and comprehensive media management.",
+
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],
@@ -11,23 +11,23 @@ export default defineConfig({
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: "Beppe's Arr Stack" }],
-    ['meta', { property: 'og:description', content: 'Opinionated Usenet+torrent homelab stack with hot-swap storage and GPU assist' }],
+    ['meta', { property: 'og:description', content: '41TB MergerFS pool, SVT-AV1 transcoding, Tailscale remote access, and comprehensive books/manga/emulation stacks' }],
     ['meta', { property: 'og:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
     ['meta', { property: 'og:image:width', content: '1200' }],
     ['meta', { property: 'og:image:height', content: '630' }],
     ['meta', { property: 'og:url', content: 'https://beppesarrstack.net' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: "Beppe's Arr Stack" }],
-    ['meta', { name: 'twitter:description', content: 'Opinionated Usenet+torrent homelab stack with hot-swap storage and GPU assist.' }],
+    ['meta', { name: 'twitter:description', content: '41TB MergerFS pool, SVT-AV1 transcoding, Tailscale remote access, EmuDeck gaming' }],
     ['meta', { name: 'twitter:image', content: 'https://images.squarespace-cdn.com/content/v1/6565030c0f2a89615e0be33d/fe9447b9-db94-4428-9713-6d2c7d146e2b/Monty2.png' }],
-    ['meta', { name: 'keywords', content: 'media automation, docker, plex, sonarr, radarr, hot-swap, jbod, gpu acceleration' }]
+    ['meta', { name: 'keywords', content: 'media automation, docker, plex, sonarr, radarr, mergerfs, svt-av1, tdarr, tailscale, emudeck, komga, audiobookshelf' }]
   ],
   // Allow dead links during local builds to keep CI green while docs are being realigned
   ignoreDeadLinks: true,
 
   themeConfig: {
     logo: '/logo.svg',
-    
+
     nav: [
       { text: 'Home', link: '/' },
       {
@@ -35,31 +35,48 @@ export default defineConfig({
         items: [
           { text: 'Quickstart', link: '/getting-started/' },
           { text: 'Ops Runbook', link: '/ops-runbook' },
+          { text: 'Stack Usage Guide', link: '/STACK_USAGE_GUIDE' },
           { text: 'Usenet Primer', link: '/usenet-primer' },
-          { text: 'Usenet Onboarding', link: '/usenet-onboarding' },
           { text: 'TRaSH Guides', link: '/trash-guides' },
-          { text: 'Reading Stack', link: '/reading-stack' },
-          { text: 'Books Reorg Plan', link: '/books-reorg-plan' },
-          { text: 'Komics TODO', link: '/TODO-komics-stack' },
           { text: 'FAQ', link: '/faq' }
+        ]
+      },
+      {
+        text: 'Infrastructure',
+        items: [
+          { text: 'Architecture', link: '/architecture/' },
+          { text: 'Storage & MergerFS', link: '/STORAGE_AND_REMOTE_ACCESS' },
+          { text: 'Tdarr Transcoding', link: '/TDARR' },
+          { text: 'Networking', link: '/networking' },
+          { text: 'Services Status', link: '/SERVICES' },
+          { text: 'Local Endpoints', link: '/local-endpoints' }
+        ]
+      },
+      {
+        text: 'Libraries',
+        items: [
+          { text: 'Books & Audiobooks', link: '/BOOKS_AND_AUDIOBOOKS_GUIDE' },
+          { text: 'Manga Ecosystem', link: '/MANGA_ECOSYSTEM_ANALYSIS' },
+          { text: 'Plex Libraries', link: '/PLEX_LIBRARY_ANALYSIS' },
+          { text: 'Mylar Setup', link: '/MYLAR_SETUP' },
+          { text: 'Suwayomi Setup', link: '/SUWAYOMI_SETUP' },
+          { text: 'Library Architecture', link: '/LIBRARY_ARCHITECTURE' }
+        ]
+      },
+      {
+        text: 'Gaming',
+        items: [
+          { text: 'EmuDeck Inventory', link: '/EMUDECK_INVENTORY' }
         ]
       },
       {
         text: 'Reference',
         items: [
           { text: 'CLI Reference', link: '/cli/' },
-          { text: 'Architecture', link: '/architecture/' },
           { text: 'Advanced', link: '/advanced/' },
-          { text: 'Service Status', link: '/SERVICES/' },
-          { text: 'Local Endpoints', link: '/local-endpoints' },
-          { text: 'Visualizations', link: '/visualizations' }
-        ]
-      },
-      {
-        text: 'Resources',
-        items: [
-          { text: 'Free Media', link: '/free-media' },
-          { text: 'Secrets', link: '/secrets' }
+          { text: 'User Taste Profile', link: '/USER_TASTE_PROFILE' },
+          { text: 'Strategic Roadmap', link: '/STRATEGIC_ROADMAP' },
+          { text: 'Free Media Resources', link: '/free-media' }
         ]
       },
       {
@@ -74,7 +91,7 @@ export default defineConfig({
     sidebar: {
       '/getting-started/': [
         {
-          text: '🚀 Getting Started',
+          text: 'Getting Started',
           items: [
             { text: 'Quick Start', link: '/getting-started/' },
             { text: 'Prerequisites', link: '/getting-started/prerequisites' },
@@ -83,10 +100,10 @@ export default defineConfig({
           ]
         }
       ],
-      
+
       '/cli/': [
         {
-          text: '📋 CLI Reference',
+          text: 'CLI Reference',
           items: [
             { text: 'Overview', link: '/cli/' },
             { text: 'Deploy Command', link: '/cli/deploy' },
@@ -98,33 +115,40 @@ export default defineConfig({
           ]
         }
       ],
-      
+
       '/architecture/': [
         {
-          text: '🏗️ Architecture',
+          text: 'Architecture',
           items: [
             { text: 'System Overview', link: '/architecture/' },
             { text: 'Design Philosophy', link: '/architecture/design-philosophy' },
             { text: 'Volume Safety', link: '/architecture/volume-safety' },
-            { text: 'CLI Design', link: '/architecture/cli-design' },
-            { text: 'Service Architecture', link: '/architecture/services' },
-            { text: 'Storage System', link: '/architecture/storage' },
-            { text: 'Hardware Integration', link: '/architecture/hardware' },
-            { text: 'Network & Security', link: '/architecture/network' }
+            { text: 'Storage System', link: '/storage/' }
           ]
         }
       ],
-      
+
+      '/storage/': [
+        {
+          text: 'Storage',
+          items: [
+            { text: 'Overview', link: '/storage/' },
+            { text: 'MergerFS Architecture', link: '/storage/architecture' },
+            { text: 'Storage & Remote Access', link: '/STORAGE_AND_REMOTE_ACCESS' },
+            { text: 'BTRFS Migration', link: '/storage/BTRFS_MIGRATION_PLAN' }
+          ]
+        }
+      ],
+
       '/advanced/': [
         {
-          text: '🔧 Advanced Topics',
+          text: 'Advanced Topics',
           items: [
             { text: 'Overview', link: '/advanced/' },
-            { text: 'Custom Configurations', link: '/advanced/custom-configs' },
             { text: 'Performance Tuning', link: '/advanced/performance' },
+            { text: 'Custom Configurations', link: '/advanced/custom-configs' },
             { text: 'Backup Strategies', link: '/advanced/backup-strategies' },
             { text: 'Hot-Swap Workflows', link: '/advanced/hot-swap' },
-            { text: 'Usenet Onboarding', link: '/usenet-onboarding' },
             { text: 'API Integration', link: '/advanced/api-integration' },
             { text: 'Troubleshooting', link: '/advanced/troubleshooting' }
           ]

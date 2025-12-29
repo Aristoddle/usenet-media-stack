@@ -52,7 +52,12 @@ Currently tracked via `manga-torrent-searcher` agent:
 
 ### Mylar API
 
-**Base URL:** `http://localhost:8090/api?apikey=cad4f40858c77c4177c99bebae4f3e17`
+**Base URL:** `http://localhost:8090/api`
+
+**API Key**: Read from config file at runtime:
+```bash
+MYLAR_API_KEY=$(grep -oP '(?<=api_key = ).+' /var/mnt/fast8tb/config/mylar/config.ini)
+```
 
 | Endpoint | Description |
 |----------|-------------|
@@ -64,18 +69,24 @@ Currently tracked via `manga-torrent-searcher` agent:
 ### Example API Calls
 
 ```bash
+# Get API key from config (never hardcode!)
+MYLAR_API_KEY=$(grep -oP '(?<=api_key = ).+' /var/mnt/fast8tb/config/mylar/config.ini)
+
 # Search for a series
-curl "http://localhost:8090/api?apikey=cad4f40858c77c4177c99bebae4f3e17&cmd=findComic&name=Chainsaw%20Man"
+curl "http://localhost:8090/api?apikey=${MYLAR_API_KEY}&cmd=findComic&name=Chainsaw%20Man"
 
 # List all monitored series
-curl "http://localhost:8090/api?apikey=cad4f40858c77c4177c99bebae4f3e17&cmd=getIndex"
+curl "http://localhost:8090/api?apikey=${MYLAR_API_KEY}&cmd=getIndex"
 
 # Force search for new releases
-curl "http://localhost:8090/api?apikey=cad4f40858c77c4177c99bebae4f3e17&cmd=forceSearch&id=COMICVINE_ID"
+curl "http://localhost:8090/api?apikey=${MYLAR_API_KEY}&cmd=forceSearch&id=COMICVINE_ID"
 ```
+
+**SECURITY NOTE**: Never commit API keys to documentation or version control. Always read from config files at runtime.
 
 ## Related Documentation
 
 - [Collection Gap Fill Strategy](./COLLECTION_GAP_FILL_STRATEGY.md)
 - [Manga Remediation Swarm](./MANGA_REMEDIATION_SWARM.md)
 - [User Taste Profile](./USER_TASTE_PROFILE.md)
+- [Manga Collection Topology](./MANGA_COLLECTION_TOPOLOGY.md)
