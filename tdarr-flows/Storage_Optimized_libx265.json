@@ -1,0 +1,179 @@
+{
+  "_id": "storage_opt_libx265",
+  "name": "Storage Optimized libx265 (CPU)",
+  "description": "Maximum compression with libx265 slow preset, CRF 23. Re-encodes bloated HEVC (>8Mbps). Skips efficient HEVC and AV1.",
+  "priority": 0,
+  "flowPlugins": [
+    {
+      "name": "Input File",
+      "sourceRepo": "Community",
+      "pluginName": "inputFile",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "inputFile_001",
+      "position": {"x": 500, "y": 50},
+      "inputsDB": {}
+    },
+    {
+      "name": "Check if AV1 (skip)",
+      "sourceRepo": "Community",
+      "pluginName": "checkVideoCodec",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "checkAV1_002",
+      "position": {"x": 500, "y": 150},
+      "inputsDB": {"codecsToProcess": "av1"}
+    },
+    {
+      "name": "Check if HEVC",
+      "sourceRepo": "Community",
+      "pluginName": "checkVideoCodec",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "checkHEVC_003",
+      "position": {"x": 350, "y": 250},
+      "inputsDB": {"codecsToProcess": "hevc"}
+    },
+    {
+      "name": "Check Bitrate >8Mbps",
+      "sourceRepo": "Community",
+      "pluginName": "checkVideoBitrate",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "checkBitrate_004",
+      "position": {"x": 200, "y": 350},
+      "inputsDB": {
+        "unit": "kbps",
+        "greaterThan": "8000",
+        "lessThan": ""
+      }
+    },
+    {
+      "name": "FFmpeg Start",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "ffmpegStart_005",
+      "position": {"x": 500, "y": 450},
+      "inputsDB": {}
+    },
+    {
+      "name": "Set Video Encoder (libx265 slow CRF23)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandSetVideoEncoder",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "setEncoder_006",
+      "position": {"x": 500, "y": 550},
+      "inputsDB": {
+        "outputCodec": "hevc",
+        "ffmpegPresetEnabled": true,
+        "ffmpegPreset": "slow",
+        "ffmpegQualityEnabled": true,
+        "ffmpegQuality": "23",
+        "hardwareEncoding": false,
+        "hardwareType": "auto",
+        "hardwareDecoding": true,
+        "forceEncoding": false
+      }
+    },
+    {
+      "name": "Copy All Audio Streams",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandSetAudioEncoder",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "copyAudio_007",
+      "position": {"x": 500, "y": 650},
+      "inputsDB": {
+        "audioEncoder": "copy",
+        "language": "",
+        "channels": ""
+      }
+    },
+    {
+      "name": "Copy All Subtitles",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandSetSubtitleEncoder",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "copySubs_008",
+      "position": {"x": 500, "y": 750},
+      "inputsDB": {
+        "subtitleEncoder": "copy"
+      }
+    },
+    {
+      "name": "Set Container MKV",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandSetContainer",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "setContainer_009",
+      "position": {"x": 500, "y": 850},
+      "inputsDB": {"container": "mkv"}
+    },
+    {
+      "name": "Execute FFmpeg",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "ffmpegExec_010",
+      "position": {"x": 500, "y": 950},
+      "inputsDB": {}
+    },
+    {
+      "name": "Check File Size Decreased",
+      "sourceRepo": "Community",
+      "pluginName": "checkFileSize",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "checkSize_011",
+      "position": {"x": 500, "y": 1050},
+      "inputsDB": {
+        "greaterThan": "",
+        "lessThan": "100"
+      }
+    },
+    {
+      "name": "Replace Original",
+      "sourceRepo": "Community",
+      "pluginName": "replaceOriginalFile",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "replace_012",
+      "position": {"x": 650, "y": 1150},
+      "inputsDB": {}
+    },
+    {
+      "name": "Keep Original (encode failed/grew)",
+      "sourceRepo": "Community",
+      "pluginName": "keepOriginalFile",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "keepOrig_013",
+      "position": {"x": 350, "y": 1150},
+      "inputsDB": {}
+    }
+  ],
+  "flowEdges": [
+    {"source": "inputFile_001", "sourceHandle": "1", "target": "checkAV1_002", "targetHandle": null, "id": "edge_01", "animated": true, "type": "smoothstep"},
+    {"source": "checkAV1_002", "sourceHandle": "1", "target": "replace_012", "targetHandle": null, "id": "edge_02", "animated": true, "type": "smoothstep", "label": "AV1=skip"},
+    {"source": "checkAV1_002", "sourceHandle": "2", "target": "checkHEVC_003", "targetHandle": null, "id": "edge_03", "animated": true, "type": "smoothstep", "label": "not AV1"},
+    {"source": "checkHEVC_003", "sourceHandle": "1", "target": "checkBitrate_004", "targetHandle": null, "id": "edge_04", "animated": true, "type": "smoothstep", "label": "is HEVC"},
+    {"source": "checkHEVC_003", "sourceHandle": "2", "target": "ffmpegStart_005", "targetHandle": null, "id": "edge_05", "animated": true, "type": "smoothstep", "label": "not HEVC→encode"},
+    {"source": "checkBitrate_004", "sourceHandle": "1", "target": "ffmpegStart_005", "targetHandle": null, "id": "edge_06", "animated": true, "type": "smoothstep", "label": ">8Mbps→re-encode"},
+    {"source": "checkBitrate_004", "sourceHandle": "2", "target": "replace_012", "targetHandle": null, "id": "edge_07", "animated": true, "type": "smoothstep", "label": "≤8Mbps=efficient"},
+    {"source": "ffmpegStart_005", "sourceHandle": "1", "target": "setEncoder_006", "targetHandle": null, "id": "edge_08", "animated": true, "type": "smoothstep"},
+    {"source": "setEncoder_006", "sourceHandle": "1", "target": "copyAudio_007", "targetHandle": null, "id": "edge_09", "animated": true, "type": "smoothstep"},
+    {"source": "copyAudio_007", "sourceHandle": "1", "target": "copySubs_008", "targetHandle": null, "id": "edge_10", "animated": true, "type": "smoothstep"},
+    {"source": "copySubs_008", "sourceHandle": "1", "target": "setContainer_009", "targetHandle": null, "id": "edge_11", "animated": true, "type": "smoothstep"},
+    {"source": "setContainer_009", "sourceHandle": "1", "target": "ffmpegExec_010", "targetHandle": null, "id": "edge_12", "animated": true, "type": "smoothstep"},
+    {"source": "ffmpegExec_010", "sourceHandle": "1", "target": "checkSize_011", "targetHandle": null, "id": "edge_13", "animated": true, "type": "smoothstep"},
+    {"source": "checkSize_011", "sourceHandle": "1", "target": "replace_012", "targetHandle": null, "id": "edge_14", "animated": true, "type": "smoothstep", "label": "smaller→replace"},
+    {"source": "checkSize_011", "sourceHandle": "2", "target": "keepOrig_013", "targetHandle": null, "id": "edge_15", "animated": true, "type": "smoothstep", "label": "larger→keep orig"}
+  ],
+  "isUiLocked": false
+}
