@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 01:10 EST)
+## Date: 2025-12-29 (Updated: 01:45 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -19,6 +19,11 @@ Major infrastructure overhaul completed:
 - Refactored docker-compose for DRY/portability (.env variables)
 - Created monitoring tools: `sysinfo-snapshot`, `metrics-collector`
 - Wired Transmission to Radarr/Sonarr (was disabled)
+- **Created STRATEGIC_ROADMAP.md with 5-tier action plan**
+- **Created docs/INDEX.md with comprehensive navigation**
+- **Archived stale docs to docs/archive/**
+- **Completed EOL/deprecated tools audit** (Readarr RETIRED)
+- **Fixed Prowlarr category sync for Mylar** (7030→7000)
 
 ---
 
@@ -40,11 +45,34 @@ TDARR_TRANSCODE_GPU_WORKERS=6
 TDARR_HEALTHCHECK_GPU_WORKERS=2
 ```
 
-### File Queue Status
-- **Queued**: 4,144 files ready for processing
-- **Success**: 1,455 already completed
+### File Queue Status (as of 01:30)
+- **Queued**: 3,473 files ready for processing
+- **Success**: 1,457 already completed
 - **Hold**: 26 on hold
-- **Errors**: 0 (all reset)
+- **Errors**: 57 (reset from 971 timeout errors)
+
+---
+
+## Critical Findings
+
+### Readarr is RETIRED (June 27, 2025)
+
+**Action Required**: Replace with Bookshelf fork
+- GitHub repository archived and read-only
+- LinuxServer.io deprecated the image
+- Current version `develop-0.4.18.2805-ls157` receives NO security updates
+- Documented in `docs/decisions/2025-12-29-stack-health-audit.md`
+
+### Doctor Who Collection Needs Reorganization
+
+**Identified Issues**:
+- Classic (1963) episodes mixed into Modern (2005) folders
+- Wrong episode numbering (E04, E09, E21, E30 - not sequential)
+- German dubbed versions mixed with English
+- Files in release folders instead of flat structure
+- Missing episodes throughout both series
+
+**Action Required**: Manual curation using TheTVDB as reference
 
 ---
 
@@ -72,8 +100,11 @@ TDARR_HEALTHCHECK_GPU_WORKERS=2
 | `.env` | Machine-specific values (hardware limits, API keys) |
 | `.env.example` | Template with hardware documentation |
 | `config/tdarr/server/Tdarr/DB2/SQL/database.db` | Tdarr SQLite (libraries, workers, settings) |
-| `docs/TDARR_TUNING.md` | **NEW** - Conservative vs aggressive settings guide |
-| `docs/SERVICE_LOGS.md` | **NEW** - Log locations for all services |
+| `docs/TDARR_TUNING.md` | Conservative vs aggressive settings guide |
+| `docs/SERVICE_LOGS.md` | Log locations for all services |
+| `docs/STRATEGIC_ROADMAP.md` | **NEW** - 5-tier prioritized action plan |
+| `docs/INDEX.md` | **NEW** - Comprehensive documentation navigation |
+| `docs/decisions/2025-12-29-stack-health-audit.md` | **NEW** - EOL tools audit |
 
 ---
 
@@ -106,17 +137,6 @@ TDARR_NODE_HEALTHCHECK_GPU_WORKERS=1
 TDARR_NODE_HEALTHCHECK_CPU_WORKERS=0
 ```
 
-### Critical Fix Applied: Schedule Override
-
-Tdarr's **24-hour schedule** was overriding workerLimits with CPU workers. Fixed all 24 hour slots to GPU-only:
-
-```bash
-# Verify schedule is GPU-only
-sqlite3 /var/mnt/fast8tb/config/tdarr/server/Tdarr/DB2/SQL/database.db \
-  "SELECT json_extract(json_data, '$.schedule[0]') FROM nodejsondb WHERE id='MainNode';"
-# Should show: healthcheckcpu=0, transcodecpu=0
-```
-
 ---
 
 ## Monitoring Tools
@@ -141,12 +161,6 @@ Located at `tools/metrics-collector` - SQLite time-series storage.
 ```
 
 Database: `/var/mnt/fast8tb/config/metrics/sysinfo.db`
-
-### Systemd Service (Optional)
-```bash
-sudo cp tools/systemd/media-stack-metrics.service /etc/systemd/system/
-sudo systemctl enable --now media-stack-metrics.service
-```
 
 ---
 
@@ -176,12 +190,12 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Enable GPU health-check workers
 - [x] Create sysinfo-snapshot monitoring tool
 
-### This Session (2025-12-29 Night)
+### This Session (2025-12-29 Night/Early Morning)
 - [x] Diagnose Tdarr limbo timeout errors (1,600+ files stuck)
 - [x] Identify root cause: Tdarr schedule override forcing CPU workers
 - [x] Fix all 24 hour slots in schedule to GPU-only
 - [x] Fix docker-compose.yml fallback defaults (were CPU, now GPU)
-- [x] Reset all error files to Queued status
+- [x] Reset all error files to Queued status (twice: 1,600+ then 971)
 - [x] Delete 240 orphaned -xpost records from database
 - [x] Kill runaway 1Password CLI process (3 days, 110% CPU)
 - [x] Create metrics-collector tool with SQLite storage
@@ -189,26 +203,32 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Create docs/TDARR_TUNING.md with conservative/aggressive profiles
 - [x] Set conservative worker counts while Plex does first-run scan
 - [x] Deploy systemd service files for metrics daemon
+- [x] Create STRATEGIC_ROADMAP.md with 5-tier action plan
+- [x] Create docs/INDEX.md with comprehensive navigation
+- [x] Archive stale audit reports to docs/archive/
+- [x] Create MANGA_INTEGRATION_STATUS.md with gap analysis
+- [x] Complete EOL/deprecated tools audit (found: Readarr RETIRED)
+- [x] Fix Prowlarr category for Mylar (7030→7000)
+- [x] Analyze Doctor Who collection organization issues
 
 ---
 
 ## Next Steps
 
-### Immediate (After Plex Finishes First-Run)
-1. Monitor thermals until Plex library analysis completes
-2. Scale Tdarr to aggressive settings (see TDARR_TUNING.md)
-3. Verify queue is processing smoothly
+### Immediate (Priority Order)
+1. Replace Readarr with Bookshelf fork (see `docs/decisions/2025-12-29-stack-health-audit.md`)
+2. Monitor thermals until Plex library analysis completes
+3. Scale Tdarr to aggressive settings when CPU drops
 
-### Documentation Cleanup (Phase 1)
-1. Archive stale audit reports to `docs/archive/`
-2. Create `docs/INDEX.md` with comprehensive TOC
-3. Normalize doc naming (lowercase with hyphens)
+### Short-Term
+1. Create Suwayomi → Komga organizer script (T2.3)
+2. Reorganize Doctor Who collection (manual, use TheTVDB)
+3. Test Mylar search with new Prowlarr category
 
-### Future Improvements
-1. Rolling stats analysis with time-window aggregation
-2. Get/set wrapper tooling for easy queryability
-3. Automated thermal-aware worker scaling
-4. Import Christmas movies to Radarr
+### Medium-Term
+1. Run Komf metadata enrichment on manga collection
+2. Wire manga-torrent-searcher agent for weekly chapter automation
+3. Upgrade Recyclarr to Remux + WEB 2160p profile
 
 ---
 
@@ -227,4 +247,7 @@ sudo docker compose up -d tdarr tdarr-node --force-recreate
 
 # Check pool health
 df -h /var/mnt/pool
+
+# Verify Readarr replacement needed
+docker ps | grep readarr
 ```
