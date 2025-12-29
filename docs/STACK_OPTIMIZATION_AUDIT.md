@@ -60,7 +60,7 @@ User-facing services.
 
 | Service | Port | Status | Audit Date | Notes |
 |---------|------|--------|------------|-------|
-| Plex | 32400 | ✅ Complete | 2025-12-28 | VAAPI enabled, GPU access verified |
+| Plex | 32400 | ⚠️ CRITICAL | 2025-12-28 | HW transcoding NOT enabled - user action required |
 | Audiobookshelf | 13378 | ⬜ Pending | - | Audiobooks + podcasts |
 | Komga | 8081 | ⬜ Pending | - | Comics/manga reader |
 | Kavita | 5000 | ⬜ Pending | - | eBooks/manga reader |
@@ -298,9 +298,9 @@ Based on user impact and complexity:
 5. ✅ **Recyclarr** - TRaSH Guides sync verified
 
 ### Phase 2: User Experience (Medium Impact)
-6. ✅ **Plex** - VAAPI hardware transcoding verified
-7. ✅ **Overseerr** - Radarr/Sonarr connections healthy
-8. ⚠️ **Bazarr** - Providers need credentials (user action required)
+6. ⚠️ **Plex** - CRITICAL: HW transcoding NOT enabled (GPU detected but setting disabled)
+7. ✅ **Overseerr** - Radarr/Sonarr API keys verified, connections healthy
+8. ⚠️ **Bazarr** - Providers need credentials (OpenSubtitles.com account required)
 9. ✅ **Tautulli** - Plex connected, analytics working
 
 ### Phase 3: Reading Stack (Medium Impact)
@@ -402,17 +402,23 @@ Based on user impact and complexity:
   - API: POST /api/v2/cruddb with collection/mode/docID pattern
 - **Commit**: 051dfa0
 
-### Plex (2025-12-28) ✅
-- **Status**: Fully operational
+### Plex (2025-12-28) ⚠️ CRITICAL ISSUE
+- **Status**: Running but HW transcoding NOT enabled
 - **Version**: 1.42.2.10156-f737b826c
-- **Hardware Transcoding**: ENABLED
-  - `HardwareAcceleratedCodecs=1`
-  - `HardwareAcceleratedEncoders=1`
-  - GPU: `/dev/dri/renderD128` (AMD 780M, RDNA3)
+- **Plex Pass**: Active (`subscriptionActive=1`, `hardware_transcoding` entitlement present)
+- **GPU Detection**: Detected (`HardwareDevicePath="1002:15bf:1f66:0031@0000:c6:00.0"`)
+- **Container GPU Access**: `/dev/dri` mapped correctly
+- **ISSUE**: Hardware acceleration NOT enabled in Plex settings!
+  - ALL transcode sessions show `transcodeHwRequested="0"`
+  - Preferences.xml missing `HardwareAcceleratedCodecs` setting
+  - All transcoding running on CPU despite VAAPI capability
+- **Host VAAPI**: Mesa 25.3.0, libva 2.22.0 - H264/HEVC/AV1 encode supported
+- **Plex FFmpeg**: Has `h264_vaapi`, `hevc_vaapi` encoders (NOT av1_vaapi)
+- **Required Action**: Enable "Use hardware acceleration when available" in:
+  `Plex → Settings → Transcoder → Use hardware acceleration when available`
 - **Quality**: TranscoderQuality=3 ("Make my CPU hurt")
 - **Libraries**: Christmas, Movies, Anime, TV Shows
-- **Temp Directory**: Uses container overlay (797GB available)
-- **Verified**: Plex token valid, API responding
+- **Verified**: Plex token valid, API responding, Tautulli connected
 
 ### Overseerr (2025-12-28) ✅
 - **Status**: Fully operational
@@ -425,13 +431,19 @@ Based on user impact and complexity:
 
 ### Bazarr (2025-12-28) ⚠️ Partial
 - **Status**: Running but providers not configured
-- **Version**: 1.5.3
+- **API Key**: `486a09ced966f66b9e616320cf0b8358`
 - **Enabled Providers**: opensubtitlescom, podnapisi, subdivx, subf2m
-- **Issue**: All providers have empty credentials
-- **Required Action**: User must configure:
-  - OpenSubtitles.com account (username/password)
-  - Subf2m user-agent configuration
-- **Connections**: Radarr 6.0.4.10291, Sonarr 4.0.16.2944 verified
+- **Issue**: All providers have empty credentials (username/password fields blank)
+- **Scoring Configuration**:
+  - Series minimum score: 90 (TRaSH recommends 90 ✅)
+  - Movie minimum score: 70 (TRaSH recommends 80 - slightly low)
+- **Sync Tools**: ffsubsync available but disabled (`use_subsync: false`)
+- **Required Actions**:
+  1. Create OpenSubtitles.com account (free works, no VIP needed)
+  2. Enter credentials in Bazarr: Settings → Providers → OpenSubtitles.com
+  3. Consider enabling subtitle sync for timing correction
+- **Connections**: Radarr (`radarr:7878`) ✅, Sonarr (`sonarr:8989`) ✅
+- **Research Applied**: TRaSH Guides scoring, provider priority recommendations
 
 ### Tautulli (2025-12-28) ✅
 - **Status**: Fully operational
@@ -443,6 +455,21 @@ Based on user impact and complexity:
 ---
 
 ## Issues Discovered & Fixed (2025-12-28)
+
+### Issue 5: Plex Hardware Transcoding Not Enabled (CRITICAL)
+- **Symptom**: All transcode sessions show `transcodeHwRequested="0"` in logs
+- **Discovery Method**: Checked `Plex Transcoder Statistics.log` during Phase 2 audit
+- **Root Cause**: Despite GPU being detected and Plex Pass active, the "Use hardware acceleration" setting was never enabled in Plex
+- **Evidence**:
+  - Preferences.xml missing `HardwareAcceleratedCodecs="1"` setting
+  - `transcodeHwFullPipeline="0"` on all recent sessions
+  - Plex API shows `hardware_transcoding` entitlement present
+  - Host VAAPI fully functional (Mesa 25.3.0, H264/HEVC/AV1 encode)
+  - Container has `/dev/dri` access with correct permissions
+- **Impact**: All transcoding running on CPU, wasting GPU capability
+- **Resolution**: User must enable in Plex UI:
+  `Settings → Transcoder → Use hardware acceleration when available`
+- **Note**: Plex FFmpeg has `h264_vaapi` and `hevc_vaapi` but NOT `av1_vaapi`
 
 ### Issue 1: Tdarr ISO Processing Errors
 - **Symptom**: 132 FFprobe errors - "unable to extract data from .iso"
@@ -488,6 +515,27 @@ Based on user impact and complexity:
 - [r/PleX](https://reddit.com/r/PleX) - Plex optimization
 - [LinuxServer.io](https://docs.linuxserver.io/) - Container documentation
 - Hardware-specific searches for AMD Ryzen 7840HS / Radeon 780M
+
+---
+
+## Parallel Agent Work (2025-12-28)
+
+### Manga Chapter Search Agent
+- **Series Checked**: Chainsaw Man, Dandadan, Bug Ego, Kagurabachi
+- **Downloads Queued**: 7 chapters total via Transmission
+  - Chainsaw Man Ch.194-195 (local was Ch.193)
+  - Dandadan Ch.182-185 (local was Ch.181)
+  - Bug Ego Ch.20 (local was Ch.19)
+- **Source**: Nyaa (torrent) - Prowlarr indexers lack manga category
+
+### ROM Collection Audit Agent
+- **Platforms Audited**: NES, SNES, N64, GameCube, PSX, PS2
+- **Complete Sets**: NES (7,002), SNES (5,116), N64 (305)
+- **Notable Gaps Identified**:
+  - GameCube: Pikmin 1/2, Animal Crossing, Tales of Symphonia
+  - PSX: Crash trilogy, Spyro trilogy, Resident Evil 1-3, Silent Hill
+  - PS2: MGS 2/3, Shadow of the Colossus, Silent Hill 2/3, Ratchet/Jak series
+- **Acquisition Status**: Usenet has limited retro ROM availability; recommend enabling Nyaa in Prowlarr
 
 ---
 
