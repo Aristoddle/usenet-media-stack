@@ -346,16 +346,23 @@ Based on user impact and complexity:
 - **Status**: Fully operational (1,826 items queued, 20.6 TB)
 - **Servers**: 4 (Newshosting, UsenetExpress, Frugal x2) with 85 connections
 - **Configuration**: par2-turbo 16 threads, direct_unpack enabled
+- **Applied Settings** (persisted to sabnzbd.ini):
+  ```ini
+  extra_par2_parameters = -t+
+  article_cache_limit = 4G
+  direct_unpack = 1
+  direct_unpack_threads = 3
+  ```
 - **Verified Settings**:
   - par2cmdline-turbo with 16-thread detection
-  - direct_unpack = 1, direct_unpack_threads = 3
   - 4 servers with proper priority (0, 0, 2, 3)
   - Categories: movies, tv, comics, audio, software, whisparr, books
 - **Learnings**:
   - Article cache max is 4G (hard-coded limit)
   - Unrar is single-threaded (disk I/O bound)
   - par2 -t+ enables full multicore on Linux
-  - 12-20 connections per server is usually sufficient
+  - API `set_config_default` doesn't work - must edit sabnzbd.ini directly
+- **Persistence**: ✅ Verified survives container restart
 
 ### Radarr (2025-12-28) ✅
 - **Status**: Fully operational via Recyclarr sync
