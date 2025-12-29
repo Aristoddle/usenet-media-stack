@@ -266,7 +266,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/sonarr:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
+      # Uses /pool/* for all media (legacy /tv mount removed)
       - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 8989:8989
@@ -302,7 +302,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/radarr:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
+      # Uses /pool/* for all media (legacy /movies mount removed)
       - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 7878:7878
@@ -337,8 +337,7 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/bazarr:/config:rw,z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
+      # Uses /pool/* for all media (legacy /movies /tv mounts removed)
       - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 6767:6767
@@ -444,7 +443,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/lidarr:/config:rw,z
       - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}:/downloads:rw,z
-      - ${MUSIC_ROOT:-/srv/usenet/media/music}:/music:rw,z
+      # Uses /pool/music directly (legacy broken /music mount removed)
       - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
     ports:
       - 8686:8686
@@ -642,12 +641,8 @@ services:
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/server:/app/server:rw,z
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/configs:/app/configs:rw,z
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/logs:/app/logs:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/movies:/media/movies:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/tv:/media/tv:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/anime-movies:/media/anime-movies:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/anime-tv:/media/anime-tv:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/christmas-movies:/media/christmas-movies:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/christmas-tv:/media/christmas-tv:rw,z
+      # Unified /pool/* schema - matches *arr apps for consistency
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
       - /tmp/tdarr_transcode:/temp:rw,z
     ports:
       - 8265:8265
@@ -692,12 +687,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/configs:/app/configs:rw,z
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/logs:/app/logs:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/movies:/media/movies:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/tv:/media/tv:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/anime-movies:/media/anime-movies:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/anime-tv:/media/anime-tv:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/christmas-movies:/media/christmas-movies:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/christmas-tv:/media/christmas-tv:rw,z
+      # Unified /pool/* schema - matches *arr apps for consistency
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
       - /tmp/tdarr_transcode:/temp:rw,z
     devices:
       - /dev/dri:/dev/dri
