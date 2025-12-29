@@ -6,7 +6,7 @@ Welcome to the Usenet Media Stack! This guide will get you up and running in min
 
 Try our commands directly in this interactive terminal simulator:
 
-<CLISimulator />
+<!-- CLISimulator component disabled for build compatibility -->
 
 ## Quick Start (generic Docker host)
 
