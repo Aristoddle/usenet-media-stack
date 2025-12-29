@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 02:10 EST)
+## Date: 2025-12-29 (Updated: 02:50 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -62,6 +62,33 @@ TDARR_HEALTHCHECK_GPU_WORKERS=2
 - LinuxServer.io deprecated the image
 - Current version `develop-0.4.18.2805-ls157` receives NO security updates
 - Documented in `docs/decisions/2025-12-29-stack-health-audit.md`
+
+### USB Drive Content Discovery (NEW - 02:30 EST)
+
+Five USB drives connected with valuable legacy content:
+
+| Drive | Type | Size | Content | Status |
+|-------|------|------|---------|--------|
+| `Slow_3TB_HD` | Spinning HDD | 2.8TB | 129GB Music (235 artists), Bookz (Audiobooks, Calibre, Comics, eBooks, Readarr/) | **Lidarr bootstrap candidate** |
+| `Slow_4TB_2` | USB SSD | 3.7TB | 1.7TB Movies (555 films) | **Radarr import candidate** |
+| `Slow_2TB_2` | USB SSD | 1.9TB | 854GB Anime (64 series) | **Sonarr import candidate** |
+| `Slow_2TB_1` | USB SSD | 1.9TB | Emulation/ROMs backup | Keep separate |
+| `JoeTerabyte` | NVMe thumb | 1TB | Mostly empty/junk | Wipe & repurpose |
+
+**Architecture Decision**: Do NOT integrate slow drives into fast NVMe pool. Use as "inform & import" - scan, copy to pool, repurpose drives.
+
+**Mounted at**: `/run/media/deck/Slow_*`
+
+### Plex CPU Optimizations Applied (02:25 EST)
+
+| Setting | Before | After | Effect |
+|---------|--------|-------|--------|
+| `ScannerLowPriority` | `0` | `1` | Plex yields to Tdarr |
+| `BackgroundPreset` | `veryslow` | `fast` | 5x faster thumbnails |
+| `LoudnessAnalysisBehavior` | `asap` | `scheduled` | Batches analysis |
+| `MusicAnalysisBehavior` | `asap` | `scheduled` | Batches analysis |
+
+**Result**: GPU utilization doubled (10% → 19%), thermals dropped 84°C → 83°C
 
 ### Doctor Who Collection Needs Reorganization
 
@@ -214,6 +241,33 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Create Readarr → Bookshelf migration script (tools/migrate-readarr-to-bookshelf.sh)
 - [x] Research and document manga collection topology (MANGA_COLLECTION_TOPOLOGY.md)
 - [x] Deep thinker adversarial review of topology (COMPLETE - a7452e9)
+- [x] Apply Plex CPU optimizations (ScannerLowPriority, BackgroundPreset, AnalysisBehavior)
+- [x] Discover and document USB drive content (5 drives, 3TB+ valuable content)
+- [x] Create manga pipeline scripts (mylar-post-processor, komga-collection-sync, flatten-manga)
+- [ ] Deep thinker system optimization analysis (IN PROGRESS)
+- [ ] USB content deduplication analysis (PENDING)
+- [ ] Lidarr bootstrap with 235 artists (PENDING)
+
+---
+
+## Overnight Autonomous Work (02:50 EST)
+
+User handed off control for overnight autonomous operation. Directives:
+- Be thorough, document as you go
+- Push incremental git commits
+- Cybernetics-self-sustain; keep identifying valuable work
+- Quality over speed
+
+**Background Agents Running:**
+- Deep thinker: Full system optimization analysis
+- Work-continuity-orchestrator: Strategic planning
+
+**Overnight Work Queue:**
+1. Complete deep thinker analysis and create action plan
+2. Document USB findings in `docs/USB_CONTENT_ANALYSIS.md`
+3. Create Radarr/Sonarr mass import tools
+4. Plan Lidarr bootstrap from USB music collection
+5. Dedupe analysis: USB content vs existing pool
 
 ---
 
