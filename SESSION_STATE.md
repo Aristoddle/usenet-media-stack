@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 02:50 EST)
+## Date: 2025-12-29 (Updated: 03:15 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -45,11 +45,11 @@ TDARR_TRANSCODE_GPU_WORKERS=6
 TDARR_HEALTHCHECK_GPU_WORKERS=2
 ```
 
-### File Queue Status (as of 01:30)
-- **Queued**: 3,473 files ready for processing
-- **Success**: 1,457 already completed
-- **Hold**: 26 on hold
-- **Errors**: 57 (reset from 971 timeout errors)
+### File Queue Status (as of 03:15)
+- **Queued**: 2,252 files ready for processing
+- **Success**: 1,473 already completed
+- **Hold**: Unknown
+- **Errors**: 2,140 (NEW: analyzed - see Tdarr Error Analysis below)
 
 ---
 
@@ -100,6 +100,30 @@ Five USB drives connected with valuable legacy content:
 - Missing episodes throughout both series
 
 **Action Required**: Manual curation using TheTVDB as reference
+
+### Tdarr Error Analysis (NEW - 03:00 EST)
+
+**2,140 files in Error state** - Analysis complete:
+
+| Error Category | Count | Root Cause | Action |
+|----------------|-------|------------|--------|
+| FFprobe success but Error state | 2,131 | `TranscodeDecisionMaker = "Not required"` - stuck from timeout | SAFE TO RESET |
+| FFprobe failure (Blood Lad) | 9 | German dub files unreadable | INVESTIGATE |
+
+**Library Breakdown**:
+- Anime-TV (kX4Xi337e): 2,139 errors
+- Christmas-Movies (jdowPE7GQ): 1 error
+
+**Recovery Command** (safe - these are "Not required" files):
+```sql
+-- Reset 2,131 recoverable errors
+UPDATE filejsondb SET health_check = 'Queued'
+WHERE health_check = 'Error'
+AND json_extract(json_data, '$.TranscodeDecisionMaker') = 'Not required'
+AND json_extract(json_data, '$.scannerReads.ffProbeRead') = 'success';
+```
+
+**Blood Lad Issue**: 9 files with German audio (`.German.2013.ANiME.DL.1080p.BluRay`) fail FFprobe - likely corrupt or unusual codec. Need manual inspection.
 
 ---
 
@@ -250,7 +274,7 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 
 ---
 
-## Overnight Autonomous Work (02:50 EST)
+## Overnight Autonomous Work (02:50 - 03:15 EST)
 
 User handed off control for overnight autonomous operation. Directives:
 - Be thorough, document as you go
@@ -258,16 +282,26 @@ User handed off control for overnight autonomous operation. Directives:
 - Cybernetics-self-sustain; keep identifying valuable work
 - Quality over speed
 
-**Background Agents Running:**
-- Deep thinker: Full system optimization analysis
-- Work-continuity-orchestrator: Strategic planning
+### Completed During Overnight Session
 
-**Overnight Work Queue:**
-1. Complete deep thinker analysis and create action plan
-2. Document USB findings in `docs/USB_CONTENT_ANALYSIS.md`
-3. Create Radarr/Sonarr mass import tools
-4. Plan Lidarr bootstrap from USB music collection
-5. Dedupe analysis: USB content vs existing pool
+1. **Created OVERNIGHT_SESSION_2025-12-29.md** - Session planning document
+2. **Created USB_CONTENT_INVENTORY.md** - Comprehensive 5-drive inventory:
+   - Slow_3TB_HD: 235 artists (129GB), 416GB Books (349GB Comics!)
+   - Slow_4TB_2: 555 movies (1.7TB)
+   - Slow_2TB_2: 64 anime series (854GB)
+   - Slow_2TB_1: Emulation/ROMs backup
+   - JoeTerabyte: 465GB trash (repurpose candidate)
+3. **Analyzed Tdarr errors** - 2,140 errors diagnosed:
+   - 2,131 recoverable (FFprobe success but stuck in Error)
+   - 9 Blood Lad files with FFprobe failures (German dubs)
+4. **Updated SESSION_STATE.md** with all findings
+
+### Overnight Work Queue (Remaining)
+1. [ ] Reset 2,131 recoverable Tdarr errors
+2. [ ] Create usb-movie-importer.sh tool
+3. [ ] Create lidarr-bootstrap.sh tool
+4. [ ] Commit documentation updates
+5. [ ] Deep thinker results integration
 
 ---
 
