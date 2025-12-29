@@ -393,7 +393,7 @@ Based on user impact and complexity:
 
 ### Tdarr (2025-12-28) ✅
 - **Status**: Fully operational
-- **Files Queued**: 5,699
+- **Files Queued**: 12,011 (after library refresh)
 - **Configuration**: GPU VAAPI (hevc_vaapi -qp 20)
 - **Learnings**:
   - Libraries must be created via UI (API causes RangeError)
@@ -401,6 +401,44 @@ Based on user impact and complexity:
   - Container paths differ from host paths
   - API: POST /api/v2/cruddb with collection/mode/docID pattern
 - **Commit**: 051dfa0
+
+---
+
+## Issues Discovered & Fixed (2025-12-28)
+
+### Issue 1: Tdarr ISO Processing Errors
+- **Symptom**: 132 FFprobe errors - "unable to extract data from .iso"
+- **Root Cause**: `containerFilter` in library settings included "iso" extension
+- **Resolution**: Removed "iso" from containerFilter for all 3 libraries via API:
+  ```bash
+  curl "http://192.168.6.167:8265/api/v2/cruddb" -H "Content-Type: application/json" \
+    -d '{"data":{"collection":"LibrarySettingsJSONDB","mode":"update","docID":"LIBRARY_ID",
+         "obj":{"containerFilter":"mkv,mp4,mov,m4v,mpg,mpeg,avi,flv,webm,wmv,vob,evo,m2ts,ts"}}}'
+  ```
+- **Prevention**: When adding libraries, exclude non-video containers (iso, img, nrg)
+
+### Issue 2: Corrupted MKV in SABnzbd Complete Folder
+- **Symptom**: 14GB file with all-zero EBML header in `-xpost` temp folder
+- **Root Cause**: SABnzbd extraction produced corrupt file (showed "Completed" in history)
+- **Resolution**: Removed corrupted folder; movie already had ISO copy in library
+- **Prevention**: Monitor for `-xpost` folders older than 24 hours
+
+### Issue 3: Stuck Incomplete Downloads
+- **Symptom**: 3 tiny folders in SABnzbd incomplete (>7 days old)
+- **Resolution**: Removed orphaned download fragments
+- **Prevention**: Periodic cleanup of incomplete folder
+
+### Issue 4: API Key Documentation Gap
+- **Problem**: Used outdated API keys from previous session
+- **Correct Keys** (from config.xml files):
+  - Radarr: `/var/mnt/fast8tb/config/radarr/config.xml` → `<ApiKey>`
+  - Sonarr: `/var/mnt/fast8tb/config/sonarr/config.xml` → `<ApiKey>`
+
+## Health Check Results (2025-12-28)
+- **Radarr root folders**: `/pool/movies` ✅, `/pool/anime` ✅ (12.19 TB free)
+- **Sonarr root folders**: `/pool/tv` ✅, `/pool/anime` ✅ (12.19 TB free)
+- **ISO files**: 132 in /pool/movies (now excluded from Tdarr, Plex serves directly)
+- **Prowlarr/SABnzbd logs**: Clean (no errors)
 
 ---
 
