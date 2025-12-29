@@ -1,0 +1,412 @@
+#!/usr/bin/env bash
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║  metrics-collector - Time-Series Metrics Storage for Media Stack            ║
+# ║                                                                              ║
+# ║  Collects sysinfo-snapshot data and stores in SQLite for historical         ║
+# ║  analysis, trend detection, and performance tuning.                          ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+#
+# Usage:
+#   ./metrics-collector                    # Collect single snapshot
+#   ./metrics-collector --daemon 30        # Run as daemon, collect every 30s
+#   ./metrics-collector --query "last 1h"  # Query recent data
+#   ./metrics-collector --export csv       # Export to CSV
+#   ./metrics-collector --stats            # Show collection statistics
+#   ./metrics-collector --thermal-watch    # Monitor and alert on thermal issues
+
+set -o pipefail
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DB_PATH="${METRICS_DB:-/var/mnt/fast8tb/config/metrics/sysinfo.db}"
+SNAPSHOT_TOOL="$SCRIPT_DIR/sysinfo-snapshot"
+
+# Thermal thresholds
+THERMAL_WARN=85
+THERMAL_CRITICAL=95
+THERMAL_PAUSE_FILE="/tmp/.tdarr-thermal-pause"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Initialize Database
+# ─────────────────────────────────────────────────────────────────────────────
+init_db() {
+  mkdir -p "$(dirname "$DB_PATH")"
+
+  sqlite3 "$DB_PATH" <<'EOSQL'
+-- Main metrics table (one row per snapshot)
+CREATE TABLE IF NOT EXISTS metrics (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts TEXT NOT NULL,
+  ts_epoch_ms INTEGER NOT NULL,
+
+  -- CPU
+  cpu_total_pct INTEGER,
+  cpu_freq_avg_mhz INTEGER,
+  cpu_freq_min_mhz INTEGER,
+  cpu_freq_max_mhz INTEGER,
+  cpu_temp_c REAL,
+  cpu_load_1m REAL,
+  cpu_load_5m REAL,
+  cpu_load_15m REAL,
+
+  -- Memory
+  mem_used_pct INTEGER,
+  mem_used_mib INTEGER,
+  mem_total_mib INTEGER,
+  mem_cached_mib INTEGER,
+  swap_used_pct INTEGER,
+
+  -- GPU
+  gpu_util_pct INTEGER,
+  gpu_temp_c REAL,
+  gpu_vram_used_mib INTEGER,
+  gpu_vram_total_mib INTEGER,
+  gpu_power_w REAL,
+  gpu_sclk_mhz INTEGER,
+  gpu_mclk_mhz INTEGER,
+
+  -- Network
+  net_interface TEXT,
+  net_rx_rate_mbps REAL,
+  net_tx_rate_mbps REAL,
+  net_rx_total_mib INTEGER,
+  net_tx_total_mib INTEGER,
+
+  -- Disk
+  disk_read_mbs REAL,
+  disk_write_mbs REAL,
+
+  -- Processes
+  proc_ffmpeg INTEGER,
+  proc_handbrake INTEGER,
+  proc_exiftool INTEGER,
+  proc_plex_transcode INTEGER,
+  proc_sabnzbd INTEGER,
+  proc_transmission INTEGER,
+  proc_top_5 TEXT,
+
+  -- Services
+  tdarr_status TEXT,
+  sab_speed_mbs REAL,
+  sab_queue INTEGER,
+
+  -- Analysis flags
+  flag_gpu_underutilized INTEGER,
+  flag_thermal_risk INTEGER,
+  flag_scanning_heavy INTEGER
+);
+
+-- Index for time-based queries
+CREATE INDEX IF NOT EXISTS idx_metrics_ts ON metrics(ts_epoch_ms);
+CREATE INDEX IF NOT EXISTS idx_metrics_date ON metrics(ts);
+
+-- Alerts table for thermal/critical events
+CREATE TABLE IF NOT EXISTS alerts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts TEXT NOT NULL,
+  ts_epoch_ms INTEGER NOT NULL,
+  alert_type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  message TEXT,
+  cpu_temp_c REAL,
+  acknowledged INTEGER DEFAULT 0
+);
+
+-- Sessions table for grouping analysis periods
+CREATE TABLE IF NOT EXISTS sessions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
+  started_at TEXT NOT NULL,
+  ended_at TEXT,
+  notes TEXT
+);
+
+-- View for quick stats
+CREATE VIEW IF NOT EXISTS v_recent_stats AS
+SELECT
+  COUNT(*) as sample_count,
+  AVG(cpu_total_pct) as avg_cpu_pct,
+  MAX(cpu_total_pct) as max_cpu_pct,
+  AVG(cpu_temp_c) as avg_cpu_temp,
+  MAX(cpu_temp_c) as max_cpu_temp,
+  AVG(gpu_util_pct) as avg_gpu_pct,
+  MAX(gpu_util_pct) as max_gpu_pct,
+  AVG(mem_used_pct) as avg_mem_pct,
+  SUM(proc_ffmpeg) as total_ffmpeg_samples,
+  SUM(proc_handbrake) as total_handbrake_samples,
+  SUM(flag_thermal_risk) as thermal_risk_count
+FROM metrics
+WHERE ts_epoch_ms > (strftime('%s', 'now') * 1000 - 3600000);  -- Last hour
+EOSQL
+
+  echo "Database initialized at $DB_PATH"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Collect and Store Snapshot
+# ─────────────────────────────────────────────────────────────────────────────
+collect() {
+  # Get JSON snapshot
+  local json=$("$SNAPSHOT_TOOL" --json 2>/dev/null)
+
+  if [[ -z "$json" ]] || ! echo "$json" | jq -e '.' &>/dev/null; then
+    echo "ERROR: Failed to get valid snapshot" >&2
+    return 1
+  fi
+
+  # Parse JSON values
+  local ts=$(echo "$json" | jq -r '.ts')
+  local ts_epoch_ms=$(echo "$json" | jq '.ts_epoch_ms')
+  local cpu_total_pct=$(echo "$json" | jq '.cpu.total_pct')
+  local cpu_freq_avg=$(echo "$json" | jq '.cpu.freq_avg_mhz')
+  local cpu_freq_min=$(echo "$json" | jq '.cpu.freq_min_mhz // 0')
+  local cpu_freq_max=$(echo "$json" | jq '.cpu.freq_max_mhz // 0')
+  local cpu_temp=$(echo "$json" | jq '.cpu.temp_c // "null"')
+  local load1=$(echo "$json" | jq '.cpu.load_1m')
+  local load5=$(echo "$json" | jq '.cpu.load_5m')
+  local load15=$(echo "$json" | jq '.cpu.load_15m')
+  local mem_pct=$(echo "$json" | jq '.memory.used_pct')
+  local mem_used=$(echo "$json" | jq '.memory.used_mib')
+  local mem_total=$(echo "$json" | jq '.memory.total_mib')
+  local mem_cached=$(echo "$json" | jq '.memory.cached_mib')
+  local swap_pct=$(echo "$json" | jq '.memory.swap_used_pct')
+  local gpu_util=$(echo "$json" | jq '.gpu.util_pct // "null"')
+  local gpu_temp=$(echo "$json" | jq '.gpu.temp_c // "null"')
+  local gpu_vram_used=$(echo "$json" | jq '.gpu.vram_used_mib // "null"')
+  local gpu_vram_total=$(echo "$json" | jq '.gpu.vram_total_mib // "null"')
+  local gpu_power=$(echo "$json" | jq '.gpu.power_w // "null"')
+  local gpu_sclk=$(echo "$json" | jq '.gpu.sclk_mhz // "null"')
+  local gpu_mclk=$(echo "$json" | jq '.gpu.mclk_mhz // "null"')
+  local net_iface=$(echo "$json" | jq -r '.network.interface')
+  local net_rx=$(echo "$json" | jq '.network.rx_rate_mbps')
+  local net_tx=$(echo "$json" | jq '.network.tx_rate_mbps')
+  local net_rx_total=$(echo "$json" | jq '.network.rx_total_mib')
+  local net_tx_total=$(echo "$json" | jq '.network.tx_total_mib')
+  local disk_r=$(echo "$json" | jq '.disk.read_mbs')
+  local disk_w=$(echo "$json" | jq '.disk.write_mbs')
+  local p_ffmpeg=$(echo "$json" | jq '.processes.ffmpeg')
+  local p_hb=$(echo "$json" | jq '.processes.handbrake')
+  local p_exif=$(echo "$json" | jq '.processes.exiftool')
+  local p_plex=$(echo "$json" | jq '.processes.plex_transcode')
+  local p_sab=$(echo "$json" | jq '.processes.sabnzbd')
+  local p_trans=$(echo "$json" | jq '.processes.transmission')
+  local top5=$(echo "$json" | jq -r '.processes.top_5')
+  local tdarr=$(echo "$json" | jq -r '.services.tdarr_status')
+  local sab_speed=$(echo "$json" | jq '.services.sab_speed_mbs // null' | tr -d '"')
+  [[ "$sab_speed" == "NA" || -z "$sab_speed" ]] && sab_speed="null"
+  local sab_q=$(echo "$json" | jq '.services.sab_queue')
+  local f_gpu=$(echo "$json" | jq 'if .analysis.gpu_underutilized then 1 else 0 end')
+  local f_therm=$(echo "$json" | jq 'if .analysis.thermal_risk then 1 else 0 end')
+  local f_scan=$(echo "$json" | jq 'if .analysis.scanning_heavy then 1 else 0 end')
+
+  # Insert with proper quoting
+  sqlite3 "$DB_PATH" "INSERT INTO metrics (
+    ts, ts_epoch_ms,
+    cpu_total_pct, cpu_freq_avg_mhz, cpu_freq_min_mhz, cpu_freq_max_mhz,
+    cpu_temp_c, cpu_load_1m, cpu_load_5m, cpu_load_15m,
+    mem_used_pct, mem_used_mib, mem_total_mib, mem_cached_mib, swap_used_pct,
+    gpu_util_pct, gpu_temp_c, gpu_vram_used_mib, gpu_vram_total_mib,
+    gpu_power_w, gpu_sclk_mhz, gpu_mclk_mhz,
+    net_interface, net_rx_rate_mbps, net_tx_rate_mbps, net_rx_total_mib, net_tx_total_mib,
+    disk_read_mbs, disk_write_mbs,
+    proc_ffmpeg, proc_handbrake, proc_exiftool, proc_plex_transcode, proc_sabnzbd, proc_transmission, proc_top_5,
+    tdarr_status, sab_speed_mbs, sab_queue,
+    flag_gpu_underutilized, flag_thermal_risk, flag_scanning_heavy
+  ) VALUES (
+    '$ts', $ts_epoch_ms,
+    $cpu_total_pct, $cpu_freq_avg, $cpu_freq_min, $cpu_freq_max,
+    $cpu_temp, $load1, $load5, $load15,
+    $mem_pct, $mem_used, $mem_total, $mem_cached, $swap_pct,
+    $gpu_util, $gpu_temp, $gpu_vram_used, $gpu_vram_total,
+    $gpu_power, $gpu_sclk, $gpu_mclk,
+    '$net_iface', $net_rx, $net_tx, $net_rx_total, $net_tx_total,
+    $disk_r, $disk_w,
+    $p_ffmpeg, $p_hb, $p_exif, $p_plex, $p_sab, $p_trans, '$top5',
+    '$tdarr', $sab_speed, $sab_q,
+    $f_gpu, $f_therm, $f_scan
+  );"
+
+  # Check for thermal alerts
+  local cpu_temp=$(echo "$json" | jq '.cpu.temp_c // 0')
+  local thermal_risk=$(echo "$json" | jq '.analysis.thermal_risk')
+
+  if [[ "$thermal_risk" == "true" ]] && awk "BEGIN {exit !($cpu_temp >= $THERMAL_CRITICAL)}"; then
+    log_alert "THERMAL_CRITICAL" "critical" "CPU temperature at ${cpu_temp}°C - CRITICAL!" "$cpu_temp"
+    echo "⚠️  CRITICAL: CPU at ${cpu_temp}°C" >&2
+  elif [[ "$thermal_risk" == "true" ]]; then
+    log_alert "THERMAL_WARNING" "warning" "CPU temperature at ${cpu_temp}°C" "$cpu_temp"
+  fi
+}
+
+log_alert() {
+  local alert_type="$1" severity="$2" message="$3" cpu_temp="$4"
+  sqlite3 "$DB_PATH" <<EOSQL
+INSERT INTO alerts (ts, ts_epoch_ms, alert_type, severity, message, cpu_temp_c)
+VALUES (datetime('now'), strftime('%s', 'now') * 1000, '$alert_type', '$severity', '$message', $cpu_temp);
+EOSQL
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Query Functions
+# ─────────────────────────────────────────────────────────────────────────────
+query_stats() {
+  echo "=== Collection Statistics ==="
+  sqlite3 -header -column "$DB_PATH" <<'EOSQL'
+SELECT
+  COUNT(*) as total_samples,
+  MIN(ts) as first_sample,
+  MAX(ts) as last_sample,
+  ROUND((MAX(ts_epoch_ms) - MIN(ts_epoch_ms)) / 3600000.0, 1) as hours_of_data
+FROM metrics;
+EOSQL
+
+  echo ""
+  echo "=== Last Hour Summary ==="
+  sqlite3 -header -column "$DB_PATH" "SELECT * FROM v_recent_stats;"
+
+  echo ""
+  echo "=== Recent Alerts ==="
+  sqlite3 -header -column "$DB_PATH" <<'EOSQL'
+SELECT ts, alert_type, severity, message
+FROM alerts
+WHERE ts > datetime('now', '-24 hours')
+ORDER BY ts DESC
+LIMIT 10;
+EOSQL
+}
+
+query_recent() {
+  local duration="${1:-1h}"
+  local ms_ago
+
+  case "$duration" in
+    *h) ms_ago=$((${duration%h} * 3600000)) ;;
+    *m) ms_ago=$((${duration%m} * 60000)) ;;
+    *d) ms_ago=$((${duration%d} * 86400000)) ;;
+    *) ms_ago=3600000 ;;
+  esac
+
+  sqlite3 -header -csv "$DB_PATH" <<EOSQL
+SELECT ts, cpu_total_pct, cpu_temp_c, gpu_util_pct, gpu_temp_c, mem_used_pct,
+       proc_ffmpeg, proc_exiftool, net_rx_rate_mbps, disk_read_mbs
+FROM metrics
+WHERE ts_epoch_ms > (strftime('%s', 'now') * 1000 - $ms_ago)
+ORDER BY ts_epoch_ms;
+EOSQL
+}
+
+export_data() {
+  local format="${1:-csv}"
+  local output_file="/tmp/metrics_export_$(date +%Y%m%d_%H%M%S).$format"
+
+  case "$format" in
+    csv)
+      sqlite3 -header -csv "$DB_PATH" "SELECT * FROM metrics ORDER BY ts_epoch_ms;" > "$output_file"
+      ;;
+    json)
+      sqlite3 "$DB_PATH" <<'EOSQL' > "$output_file"
+SELECT json_group_array(json_object(
+  'ts', ts,
+  'cpu_pct', cpu_total_pct,
+  'cpu_temp', cpu_temp_c,
+  'gpu_pct', gpu_util_pct,
+  'mem_pct', mem_used_pct
+)) FROM metrics ORDER BY ts_epoch_ms;
+EOSQL
+      ;;
+  esac
+
+  echo "Exported to: $output_file"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Thermal Watch Mode
+# ─────────────────────────────────────────────────────────────────────────────
+thermal_watch() {
+  echo "🌡️  Thermal watch mode - monitoring CPU temperature..."
+  echo "   Warning: ${THERMAL_WARN}°C  |  Critical: ${THERMAL_CRITICAL}°C"
+  echo ""
+
+  while true; do
+    local json=$("$SNAPSHOT_TOOL" --json 2>/dev/null)
+    local cpu_temp=$(echo "$json" | jq '.cpu.temp_c // 0')
+    local cpu_pct=$(echo "$json" | jq '.cpu.total_pct // 0')
+    local gpu_pct=$(echo "$json" | jq '.gpu.util_pct // 0')
+
+    local status="✅"
+    if awk "BEGIN {exit !($cpu_temp >= $THERMAL_CRITICAL)}"; then
+      status="🔥 CRITICAL"
+      # Could add auto-pause logic here
+    elif awk "BEGIN {exit !($cpu_temp >= $THERMAL_WARN)}"; then
+      status="⚠️  WARNING"
+    fi
+
+    printf "\r%s CPU: %3d%% @ %.1f°C | GPU: %3d%% | %s    " \
+      "$(date +%H:%M:%S)" "$cpu_pct" "$cpu_temp" "$gpu_pct" "$status"
+
+    # Store in DB
+    collect &>/dev/null
+
+    sleep 5
+  done
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Daemon Mode
+# ─────────────────────────────────────────────────────────────────────────────
+daemon_mode() {
+  local interval="${1:-30}"
+  echo "📊 Starting metrics collector daemon (interval: ${interval}s)"
+  echo "   Database: $DB_PATH"
+  echo "   Press Ctrl+C to stop"
+  echo ""
+
+  local count=0
+  while true; do
+    collect
+    count=$((count + 1))
+
+    if (( count % 10 == 0 )); then
+      echo "[$(date +%H:%M:%S)] Collected $count samples"
+    fi
+
+    sleep "$interval"
+  done
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────────────────────
+case "${1:-}" in
+  --init)
+    init_db
+    ;;
+  --daemon|-d)
+    [[ ! -f "$DB_PATH" ]] && init_db
+    daemon_mode "${2:-30}"
+    ;;
+  --query|-q)
+    query_recent "${2:-1h}"
+    ;;
+  --stats|-s)
+    query_stats
+    ;;
+  --export|-e)
+    export_data "${2:-csv}"
+    ;;
+  --thermal-watch|-t)
+    [[ ! -f "$DB_PATH" ]] && init_db
+    thermal_watch
+    ;;
+  --help|-h)
+    head -20 "$0" | tail -15
+    ;;
+  *)
+    [[ ! -f "$DB_PATH" ]] && init_db
+    collect
+    echo "Snapshot collected at $(date)"
+    ;;
+esac

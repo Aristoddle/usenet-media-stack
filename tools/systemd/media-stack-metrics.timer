@@ -1,0 +1,12 @@
+[Unit]
+Description=Media Stack Metrics Collection Timer
+Requires=media-stack-metrics.service
+
+[Timer]
+# Alternative to daemon mode - collect every 30 seconds via timer
+OnBootSec=60
+OnUnitActiveSec=30s
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target

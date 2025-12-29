@@ -534,6 +534,10 @@ services:
       - TZ=Etc/UTC
       - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM:-}
+      # AMD GPU VAAPI fix: Container Mesa is too old for RDNA3 (gfx1103/780M)
+      # This mod copies Alpine edge Mesa drivers into container for HW transcoding
+      # Ref: https://github.com/jefflessard/plex-vaapi-amdgpu-mod
+      - DOCKER_MODS=jefflessard/plex-vaapi-amdgpu-mod
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/plex:/config:rw,z
       - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,z
@@ -542,7 +546,8 @@ services:
       - ${MEDIA_ROOT:-/srv/usenet/media}/music:/music:rw,z
       - ${BOOKS_ROOT:-/srv/usenet/books}:/books:rw,z
       - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}/christmas:/christmas:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/christmas-movies:/christmas-movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/christmas-tv:/christmas-tv:rw,z
     # No ports needed with host network mode
     devices:
       - /dev/dri:/dev/dri
@@ -606,30 +611,44 @@ services:
     logging:
       driver: json-file
       options: *id002
+  # Tdarr Transcoding Stack - AMD VAAPI Hardware Encoding (RDNA3/780M)
+  # Enables HEVC transcoding for 40-50% storage savings
   tdarr:
     <<: *network_tweaks
-    image: ghcr.io/haveagitgat/tdarr:2.26.01
+    image: ghcr.io/haveagitgat/tdarr:latest
     container_name: tdarr
     hostname: tdarr
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
-      - TDARR_INSTANCE_NAME=Main
+      - TZ=America/Los_Angeles
+      - UMASK_SET=002
       - serverIP=0.0.0.0
       - serverPort=8266
       - webUIPort=8265
       - internalNode=true
-      - nodeID=MainNode
+      - inContainer=true
+      - ffmpegVersion=7
+      - nodeName=MainNode
+      # Worker configuration (declarative - survives fresh deploys)
+      # GPU-only transcoding: VAAPI handles encoding efficiently
+      - transcodegpuWorkers=${TDARR_TRANSCODE_GPU_WORKERS:-4}
+      - transcodecpuWorkers=${TDARR_TRANSCODE_CPU_WORKERS:-0}
+      - healthcheckgpuWorkers=${TDARR_HEALTHCHECK_GPU_WORKERS:-1}
+      - healthcheckcpuWorkers=${TDARR_HEALTHCHECK_CPU_WORKERS:-0}
+      # NOTE: Tdarr Pro license key must be entered via Web UI -> Options
+      # License: 2RVB2HW-BW14CDZ-M4J6Z2T-XNB61SY
     volumes:
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/server:/app/server:rw,z
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/configs:/app/configs:rw,z
       - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/logs:/app/logs:rw,z
-      - ${MEDIA_ROOT:-/srv/usenet/media}:/media:rw,z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/movies:/movies:rw,z
-      - ${MEDIA_ROOT:-/srv/usenet/media}/tv:/tv:rw,z
-      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/tdarr_transcode:/temp:rw,z
-      - ${POOL_ROOT:-/var/mnt/pool}:/pool:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/movies:/media/movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/tv:/media/tv:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/anime-movies:/media/anime-movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/anime-tv:/media/anime-tv:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/christmas-movies:/media/christmas-movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/christmas-tv:/media/christmas-tv:rw,z
+      - /tmp/tdarr_transcode:/temp:rw,z
     ports:
       - 8265:8265
       - 8266:8266
@@ -640,12 +659,57 @@ services:
       mode: replicated
       replicas: 1
       resources:
+        # Resource limits from .env - tune per machine
         limits:
-          cpus: '4.0'
-          memory: 16G
+          cpus: '${TDARR_MAIN_CPU_LIMIT:-8.0}'
+          memory: ${TDARR_MAIN_MEM_LIMIT:-24G}
         reservations:
-          cpus: '1.0'
-          memory: 4G
+          cpus: '${TDARR_MAIN_CPU_RESERVE:-4.0}'
+          memory: ${TDARR_MAIN_MEM_RESERVE:-8G}
+    logging:
+      driver: json-file
+      options: *id002
+  # Tdarr secondary node for parallel processing
+  tdarr-node:
+    <<: *network_tweaks
+    image: ghcr.io/haveagitgat/tdarr_node:latest
+    container_name: tdarr-node
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - UMASK_SET=002
+      - nodeName=SecondaryNode
+      - serverIP=tdarr
+      - serverPort=8266
+      - inContainer=true
+      - ffmpegVersion=7
+      # Secondary node: GPU-only, fewer workers (from .env)
+      - transcodegpuWorkers=${TDARR_NODE_TRANSCODE_GPU_WORKERS:-2}
+      - transcodecpuWorkers=${TDARR_NODE_TRANSCODE_CPU_WORKERS:-0}
+      - healthcheckgpuWorkers=${TDARR_NODE_HEALTHCHECK_GPU_WORKERS:-1}
+      - healthcheckcpuWorkers=${TDARR_NODE_HEALTHCHECK_CPU_WORKERS:-0}
+    volumes:
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/configs:/app/configs:rw,z
+      - ${CONFIG_ROOT:-/srv/usenet/config}/tdarr/logs:/app/logs:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/movies:/media/movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/tv:/media/tv:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/anime-movies:/media/anime-movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/anime-tv:/media/anime-tv:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/christmas-movies:/media/christmas-movies:rw,z
+      - ${POOL_ROOT:-/var/mnt/pool}/christmas-tv:/media/christmas-tv:rw,z
+      - /tmp/tdarr_transcode:/temp:rw,z
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+    deploy:
+      resources:
+        # Secondary node resources from .env
+        limits:
+          cpus: '${TDARR_NODE_CPU_LIMIT:-6.0}'
+          memory: ${TDARR_NODE_MEM_LIMIT:-12G}
+    depends_on:
+      - tdarr
     logging:
       driver: json-file
       options: *id002

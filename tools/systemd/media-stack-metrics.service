@@ -1,0 +1,16 @@
+[Unit]
+Description=Media Stack Metrics Collector
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=deck
+Environment="METRICS_DB=/var/mnt/fast8tb/config/metrics/sysinfo.db"
+Environment="SABNZBD_API_KEY=fb16321e7df44db05c78de9d17c83afb"
+WorkingDirectory=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/tools
+ExecStart=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/tools/metrics-collector --daemon 30
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

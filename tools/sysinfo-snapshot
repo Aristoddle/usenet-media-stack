@@ -1,0 +1,457 @@
+#!/usr/bin/env bash
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║  sysinfo-snapshot - Media Stack System Monitoring Tool                       ║
+# ║                                                                              ║
+# ║  Captures comprehensive system state for performance tuning, debugging,     ║
+# ║  and time-series analysis of usenet-media-stack workloads.                   ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+#
+# Usage:
+#   ./sysinfo-snapshot              # Human-readable key=value output
+#   ./sysinfo-snapshot --json       # JSON output for database/API ingestion
+#   ./sysinfo-snapshot --watch 5    # Continuous monitoring every 5 seconds
+#   ./sysinfo-snapshot --compact    # Single-line compact output for logging
+#
+# Metrics captured:
+#   - CPU: total/per-core usage, frequency (cur/min/max), temperature, load avg
+#   - Memory: used/available, swap, cached
+#   - GPU: utilization, VRAM, temperature, power draw, clock speeds
+#   - Network: interface throughput (bytes/sec delta), totals
+#   - Disk: I/O throughput for key mount points
+#   - Processes: media-stack specific (ffmpeg, exiftool, Plex, SAB, etc.)
+#   - Services: Tdarr queue status, SABnzbd speed, Transmission status
+#
+# Environment:
+#   SNAPSHOT_INTERVAL_MS=200    # CPU sampling window (default 200ms)
+#   SNAPSHOT_SERVICES=1         # Query service APIs (set 0 to skip)
+
+set -o pipefail
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+SAMPLE_INTERVAL_SEC="${SNAPSHOT_INTERVAL_MS:-200}"
+SAMPLE_INTERVAL_SEC=$(awk "BEGIN {print $SAMPLE_INTERVAL_SEC/1000}")
+QUERY_SERVICES="${SNAPSHOT_SERVICES:-1}"
+
+# Parse arguments
+OUTPUT_FORMAT="kv"
+WATCH_INTERVAL=0
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --json|-j) OUTPUT_FORMAT="json"; shift ;;
+    --compact|-c) OUTPUT_FORMAT="compact"; shift ;;
+    --watch|-w) WATCH_INTERVAL="${2:-5}"; shift 2 ;;
+    --no-services) QUERY_SERVICES=0; shift ;;
+    --help|-h)
+      head -35 "$0" | tail -30
+      exit 0
+      ;;
+    *) shift ;;
+  esac
+done
+
+# State file for delta calculations (network/disk throughput)
+STATE_FILE="/tmp/.sysinfo-snapshot-state"
+
+snapshot() {
+  local ts=$(date -Is)
+  local ts_epoch=$(date +%s%3N)  # Millisecond precision
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # CPU Usage (sampled over interval)
+  # ─────────────────────────────────────────────────────────────────────────────
+  mapfile -t s1 < <(grep "^cpu" /proc/stat)
+  sleep "$SAMPLE_INTERVAL_SEC"
+  mapfile -t s2 < <(grep "^cpu" /proc/stat)
+
+  calc_usage() {
+    local l1="$1" l2="$2"
+    read -a a <<< "$l1"
+    read -a b <<< "$l2"
+    local idle1=$((a[4]+a[5]))
+    local idle2=$((b[4]+b[5]))
+    local total1=0 total2=0
+    for ((i=1;i<${#a[@]};i++)); do total1=$((total1 + a[i])); done
+    for ((i=1;i<${#b[@]};i++)); do total2=$((total2 + b[i])); done
+    local dt=$((total2-total1))
+    local didle=$((idle2-idle1))
+    echo $(( dt>0 ? (100*(dt-didle)/dt) : 0 ))
+  }
+
+  local cpu_total=$(calc_usage "${s1[0]}" "${s2[0]}")
+  local cpu_cores=()
+  for i in "${!s1[@]}"; do
+    [[ $i -eq 0 ]] && continue
+    cpu_cores+=("$(calc_usage "${s1[i]}" "${s2[i]}")")
+  done
+  local num_cores=${#cpu_cores[@]}
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # CPU Frequency (per-core current, plus global min/max)
+  # ─────────────────────────────────────────────────────────────────────────────
+  local cpu_freq_cur_mhz=() cpu_freq_min_mhz=NA cpu_freq_max_mhz=NA cpu_freq_avg_mhz=0
+  local freq_sum=0 freq_count=0
+
+  for cpu_dir in /sys/devices/system/cpu/cpu[0-9]*; do
+    local cur_file="$cpu_dir/cpufreq/scaling_cur_freq"
+    if [[ -r "$cur_file" ]]; then
+      local freq_khz=$(< "$cur_file")
+      local freq_mhz=$((freq_khz / 1000))
+      cpu_freq_cur_mhz+=("$freq_mhz")
+      freq_sum=$((freq_sum + freq_mhz))
+      freq_count=$((freq_count + 1))
+    fi
+  done
+
+  [[ $freq_count -gt 0 ]] && cpu_freq_avg_mhz=$((freq_sum / freq_count))
+
+  # Global min/max from policy
+  local policy_dir="/sys/devices/system/cpu/cpufreq/policy0"
+  [[ -r "$policy_dir/scaling_min_freq" ]] && cpu_freq_min_mhz=$(( $(< "$policy_dir/scaling_min_freq") / 1000 ))
+  [[ -r "$policy_dir/scaling_max_freq" ]] && cpu_freq_max_mhz=$(( $(< "$policy_dir/scaling_max_freq") / 1000 ))
+
+  # Load average
+  read load1 load5 load15 _ _ < /proc/loadavg
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # CPU Temperature
+  # ─────────────────────────────────────────────────────────────────────────────
+  read_temp() { [[ -r "$1" ]] && awk "{printf \"%.1f\", \$1/1000}" "$1" || echo "null"; }
+
+  local cpu_temp_c="null"
+  for hw in /sys/class/hwmon/hwmon*; do
+    [[ -r "$hw/name" && -r "$hw/temp1_input" ]] || continue
+    if grep -qi "k10temp\|coretemp\|zenpower" "$hw/name"; then
+      cpu_temp_c=$(read_temp "$hw/temp1_input")
+      break
+    fi
+  done
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Memory
+  # ─────────────────────────────────────────────────────────────────────────────
+  local mem_total_kb=$(awk "/MemTotal/ {print \$2}" /proc/meminfo)
+  local mem_avail_kb=$(awk "/MemAvailable/ {print \$2}" /proc/meminfo)
+  local mem_cached_kb=$(awk "/^Cached:/ {print \$2}" /proc/meminfo)
+  local mem_buffers_kb=$(awk "/^Buffers:/ {print \$2}" /proc/meminfo)
+  local mem_used_kb=$((mem_total_kb - mem_avail_kb))
+  local mem_used_pct=$((100 * mem_used_kb / mem_total_kb))
+
+  local swap_total_kb=$(awk "/SwapTotal/ {print \$2}" /proc/meminfo)
+  local swap_free_kb=$(awk "/SwapFree/ {print \$2}" /proc/meminfo)
+  local swap_used_pct=0
+  [[ $swap_total_kb -gt 0 ]] && swap_used_pct=$(( 100 * (swap_total_kb - swap_free_kb) / swap_total_kb ))
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # GPU (AMD AMDGPU - comprehensive)
+  # ─────────────────────────────────────────────────────────────────────────────
+  local gpu_util="null" gpu_temp_c="null" gpu_driver="unknown"
+  local gpu_vram_used_mib="null" gpu_vram_total_mib="null"
+  local gpu_power_w="null" gpu_power_cap_w="null"
+  local gpu_sclk_mhz="null" gpu_mclk_mhz="null"
+  local gpu_card=""
+
+  for p in /sys/class/drm/card*/device/gpu_busy_percent; do
+    [[ -r "$p" ]] || continue
+    gpu_util=$(< "$p")
+    gpu_card="${p%/device/gpu_busy_percent}"
+    break
+  done
+
+  if [[ -n "$gpu_card" ]]; then
+    # Driver
+    [[ -r "$gpu_card/device/driver/module" ]] && \
+      gpu_driver=$(basename "$(readlink -f "$gpu_card/device/driver/module")")
+
+    # VRAM
+    local vram_used_file="$gpu_card/device/mem_info_vram_used"
+    local vram_total_file="$gpu_card/device/mem_info_vram_total"
+    [[ -r "$vram_used_file" ]] && gpu_vram_used_mib=$(( $(< "$vram_used_file") / 1048576 ))
+    [[ -r "$vram_total_file" ]] && gpu_vram_total_mib=$(( $(< "$vram_total_file") / 1048576 ))
+
+    # Clock speeds (parse pp_dpm_sclk and pp_dpm_mclk for current freq)
+    local sclk_file="$gpu_card/device/pp_dpm_sclk"
+    local mclk_file="$gpu_card/device/pp_dpm_mclk"
+    if [[ -r "$sclk_file" ]]; then
+      gpu_sclk_mhz=$(grep '\*' "$sclk_file" 2>/dev/null | grep -oE '[0-9]+Mhz' | head -1 | grep -oE '[0-9]+' || echo "null")
+    fi
+    if [[ -r "$mclk_file" ]]; then
+      gpu_mclk_mhz=$(grep '\*' "$mclk_file" 2>/dev/null | grep -oE '[0-9]+Mhz' | head -1 | grep -oE '[0-9]+' || echo "null")
+    fi
+
+    # Temperature and power from hwmon
+    for hw in "$gpu_card"/device/hwmon/hwmon*; do
+      [[ -r "$hw/name" ]] || continue
+      if grep -qi "amdgpu\|gpu" "$hw/name"; then
+        [[ -r "$hw/temp1_input" ]] && gpu_temp_c=$(read_temp "$hw/temp1_input")
+        [[ -r "$hw/power1_average" ]] && gpu_power_w=$(awk "{printf \"%.1f\", \$1/1000000}" "$hw/power1_average")
+        [[ -r "$hw/power1_cap" ]] && gpu_power_cap_w=$(awk "{printf \"%.0f\", \$1/1000000}" "$hw/power1_cap")
+        break
+      fi
+    done
+  fi
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Network (throughput delta calculation)
+  # ─────────────────────────────────────────────────────────────────────────────
+  local net_rx_bytes=0 net_tx_bytes=0
+  local net_rx_rate_mbps=0 net_tx_rate_mbps=0
+  local primary_iface=$(ip route | awk '/default/ {print $5; exit}')
+
+  if [[ -n "$primary_iface" && -d "/sys/class/net/$primary_iface/statistics" ]]; then
+    net_rx_bytes=$(< "/sys/class/net/$primary_iface/statistics/rx_bytes")
+    net_tx_bytes=$(< "/sys/class/net/$primary_iface/statistics/tx_bytes")
+
+    # Calculate rate from previous snapshot
+    if [[ -r "$STATE_FILE" ]]; then
+      source "$STATE_FILE" 2>/dev/null
+      local elapsed_ms=$((ts_epoch - ${PREV_TS_EPOCH:-$ts_epoch}))
+      if [[ $elapsed_ms -gt 0 ]]; then
+        local rx_delta=$((net_rx_bytes - ${PREV_NET_RX:-$net_rx_bytes}))
+        local tx_delta=$((net_tx_bytes - ${PREV_NET_TX:-$net_tx_bytes}))
+        # Convert to Mbps: (bytes_delta * 8) / (elapsed_ms / 1000) / 1_000_000
+        net_rx_rate_mbps=$(awk "BEGIN {printf \"%.2f\", ($rx_delta * 8) / ($elapsed_ms / 1000) / 1000000}")
+        net_tx_rate_mbps=$(awk "BEGIN {printf \"%.2f\", ($tx_delta * 8) / ($elapsed_ms / 1000) / 1000000}")
+      fi
+    fi
+  fi
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Disk I/O (throughput for key disks)
+  # ─────────────────────────────────────────────────────────────────────────────
+  local disk_read_mbs=0 disk_write_mbs=0
+
+  # Read current sector counts
+  local disk_stats=""
+  for disk in nvme0n1 nvme1n1 sda sdb; do
+    local stat_file="/sys/block/$disk/stat"
+    [[ -r "$stat_file" ]] || continue
+    read sectors_read _ _ _ sectors_written _ < <(awk '{print $3, $7}' "$stat_file")
+    disk_stats+="$disk:$sectors_read:$sectors_written "
+  done
+
+  # Calculate rate from previous (sector = 512 bytes)
+  if [[ -r "$STATE_FILE" ]]; then
+    source "$STATE_FILE" 2>/dev/null
+    local elapsed_sec=$(awk "BEGIN {print ($ts_epoch - ${PREV_TS_EPOCH:-$ts_epoch}) / 1000}")
+    if [[ -n "$PREV_DISK_STATS" ]] && awk "BEGIN {exit !($elapsed_sec > 0)}"; then
+      local total_read_sectors=0 total_write_sectors=0
+      for entry in $disk_stats; do
+        local disk=${entry%%:*}
+        local rest=${entry#*:}
+        local cur_read=${rest%%:*}
+        local cur_write=${rest#*:}
+
+        # Find previous values
+        for prev_entry in $PREV_DISK_STATS; do
+          if [[ "${prev_entry%%:*}" == "$disk" ]]; then
+            local prev_rest=${prev_entry#*:}
+            local prev_read=${prev_rest%%:*}
+            local prev_write=${prev_rest#*:}
+            total_read_sectors=$((total_read_sectors + cur_read - prev_read))
+            total_write_sectors=$((total_write_sectors + cur_write - prev_write))
+            break
+          fi
+        done
+      done
+      disk_read_mbs=$(awk "BEGIN {printf \"%.1f\", ($total_read_sectors * 512 / 1048576) / $elapsed_sec}")
+      disk_write_mbs=$(awk "BEGIN {printf \"%.1f\", ($total_write_sectors * 512 / 1048576) / $elapsed_sec}")
+    fi
+  fi
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Media Stack Processes
+  # ─────────────────────────────────────────────────────────────────────────────
+  count_procs() {
+    local count=$(pgrep -c -f "$1" 2>/dev/null | tr -d '\n')
+    [[ -z "$count" || ! "$count" =~ ^[0-9]+$ ]] && count=0
+    echo "$count"
+  }
+
+  local ffmpeg_count=$(count_procs "ffmpeg|tdarr-ffmpeg")
+  local handbrake_count=$(count_procs "HandBrakeCLI")
+  local exiftool_count=$(count_procs "exiftool")
+  local plex_transcode_count=$(count_procs "Plex Transcoder")
+  local sabnzbd_count=$(count_procs "SABnzbd")
+  local transmission_count=$(count_procs "transmission-daemon")
+
+  # Top 5 CPU consumers
+  local top_procs=""
+  top_procs=$(ps -eo comm,%cpu --sort=-%cpu 2>/dev/null | head -6 | tail -5 | \
+    awk '{gsub(/ /, "_", $1); printf "%s:%.1f ", $1, $2}' | xargs)
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Service APIs (optional, adds latency)
+  # ─────────────────────────────────────────────────────────────────────────────
+  local tdarr_status="NA" tdarr_queue=0
+  local sab_speed_mbs="NA" sab_queue=0
+  local transmission_active=0
+
+  if [[ "$QUERY_SERVICES" == "1" ]]; then
+    # Tdarr
+    local tdarr_resp=$(curl -s --max-time 1 http://localhost:8265/api/v2/status 2>/dev/null)
+    if echo "$tdarr_resp" | jq -e '.status' &>/dev/null; then
+      tdarr_status=$(echo "$tdarr_resp" | jq -r '.status')
+    fi
+
+    # SABnzbd (if API key available)
+    if [[ -n "${SABNZBD_API_KEY:-}" ]]; then
+      local sab_resp=$(curl -s --max-time 1 "http://localhost:8080/api?mode=queue&apikey=${SABNZBD_API_KEY}&output=json" 2>/dev/null)
+      if echo "$sab_resp" | jq -e '.queue' &>/dev/null; then
+        sab_speed_mbs=$(echo "$sab_resp" | jq -r '.queue.speed // "0"' | sed 's/[^0-9.]//g')
+        sab_queue=$(echo "$sab_resp" | jq -r '.queue.noofslots // 0')
+      fi
+    fi
+
+    # Transmission
+    local trans_resp=$(curl -s --max-time 1 http://localhost:9091/transmission/rpc 2>/dev/null)
+    # Transmission requires session-id dance, skip for now
+  fi
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Save state for next delta calculation
+  # ─────────────────────────────────────────────────────────────────────────────
+  cat > "$STATE_FILE" <<EOSTATE
+PREV_TS_EPOCH=$ts_epoch
+PREV_NET_RX=$net_rx_bytes
+PREV_NET_TX=$net_tx_bytes
+PREV_DISK_STATS="$disk_stats"
+EOSTATE
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Analysis flags
+  # ─────────────────────────────────────────────────────────────────────────────
+  local gpu_underutilized="false"
+  local thermal_risk="false"
+  local scanning_heavy="false"
+
+  [[ "$gpu_util" != "null" && "$gpu_util" -lt 30 && "$cpu_total" -gt 80 ]] && gpu_underutilized="true"
+  [[ "$cpu_temp_c" != "null" ]] && awk "BEGIN {exit !($cpu_temp_c > 85)}" && thermal_risk="true"
+  [[ "$exiftool_count" -gt 2 ]] && scanning_heavy="true"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Output
+  # ─────────────────────────────────────────────────────────────────────────────
+  case "$OUTPUT_FORMAT" in
+    json)
+      cat <<EOF
+{
+  "ts": "$ts",
+  "ts_epoch_ms": $ts_epoch,
+  "cpu": {
+    "total_pct": $cpu_total,
+    "cores_pct": [$(IFS=,; echo "${cpu_cores[*]}")],
+    "cores_count": $num_cores,
+    "freq_avg_mhz": $cpu_freq_avg_mhz,
+    "freq_min_mhz": $cpu_freq_min_mhz,
+    "freq_max_mhz": $cpu_freq_max_mhz,
+    "temp_c": $cpu_temp_c,
+    "load_1m": $load1,
+    "load_5m": $load5,
+    "load_15m": $load15
+  },
+  "memory": {
+    "used_pct": $mem_used_pct,
+    "used_mib": $((mem_used_kb / 1024)),
+    "total_mib": $((mem_total_kb / 1024)),
+    "cached_mib": $((mem_cached_kb / 1024)),
+    "swap_used_pct": $swap_used_pct
+  },
+  "gpu": {
+    "util_pct": $gpu_util,
+    "temp_c": $gpu_temp_c,
+    "vram_used_mib": $gpu_vram_used_mib,
+    "vram_total_mib": $gpu_vram_total_mib,
+    "power_w": $gpu_power_w,
+    "power_cap_w": $gpu_power_cap_w,
+    "sclk_mhz": $gpu_sclk_mhz,
+    "mclk_mhz": $gpu_mclk_mhz,
+    "driver": "$gpu_driver"
+  },
+  "network": {
+    "interface": "$primary_iface",
+    "rx_rate_mbps": $net_rx_rate_mbps,
+    "tx_rate_mbps": $net_tx_rate_mbps,
+    "rx_total_mib": $((net_rx_bytes / 1048576)),
+    "tx_total_mib": $((net_tx_bytes / 1048576))
+  },
+  "disk": {
+    "read_mbs": $disk_read_mbs,
+    "write_mbs": $disk_write_mbs
+  },
+  "processes": {
+    "ffmpeg": $ffmpeg_count,
+    "handbrake": $handbrake_count,
+    "exiftool": $exiftool_count,
+    "plex_transcode": $plex_transcode_count,
+    "sabnzbd": $sabnzbd_count,
+    "transmission": $transmission_count,
+    "top_5": "$top_procs"
+  },
+  "services": {
+    "tdarr_status": "$tdarr_status",
+    "tdarr_queue": $tdarr_queue,
+    "sab_speed_mbs": "$sab_speed_mbs",
+    "sab_queue": $sab_queue
+  },
+  "analysis": {
+    "gpu_underutilized": $gpu_underutilized,
+    "thermal_risk": $thermal_risk,
+    "scanning_heavy": $scanning_heavy
+  }
+}
+EOF
+      ;;
+
+    compact)
+      # Single line for log files
+      printf "%s cpu=%d%% gpu=%d%% temp=%s°C freq=%dMHz mem=%d%% " \
+        "$ts" "$cpu_total" "${gpu_util:-0}" "${cpu_temp_c:-NA}" "$cpu_freq_avg_mhz" "$mem_used_pct"
+      printf "net=↓%.1f↑%.1fMbps disk=r%.1fw%.1fMB/s " \
+        "$net_rx_rate_mbps" "$net_tx_rate_mbps" "$disk_read_mbs" "$disk_write_mbs"
+      printf "ffmpeg=%d exiftool=%d plex=%d\n" \
+        "$ffmpeg_count" "$exiftool_count" "$plex_transcode_count"
+      ;;
+
+    *)
+      # Human readable key=value
+      printf "ts=%s\n" "$ts"
+      printf "cpu: total=%d%% load=%.1f,%.1f,%.1f temp=%s°C freq=%d/%d/%dMHz\n" \
+        "$cpu_total" "$load1" "$load5" "$load15" "${cpu_temp_c:-NA}" \
+        "$cpu_freq_avg_mhz" "$cpu_freq_min_mhz" "$cpu_freq_max_mhz"
+      printf "mem: used=%d%% (%dMiB/%dMiB) cached=%dMiB swap=%d%%\n" \
+        "$mem_used_pct" "$((mem_used_kb/1024))" "$((mem_total_kb/1024))" \
+        "$((mem_cached_kb/1024))" "$swap_used_pct"
+      printf "gpu: util=%s%% temp=%s°C vram=%s/%sMiB power=%sW/%sW sclk=%sMHz mclk=%sMHz\n" \
+        "${gpu_util:-NA}" "${gpu_temp_c:-NA}" "${gpu_vram_used_mib:-NA}" "${gpu_vram_total_mib:-NA}" \
+        "${gpu_power_w:-NA}" "${gpu_power_cap_w:-NA}" "${gpu_sclk_mhz:-NA}" "${gpu_mclk_mhz:-NA}"
+      printf "net: %s ↓%.2fMbps ↑%.2fMbps (total: ↓%dMiB ↑%dMiB)\n" \
+        "$primary_iface" "$net_rx_rate_mbps" "$net_tx_rate_mbps" \
+        "$((net_rx_bytes/1048576))" "$((net_tx_bytes/1048576))"
+      printf "disk: read=%.1fMB/s write=%.1fMB/s\n" "$disk_read_mbs" "$disk_write_mbs"
+      printf "procs: ffmpeg=%d handbrake=%d exiftool=%d plex=%d sab=%d transmission=%d\n" \
+        "$ffmpeg_count" "$handbrake_count" "$exiftool_count" "$plex_transcode_count" \
+        "$sabnzbd_count" "$transmission_count"
+      printf "top5: %s\n" "$top_procs"
+      printf "services: tdarr=%s sab_speed=%sMB/s sab_queue=%d\n" \
+        "$tdarr_status" "$sab_speed_mbs" "$sab_queue"
+      printf "analysis: gpu_underutilized=%s thermal_risk=%s scanning_heavy=%s\n" \
+        "$gpu_underutilized" "$thermal_risk" "$scanning_heavy"
+      ;;
+  esac
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────────────────────
+if [[ $WATCH_INTERVAL -gt 0 ]]; then
+  echo "# sysinfo-snapshot watching every ${WATCH_INTERVAL}s (Ctrl+C to stop)" >&2
+  while true; do
+    snapshot
+    sleep "$WATCH_INTERVAL"
+  done
+else
+  snapshot
+fi
