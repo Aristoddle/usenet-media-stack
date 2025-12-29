@@ -28,6 +28,8 @@ NC='\033[0m'
 # Configuration
 SUWAYOMI_DOWNLOADS="${SUWAYOMI_DOWNLOADS:-/var/mnt/fast8tb/Local/downloads/suwayomi-chapters}"
 COMICS_ROOT="${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}"
+# Weekly chapters go to separate subdirectory to distinguish from tankobon
+SUWAYOMI_OUTPUT_DIR="${SUWAYOMI_OUTPUT_DIR:-${COMICS_ROOT}/[Weekly Chapters]}"
 KOMGA_URL="${KOMGA_URL:-http://localhost:8081}"
 KOMGA_USER="${KOMGA_USERNAME:-}"
 KOMGA_PASS="${KOMGA_PASSWORD:-}"
@@ -147,17 +149,32 @@ process_chapter() {
     series_name=$(sanitize_name "$series_name")
     chapter_name=$(sanitize_name "$chapter_name")
 
-    # Determine output directory (use Suwayomi format for now)
-    local output_dir="${COMICS_ROOT}/${series_name} (Suwayomi)"
+    # Extract chapter number for proper naming
+    # Suwayomi uses: "Chapter X", "Chapter X.5", "Ch. X", etc.
+    local chapter_num=""
+    if [[ "$chapter_name" =~ [Cc]h(apter)?[[:space:]]*([0-9]+(\.[0-9]+)?) ]]; then
+        chapter_num="${BASH_REMATCH[2]}"
+    else
+        # Fallback: use chapter_name as-is
+        chapter_num="$chapter_name"
+    fi
 
-    # Create CBZ filename: SeriesName - ChapterX.cbz
-    local cbz_filename="${series_name} - ${chapter_name}.cbz"
+    # Pad chapter number (e.g., "5" -> "005", "125.5" -> "125.5")
+    if [[ "$chapter_num" =~ ^[0-9]+$ ]]; then
+        chapter_num=$(printf "%03d" "$chapter_num")
+    fi
+
+    # Output to [Weekly Chapters]/SeriesName/ with c{chapter} naming
+    local output_dir="${SUWAYOMI_OUTPUT_DIR}/${series_name}"
+
+    # Create CBZ filename: SeriesName c{chapter}.cbz (matches tankobon v{vol} pattern)
+    local cbz_filename="${series_name} c${chapter_num}.cbz"
     local output_path="${output_dir}/${cbz_filename}"
 
-    log "Processing: $series_name - $chapter_name"
-    log "  Source: $source_name"
+    log "Processing: $series_name c${chapter_num}"
+    log "  Source: $source_name ($chapter_name)"
     log "  Images: $image_count"
-    log "  Output: $output_path"
+    log "  Output: [Weekly Chapters]/${series_name}/${cbz_filename}"
 
     if [[ -f "$output_path" ]]; then
         warn "  Already exists: $output_path"
@@ -231,7 +248,7 @@ scan_downloads() {
 main() {
     log "Suwayomi Chapter Organizer"
     log "  Downloads: $SUWAYOMI_DOWNLOADS"
-    log "  Comics: $COMICS_ROOT"
+    log "  Output: $SUWAYOMI_OUTPUT_DIR"
     log "  Komga: $KOMGA_URL"
 
     if [[ "$WATCH_MODE" == "true" ]]; then
