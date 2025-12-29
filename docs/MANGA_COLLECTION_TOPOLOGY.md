@@ -324,16 +324,12 @@ After flattening, update Mylar series paths:
 
 | Script | Purpose | Status |
 |--------|---------|--------|
-| `suwayomi-organizer.sh` | Chapter download -> CBZ | EXISTS (needs fixes) |
-| `mylar-post-processor.sh` | SABnzbd -> Comics folder | NEEDED |
-| `komga-collection-sync.sh` | Auto-create cross-library collections | NEEDED |
-| `flatten-manga-directories.sh` | Migration helper | NEEDED |
+| `suwayomi-organizer.sh` | Chapter download -> CBZ | COMPLETE (4-digit padding, edge cases) |
+| `mylar-post-processor.sh` | SABnzbd -> Comics folder | COMPLETE |
+| `komga-collection-sync.sh` | Auto-create cross-library collections | COMPLETE |
+| `flatten-manga-directories.sh` | Migration helper | COMPLETE |
 
-### suwayomi-organizer.sh Fixes Needed
-
-1. Change padding from 3-digit to 4-digit
-2. Improve chapter regex for edge cases
-3. Add failed download logging
+All scripts are located in `tools/` and documented in `tools/README.md`.
 
 ---
 

@@ -184,3 +184,136 @@ sqlite3 /var/mnt/fast8tb/config/metrics/sysinfo.db "
 sqlite3 /var/mnt/fast8tb/config/metrics/sysinfo.db "
   SELECT MAX(net_rx_rate_mbps), MAX(net_tx_rate_mbps) FROM metrics;"
 ```
+
+---
+
+## Manga Pipeline Tools
+
+### suwayomi-organizer.sh
+
+Converts Suwayomi chapter downloads into CBZ archives and moves to Komga library.
+
+```bash
+# Single scan
+./suwayomi-organizer.sh
+
+# Dry run (show what would be done)
+./suwayomi-organizer.sh --dry-run
+
+# Watch mode (daemon - monitor for new downloads)
+./suwayomi-organizer.sh --watch
+```
+
+**Features:**
+- Parses Suwayomi's Source/Series/Chapter directory structure
+- Creates properly named CBZ archives (4-digit chapter padding)
+- Moves to Manga-Weekly library for Komga
+- Triggers Komga library rescan
+- Logs processed/failed chapters
+
+**Environment:**
+- `SUWAYOMI_DOWNLOADS` - Suwayomi chapter download path
+- `SUWAYOMI_OUTPUT_DIR` - Target Komga library (default: Comics/[Weekly Chapters])
+- `KOMGA_URL`, `KOMGA_USERNAME`, `KOMGA_PASSWORD` - Komga API credentials
+
+---
+
+### mylar-post-processor.sh
+
+SABnzbd post-processing script for Mylar comic downloads.
+
+```bash
+# Usually called by SABnzbd, but can run manually:
+./mylar-post-processor.sh "/path/to/download" "NZB.Name" "Clean Name"
+```
+
+**Setup:**
+1. Add script to SABnzbd Scripts Folder
+2. Configure Mylar to use this as post-processing script
+
+**Features:**
+- Normalizes filenames for series/volume patterns
+- Moves to correct series folder in Comics library
+- Creates series folders if needed
+- Triggers Komga rescan
+- Logs all operations
+
+**Environment:**
+- `COMICS_ROOT` - Target comics library path
+- `KOMGA_URL`, `KOMGA_USERNAME`, `KOMGA_PASSWORD` - Komga API credentials
+
+---
+
+### komga-collection-sync.sh
+
+Creates Komga collections linking same-name series across libraries.
+
+```bash
+# Create collections for cross-library series
+./komga-collection-sync.sh
+
+# Dry run
+./komga-collection-sync.sh --dry-run
+
+# Verbose output
+./komga-collection-sync.sh --verbose
+```
+
+**Use Case:** When you have "Chainsaw Man" in both "Manga (Collected)" and "Manga (Weekly)" libraries, this creates a "Chainsaw Man (All Editions)" collection containing both.
+
+**Features:**
+- Scans all Komga libraries for same-name series
+- Normalizes names (removes publisher tags, language codes, years)
+- Creates or updates collections automatically
+- Idempotent (safe to run repeatedly)
+
+**Environment:**
+- `KOMGA_URL` - Komga server URL (default: http://localhost:8081)
+- `KOMGA_USERNAME`, `KOMGA_PASSWORD` - Komga admin credentials
+
+---
+
+### flatten-manga-directories.sh
+
+Migration helper to flatten nested manga directories for Komga compatibility.
+
+```bash
+# Dry run (recommended first)
+./flatten-manga-directories.sh --dry-run
+
+# Interactive mode (prompt before each change)
+./flatten-manga-directories.sh --interactive
+
+# Also remove __Panels, .DS_Store, etc.
+./flatten-manga-directories.sh --cleanup
+
+# Target specific directory
+./flatten-manga-directories.sh /path/to/comics
+```
+
+**Problem Solved:** Some manga has nested structures like `Series/1. Volumes/v01.cbz` which Komga treats as separate series.
+
+**Features:**
+- Detects common nested patterns (Volumes, Chapters, Extras, etc.)
+- Flattens to `Series/Series v01.cbz` format
+- Creates backup manifest before changes
+- Removes empty directories after moving files
+- Optional cleanup of YACReader `__Panels` directories
+
+**Safety:**
+- Always use `--dry-run` first
+- Creates JSON manifest of all changes
+- Never deletes files (moves only)
+- Logs all operations
+
+---
+
+### migrate-readarr-to-bookshelf.sh
+
+Migration script for Readarr to Bookshelf fork (Readarr is EOL as of June 2025).
+
+```bash
+./migrate-readarr-to-bookshelf.sh --dry-run
+```
+
+See [docs/decisions/2025-12-29-stack-health-audit.md](../docs/decisions/2025-12-29-stack-health-audit.md) for details.

@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 01:52 EST)
+## Date: 2025-12-29 (Updated: 02:10 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -213,13 +213,15 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Create Suwayomi chapter organizer script (tools/suwayomi-organizer.sh)
 - [x] Create Readarr → Bookshelf migration script (tools/migrate-readarr-to-bookshelf.sh)
 - [x] Research and document manga collection topology (MANGA_COLLECTION_TOPOLOGY.md)
-- [ ] Deep thinker adversarial review of topology (IN PROGRESS)
+- [x] Deep thinker adversarial review of topology (COMPLETE - a7452e9)
 
 ---
 
 ## Active Git Commits (This Session)
 
 ```
+a7452e9 docs(manga): adversarial review - edge cases, 4-digit padding, migration phases
+5af26e2 docs: update SESSION_STATE with manga topology work
 77c9a97 docs(manga): researched topology with Komga constraints
 53f91fc docs(manga): add collection topology for two-track system
 d50fddb feat(tools): add Suwayomi chapter organizer script
@@ -234,19 +236,27 @@ cd8ac90 fix(tdarr): GPU-only config, monitoring tools, error recovery
 ## Next Steps
 
 ### Immediate (Priority Order)
-1. Replace Readarr with Bookshelf fork (see `docs/decisions/2025-12-29-stack-health-audit.md`)
-2. Monitor thermals until Plex library analysis completes
-3. Scale Tdarr to aggressive settings when CPU drops
+1. Create missing manga pipeline scripts:
+   - `mylar-post-processor.sh` - SABnzbd post-processing hook
+   - `komga-collection-sync.sh` - Cross-library collection linking
+   - `flatten-manga-directories.sh` - Migration helper for nested folders
+2. Create Manga-Weekly directory structure for two-library topology
+3. Scale Tdarr to aggressive settings (Plex analysis complete)
 
 ### Short-Term
-1. Create Suwayomi → Komga organizer script (T2.3)
-2. Reorganize Doctor Who collection (manual, use TheTVDB)
+1. Replace Readarr with Bookshelf fork (see `docs/decisions/2025-12-29-stack-health-audit.md`)
+2. Reorganize Doctor Who collection (manual curation required)
 3. Test Mylar search with new Prowlarr category
 
 ### Medium-Term
 1. Run Komf metadata enrichment on manga collection
 2. Wire manga-torrent-searcher agent for weekly chapter automation
 3. Upgrade Recyclarr to Remux + WEB 2160p profile
+
+### Completed This Session
+- [x] Adversarial topology review (23 weaknesses analyzed, addressed)
+- [x] 4-digit padding update in suwayomi-organizer.sh
+- [x] Edge case naming conventions documented
 
 ---
 
