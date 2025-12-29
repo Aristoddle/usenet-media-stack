@@ -282,6 +282,29 @@ User handed off control for overnight autonomous operation. Directives:
 - Cybernetics-self-sustain; keep identifying valuable work
 - Quality over speed
 
+### VAAPI Deep Dive (04:00+ EST)
+
+**Critical Finding**: Deep thinker analysis confirmed Tdarr was using `libx265` (CPU software encoding) instead of `hevc_vaapi` (GPU hardware encoding). This explained the 135+ load average and 100% CPU utilization.
+
+**Verification Steps Completed**:
+1. ✅ VAAPI is available in Tdarr container (`vainfo` shows AMD 780M with HEVC encode support)
+2. ✅ DRI devices mounted correctly (`/dev/dri/renderD128` accessible)
+3. ✅ FFmpeg VAAPI test successful inside container: `hevc_vaapi` encoder works at `4.57x` speed
+4. ✅ Tdarr node reports `hevc_vaapi-true-true` (encoder enabled AND working)
+5. ⚠️ Switched libraries from Flow mode to Plugin mode with `Tdarr_Plugin_00td_action_transcode`
+6. ⚠️ Workers not spawning (0 running) despite correct configuration
+
+**Current Blocker**:
+- FATAL errors during file scanning: `TypeError: Cannot read properties of undefined (reading 'on')`
+- Workers configured correctly (4 GPU transcode, 1 GPU healthcheck per node)
+- Libraries show `processLibrary = 1` (enabled)
+- Global pause = false, nodes not paused
+- **Root Cause Under Investigation**: JavaScript runtime error in `scanFilesInternal`
+
+**System Impact**:
+- Load average dropped from **135 → 43** (Tdarr not transcoding = less CPU)
+- Need to fix worker dispatch to utilize VAAPI properly
+
 ### Completed During Overnight Session
 
 1. **Created OVERNIGHT_SESSION_2025-12-29.md** - Session planning document
