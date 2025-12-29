@@ -34,6 +34,7 @@ KOMGA_URL="${KOMGA_URL:-http://localhost:8081}"
 KOMGA_USER="${KOMGA_USERNAME:-}"
 KOMGA_PASS="${KOMGA_PASSWORD:-}"
 PROCESSED_LOG="${SUWAYOMI_DOWNLOADS}/.processed_chapters.log"
+FAILED_LOG="${SUWAYOMI_DOWNLOADS}/.failed_chapters.log"
 
 DRY_RUN=false
 WATCH_MODE=false
@@ -63,6 +64,16 @@ done
 # Ensure directories exist
 mkdir -p "$SUWAYOMI_DOWNLOADS"
 touch "$PROCESSED_LOG"
+touch "$FAILED_LOG"
+
+# Log failed chapter for later retry
+log_failed() {
+    local chapter_path="$1"
+    local reason="$2"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "$timestamp|$chapter_path|$reason" >> "$FAILED_LOG"
+    warn "Failed: $chapter_path - $reason"
+}
 
 # Check if chapter already processed
 is_processed() {
@@ -130,7 +141,7 @@ process_chapter() {
     local image_count=$(find "$chapter_dir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | wc -l)
 
     if [[ $image_count -lt 3 ]]; then
-        debug "Incomplete chapter (only $image_count images): $chapter_dir"
+        log_failed "$chapter_dir" "Incomplete download (only $image_count images)"
         return 0
     fi
 
@@ -141,7 +152,7 @@ process_chapter() {
     local chapter_name=$(echo "$rel_path" | cut -d'/' -f3)
 
     if [[ -z "$series_name" || -z "$chapter_name" ]]; then
-        warn "Could not parse: $chapter_dir"
+        log_failed "$chapter_dir" "Could not parse series/chapter name"
         return 1
     fi
 
@@ -150,18 +161,44 @@ process_chapter() {
     chapter_name=$(sanitize_name "$chapter_name")
 
     # Extract chapter number for proper naming
-    # Suwayomi uses: "Chapter X", "Chapter X.5", "Ch. X", etc.
+    # Handle various Suwayomi formats:
+    #   "Chapter X", "Chapter X.5", "Ch. X", "Ch.X"
+    #   "Vol.X Ch.Y", "Vol.X Chapter Y"
+    #   "Chapter X: Title Here", "Ch. X - Title"
+    #   "[Scanlator] Chapter X"
     local chapter_num=""
-    if [[ "$chapter_name" =~ [Cc]h(apter)?[[:space:]]*([0-9]+(\.[0-9]+)?) ]]; then
+
+    # Strip scanlator tags first: [Scanlator] or (Scanlator)
+    local clean_name="${chapter_name}"
+    clean_name=$(echo "$clean_name" | sed 's/^\[[^]]*\][[:space:]]*//')
+    clean_name=$(echo "$clean_name" | sed 's/^([^)]*)[[:space:]]*//')
+
+    # Try Vol.X Ch.Y format first (extract chapter, ignore volume)
+    if [[ "$clean_name" =~ [Vv]ol\.?[[:space:]]*[0-9]+[[:space:]]+[Cc]h(apter)?\.?[[:space:]]*([0-9]+(\.[0-9]+)?) ]]; then
         chapter_num="${BASH_REMATCH[2]}"
+    # Standard chapter formats: "Chapter X", "Ch. X", "Ch.X"
+    elif [[ "$clean_name" =~ [Cc]h(apter)?\.?[[:space:]]*([0-9]+(\.[0-9]+)?)[[:space:]]*(:|-)? ]]; then
+        chapter_num="${BASH_REMATCH[2]}"
+    # Just a number (some extensions use bare numbers)
+    elif [[ "$clean_name" =~ ^[[:space:]]*([0-9]+(\.[0-9]+)?)[[:space:]]*$ ]]; then
+        chapter_num="${BASH_REMATCH[1]}"
     else
-        # Fallback: use chapter_name as-is
+        # Fallback: use chapter_name as-is (will not be padded)
         chapter_num="$chapter_name"
+        warn "Could not parse chapter number from: $chapter_name"
     fi
 
-    # Pad chapter number (e.g., "5" -> "005", "125.5" -> "125.5")
-    if [[ "$chapter_num" =~ ^[0-9]+$ ]]; then
-        chapter_num=$(printf "%03d" "$chapter_num")
+    # Pad chapter number to 4 digits (e.g., "5" -> "0005", "125" -> "0125")
+    # Preserve decimal for half-chapters: "125.5" -> "0125.5"
+    if [[ "$chapter_num" =~ ^([0-9]+)(\.([0-9]+))?$ ]]; then
+        local int_part="${BASH_REMATCH[1]}"
+        local decimal_part="${BASH_REMATCH[3]}"
+        int_part=$(printf "%04d" "$int_part")
+        if [[ -n "$decimal_part" ]]; then
+            chapter_num="${int_part}.${decimal_part}"
+        else
+            chapter_num="$int_part"
+        fi
     fi
 
     # Output to [Weekly Chapters]/SeriesName/ with c{chapter} naming
