@@ -665,8 +665,14 @@ services:
       driver: json-file
       options: *id002
   # Tdarr secondary node for parallel processing
+  # NOTE: Does NOT use network_tweaks anchor - needs podman internal DNS
+  # to resolve 'tdarr' hostname for serverIP connection
   tdarr-node:
-    <<: *network_tweaks
+    dns_opt:
+      - use-vc
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
     image: ghcr.io/haveagitgat/tdarr_node:latest
     container_name: tdarr-node
     environment:
