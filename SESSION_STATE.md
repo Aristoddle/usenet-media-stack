@@ -1,8 +1,46 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-29 (Updated: 14:15 EST)
+## Date: 2025-12-30 (Updated: 06:45 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
+
+---
+
+## Session Update: 2025-12-30
+
+### Active Transcodes (Direct FFmpeg - Bypassing Tdarr Queue Issues)
+
+3 parallel SVT-AV1 transcodes running at load average ~47:
+- **Dogma (1999)**: 24GB → AV1, ~5 fps, started 03:30 EST
+- **A Bug's Life (1998)**: 40GB ISO extract → AV1
+- **A Haunting in Venice (2023)**: 32GB ISO extract → AV1
+
+Estimated completion: 8-12 hours per file (CPU-limited by design for maximum compression).
+
+### Git-Tracked Tdarr Configuration ✓
+
+Created portable, git-tracked Tdarr config structure:
+- `config/tdarr/flows/` - 4 SVT-AV1 flow definitions (JSON)
+- `config/tdarr/libraries/` - 7 library configurations
+- `config/tdarr/tdarr-config-sync.sh` - Export/import script
+
+**Commit**: `e7be722` - Pushed to origin/main
+
+### ROM Acquisition Agent Completed ✓
+
+6 NZBs prepared for download:
+- SMT V Vengeance (NSW): 15.29 GB
+- Vagrant Story (PSX): 167.7 MB
+- Legend of Mana (PSX): 455 MB
+- Mega Man Legends 1 & 2 (PSX): 568 MB total
+- Suikoden II BugFix (PSX): 392 MB
+
+**Location**: `/var/mnt/fast8tb/Local/downloads/roms/nzbs/`
+**Status**: Pending manual SABnzbd UI processing (API had issues)
+
+### Tdarr Queue System Issue (Deferred)
+
+Root cause identified: Tdarr's in-memory queue state doesn't sync properly with SQLite database. Files show in database but not in API/queue. Workaround: Direct FFmpeg transcodes until Tdarr issue resolved.
 
 ---
 
