@@ -1,6 +1,6 @@
 # Working Services Documentation
 
-**Status**: Live snapshot (Dec 27, 2025) -- 24 containers running, all healthy. Single source of truth for working services.
+**Status**: Live snapshot (Dec 29, 2025) -- 25 containers running, all healthy. Single source of truth for working services.
 
 ## Core Working Services
 
@@ -30,6 +30,7 @@
 
 ### Processing & Management
 - **Tdarr** -- http://localhost:8265 (transcoding with GPU acceleration)
+- **MakeMKV** -- http://localhost:5800 (ISO extraction, VNC: 5900)
 - **Portainer** -- http://localhost:9000 (container management)
 - **Netdata** -- http://localhost:19999 (system monitoring)
 - **Uptime Kuma** -- http://localhost:3001 (service monitoring)
@@ -106,4 +107,4 @@ VA-API is available inside the container for hardware-accelerated transcoding:
 
 ---
 
-*Last validated: 27Dec25 via automated HTTP probe and GPU verification*
+*Last validated: 29Dec25 via automated HTTP probe and GPU verification*

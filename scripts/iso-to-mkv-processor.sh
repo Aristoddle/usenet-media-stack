@@ -18,8 +18,19 @@
 set -euo pipefail
 
 # Configuration
+# Source .env if running from repo directory (for DOWNLOADS_ROOT)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+if [[ -f "$REPO_ROOT/.env" ]]; then
+    # Source only path-related vars (avoid secrets)
+    export POOL_ROOT=$(grep '^POOL_ROOT=' "$REPO_ROOT/.env" | cut -d'=' -f2)
+    export DOWNLOADS_ROOT=$(grep '^DOWNLOADS_ROOT=' "$REPO_ROOT/.env" | cut -d'=' -f2)
+fi
+
 POOL_ROOT="${POOL_ROOT:-/var/mnt/pool}"
-OUTPUT_ROOT="${MAKEMKV_OUTPUT:-/var/mnt/fast8tb/Local/downloads/makemkv-output}"
+DOWNLOADS_ROOT="${DOWNLOADS_ROOT:-/var/mnt/pool/downloads}"
+# Output directory MUST match container's /output mount (see docker-compose.yml)
+OUTPUT_ROOT="${MAKEMKV_OUTPUT:-${DOWNLOADS_ROOT}/makemkv-output}"
 PROCESSED_LOG="${OUTPUT_ROOT}/.processed-isos.log"
 MIN_LENGTH="${MAKEMKV_MIN_LENGTH:-3600}"  # 60 minutes - filters out bonus content
 CONTAINER_NAME="makemkv"

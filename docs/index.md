@@ -4,7 +4,7 @@ title: "Beppe's Arr Stack"
 hero:
   name: "Beppe's Arr Stack"
   text: "41TB MergerFS Media Homelab"
-  tagline: "24 Docker containers • SVT-AV1 transcoding • Tailscale remote access • EmuDeck gaming"
+  tagline: "25 Docker containers • SVT-AV1 transcoding • Tailscale remote access • EmuDeck gaming"
   actions:
     - theme: brand
       text: Quick Start
@@ -17,8 +17,8 @@ hero:
       link: /STORAGE_AND_REMOTE_ACCESS
 features:
   - icon: ⚙️
-    title: 24 Containers Running
-    details: Prowlarr, Sonarr, Radarr, Lidarr, Whisparr with SABnzbd + Transmission. Full *arr stack.
+    title: 25 Containers Running
+    details: Prowlarr, Sonarr, Radarr, Lidarr, Whisparr with SABnzbd + Transmission. Full *arr stack + MakeMKV.
   - icon: 💾
     title: 41TB MergerFS Pool
     details: 8 NVMe drives unified. RAM caching enabled (cache.files=auto-full). 96GB memory.
@@ -98,6 +98,7 @@ All services accessible via `http://100.115.21.9:<port>` from any Tailscale-conn
 
 - [Storage and Remote Access](/STORAGE_AND_REMOTE_ACCESS) - MergerFS pool, Tailscale setup
 - [Tdarr Configuration](/TDARR) - SVT-AV1 encoding, troubleshooting
+- [ISO to AV1 Pipeline](/ISO_REENCODING_WORKFLOW) - Blu-ray extraction with MakeMKV + Tdarr
 - [Books and Audiobooks Guide](/BOOKS_AND_AUDIOBOOKS_GUIDE) - Complete serving stack
 - [EmuDeck Inventory](/EMUDECK_INVENTORY) - ROM collections, emulators
 - [Performance Tuning](/advanced/performance) - MergerFS caching, Tdarr workers

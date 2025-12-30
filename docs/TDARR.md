@@ -398,6 +398,7 @@ Wait 2-3 minutes for workers to stabilize before assessing.
 ## Related Documentation
 
 - [Performance Tuning](./advanced/performance.md) - SVT-AV1 configuration details
+- [ISO to AV1 Pipeline](./ISO_REENCODING_WORKFLOW.md) - Blu-ray ISO extraction and transcoding
 - [Stack Usage Guide](./STACK_USAGE_GUIDE.md) - Tdarr API reference and setup
 - [Services](./SERVICES.md) - Container overview
 

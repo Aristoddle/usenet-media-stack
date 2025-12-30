@@ -1,30 +1,179 @@
-# ISO Disc Image Re-encoding Workflow
+# ISO to AV1 Transcoding Pipeline
 
-> **Purpose**: Convert .iso disc images to high-fidelity, Plex-optimized media files
-> **Last Updated**: 2025-12-25
-
----
-
-## Why Re-encode ISOs?
-
-| Factor | Raw ISO | Re-encoded |
-|--------|---------|------------|
-| Size | 25-50GB (Blu-ray) | 8-15GB (same quality) |
-| Plex compatibility | Requires disc menu | Direct play |
-| Streaming | Impossible | Native |
-| Storage efficiency | ~30% of capacity | 100% usable |
-| Quality | Lossless (overkill) | Visually lossless |
-
-**Your math is correct**: A 40GB Blu-ray ISO → ~12GB HEVC/AV1 at visually lossless quality = **70% storage savings** with no perceptible loss.
+> **Purpose**: Convert Blu-ray ISOs to highly compressed AV1 files for Plex
+> **Last Updated**: 2025-12-29
+> **Pipeline**: ISO -> MakeMKV (Docker) -> Tdarr (SVT-AV1)
 
 ---
 
-## Recommended Toolchain
-
-### Primary: MakeMKV + HandBrake
+## Architecture Overview
 
 ```
-ISO/Disc → MakeMKV → .mkv (lossless) → HandBrake → Final .mkv (encoded)
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                         ISO → AV1 TRANSCODING PIPELINE                          │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  STAGE 1: ISO EXTRACTION (MakeMKV Container)                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │  scripts/iso-to-mkv-processor.sh                                        │   │
+│  │  - Scans pool/movies for .iso files                                     │   │
+│  │  - Extracts main title (>60min) via MakeMKV CLI                         │   │
+│  │  - Outputs lossless MKV to downloads/makemkv-output/                    │   │
+│  │  - Tracks processed ISOs to avoid re-extraction                         │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                              │                                                  │
+│                              ▼                                                  │
+│  STAGE 2: AV1 ENCODING (Tdarr)                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────────┐   │
+│  │  tdarr-flows/SVT-AV1_Production_v3.json                                 │   │
+│  │  - VAAPI hardware decode (GPU-accelerated)                              │   │
+│  │  - SVT-AV1 CPU encode (libsvtav1, CRF 30)                               │   │
+│  │  - Film grain synthesis for better compression                          │   │
+│  │  - 60-70% file size reduction                                           │   │
+│  └─────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Why This Pipeline?
+
+| Factor | Raw ISO | MKV (Lossless) | AV1 (Final) |
+|--------|---------|----------------|-------------|
+| Size | 40GB | 35GB | **10-12GB** |
+| Plex compatible | No (disc menu) | Yes | Yes |
+| Streaming | Impossible | Possible | Excellent |
+| CPU decode cost | High | Medium | Low |
+| Storage savings | 0% | 12% | **70%** |
+
+**Bottom line**: 40GB Blu-ray ISO -> 12GB AV1 = **70% storage savings** with visually lossless quality.
+
+---
+
+## Component Details
+
+### Stage 1: MakeMKV Container
+
+The Docker stack includes a dedicated MakeMKV container for ISO extraction:
+
+```yaml
+# docker-compose.yml excerpt
+makemkv:
+  image: jlesage/makemkv:latest
+  container_name: makemkv
+  environment:
+    - MAKEMKV_KEY=BETA           # Auto-fetch beta key
+    - AUTO_DISC_RIPPER=0         # ISO-only mode
+  volumes:
+    - ${CONFIG_ROOT}/makemkv:/config
+    - ${POOL_ROOT}:/pool:ro      # Read ISOs from pool
+    - ${DOWNLOADS_ROOT}/makemkv-output:/output
+  ports:
+    - 5800:5800                  # Web GUI
+```
+
+**Key Points**:
+- Uses free BETA license (auto-refreshes)
+- Read-only pool access for safety
+- Output goes to staging area (not directly to library)
+
+### Stage 2: ISO Processor Script
+
+The `scripts/iso-to-mkv-processor.sh` automates extraction:
+
+```bash
+# Scan for ISOs and show status
+./scripts/iso-to-mkv-processor.sh --scan
+
+# Process all unprocessed ISOs
+./scripts/iso-to-mkv-processor.sh
+
+# Process specific ISO
+./scripts/iso-to-mkv-processor.sh /var/mnt/pool/movies/Some.Movie.2024/movie.iso
+
+# Watch mode (continuous monitoring)
+./scripts/iso-to-mkv-processor.sh --watch
+```
+
+**Environment Variables**:
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `POOL_ROOT` | `/var/mnt/pool` | Media pool base path |
+| `MAKEMKV_OUTPUT` | `${DOWNLOADS_ROOT}/makemkv-output` | MKV output directory |
+| `MAKEMKV_MIN_LENGTH` | `3600` | Min title length (60min filters bonus content) |
+
+### Stage 3: Tdarr SVT-AV1 Flow
+
+After MKV extraction, Tdarr encodes to AV1:
+
+**Flow**: `tdarr-flows/SVT-AV1_Production_v3.json`
+
+```json
+{
+  "name": "SVT-AV1 Production v3 (Fixed)",
+  "description": "VAAPI decode -> SVT-AV1 CPU encode",
+  "flowPlugins": [
+    "inputFile",
+    "checkVideoCodec (skip AV1/VP9)",
+    "checkVideoBitrate (only HEVC >6Mbps)",
+    "ffmpegCommandStart (VAAPI decode)",
+    "ffmpegCommandCustomArguments (SVT-AV1)",
+    "ffmpegCommandSetContainer (MKV)",
+    "ffmpegCommandExecute",
+    "compareFileSizeRatio",
+    "replaceOriginalFile"
+  ]
+}
+```
+
+**SVT-AV1 Encode Parameters**:
+```bash
+-c:v libsvtav1 -crf 30 -preset 5 -pix_fmt yuv420p10le \
+  -svtav1-params tune=0:enable-overlays=1:scd=1:film-grain=8:keyint=10s:lp=2:pin=0
+```
+
+| Parameter | Value | Purpose |
+|-----------|-------|---------|
+| `crf 30` | Quality | ~65% size reduction, excellent quality |
+| `preset 5` | Speed | Balanced speed/compression |
+| `film-grain=8` | Compression | Film grain synthesis for grainy content |
+| `lp=2` | Threads | 2 thread pools per worker |
+| `pin=0` | Affinity | Let OS schedule threads |
+
+---
+
+## Systemd Service (Optional)
+
+For automatic ISO watching on boot:
+
+```bash
+# Install service
+sudo cp systemd/iso-processor.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable iso-processor.service
+sudo systemctl start iso-processor.service
+
+# Check status
+systemctl status iso-processor.service
+```
+
+Service watches `pool/movies` and auto-processes new ISOs.
+
+---
+
+## Original Toolchain Reference
+
+### Primary: MakeMKV + Tdarr (Recommended)
+
+```
+ISO → MakeMKV (Docker) → .mkv (lossless) → Tdarr → Final .mkv (AV1)
+```
+
+This is the production pipeline documented above.
+
+### Alternative: MakeMKV + HandBrake (Manual)
+
+```
+ISO → MakeMKV → .mkv (lossless) → HandBrake → Final .mkv (HEVC/AV1)
 ```
 
 1. **MakeMKV** ($50 lifetime, free beta available)

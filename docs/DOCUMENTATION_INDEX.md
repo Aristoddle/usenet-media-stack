@@ -2,7 +2,7 @@
 
 Comprehensive table of contents for the Usenet Media Stack documentation.
 
-**Last Updated**: 2025-12-29 (Post-Audit)
+**Last Updated**: 2025-12-29 (Documentation Audit)
 
 ---
 
@@ -90,7 +90,9 @@ Individual service configuration and guides.
 | [Reading Stack](reading-stack.md) | Comics, ebooks, and audiobooks |
 | [Komga + Komf Quickstart](komga.md) | Comics and OPDS setup |
 | [Komga Corrupt CBZ](komga-corrupt-cbz.md) | Handling corrupt CBZ files |
-| [Suwayomi Setup](suwayomi-setup.md) | Tachidesk manga server |
+| [Suwayomi Setup](SUWAYOMI_SETUP.md) | Tachidesk manga server |
+| [Mylar Setup](MYLAR_SETUP.md) | Comic book management |
+| [Books and Audiobooks Guide](BOOKS_AND_AUDIOBOOKS_GUIDE.md) | Comprehensive reading setup |
 
 ### Manga Acquisition
 
@@ -98,8 +100,21 @@ Individual service configuration and guides.
 |----------|-------------|
 | [Manga Acquisition Pipeline](MANGA_ACQUISITION_PIPELINE.md) | Two-track manga acquisition system |
 | [Manga Collection Topology](MANGA_COLLECTION_TOPOLOGY.md) | Folder structure and organization |
+| [Manga Ecosystem Analysis](MANGA_ECOSYSTEM_ANALYSIS.md) | Complete manga tooling analysis |
 | [Manga Integration Status](MANGA_INTEGRATION_STATUS.md) | Current gaps and next steps |
+| [Manga Naming Migration Plan](MANGA_NAMING_MIGRATION_PLAN.md) | Standardizing naming conventions |
+| [Recommended Manga Acquisitions](RECOMMENDED_MANGA_ACQUISITIONS.md) | Priority acquisition targets |
 | [Collection Gap-Fill Strategy](COLLECTION_GAP_FILL_STRATEGY.md) | Filling collection gaps |
+
+---
+
+## Gaming / Emulation
+
+| Document | Description |
+|----------|-------------|
+| [EmuDeck Inventory](EMUDECK_INVENTORY.md) | Current ROM collection status |
+| [EmuDeck Acquisition Plan](EMUDECK_ACQUISITION_PLAN.md) | ROM acquisition strategy |
+| [EmuDeck Tools Guide](EMUDECK_TOOLS_GUIDE.md) | ROM management tools |
 
 ---
 
@@ -153,6 +168,15 @@ Supplementary and reference documentation.
 | [Visualizations](visualizations.md) | Advanced system visualizations |
 | [USB Content Inventory](USB_CONTENT_INVENTORY.md) | USB drive content for import |
 
+### Plex Analysis
+
+| Document | Description |
+|----------|-------------|
+| [Plex Library Analysis](PLEX_LIBRARY_ANALYSIS.md) | Library structure and optimization |
+| [Plex Cleanup Report](PLEX_CLEANUP_REPORT.md) | Library cleanup results |
+| [TV Reorganization Plan](TV_REORGANIZATION_PLAN.md) | TV library restructuring |
+| [Doctor Who Organization](DOCTOR_WHO_ORGANIZATION.md) | Special Doctor Who handling |
+
 ### Future Planning
 
 | Document | Description |
@@ -201,6 +225,7 @@ Architecture decision records.
 | Document | Description |
 |----------|-------------|
 | [Audit Results 2025-12-29](AUDIT_RESULTS_2025-12-29.md) | Documentation audit and cleanup |
+| [Acquisition Log 2025-12-29](ACQUISITION_LOG_2025-12-29.md) | Media acquisition session log |
 
 ---
 

@@ -47,6 +47,7 @@ export default defineConfig({
           { text: 'Architecture', link: '/architecture/' },
           { text: 'Storage & MergerFS', link: '/STORAGE_AND_REMOTE_ACCESS' },
           { text: 'Tdarr Transcoding', link: '/TDARR' },
+          { text: 'ISO to AV1 Pipeline', link: '/ISO_REENCODING_WORKFLOW' },
           { text: 'Networking', link: '/networking' },
           { text: 'Services Status', link: '/SERVICES' },
           { text: 'Local Endpoints', link: '/local-endpoints' }
