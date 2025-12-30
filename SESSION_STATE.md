@@ -1,5 +1,5 @@
 # Session State - Media Stack Infrastructure Overhaul
-## Date: 2025-12-30 (Updated: 06:45 EST)
+## Date: 2025-12-30 (Updated: 14:45 EST)
 
 This document captures the complete state after a major infrastructure session.
 Use this to continue work post-context-compaction.
@@ -11,13 +11,13 @@ Use this to continue work post-context-compaction.
 ### Active Transcodes (Direct FFmpeg - Bypassing Tdarr Queue Issues)
 
 3 parallel SVT-AV1 transcodes running at load average ~47:
-- **Dogma (1999)**: 24GB → AV1, ~5 fps, started 03:30 EST
-- **A Bug's Life (1998)**: 40GB ISO extract → AV1
-- **A Haunting in Venice (2023)**: 32GB ISO extract → AV1
+- **Dogma (1999)**: 24GB -> AV1, ~8 hours runtime, near completion
+- **A Bug's Life (1998)**: 40GB ISO extract -> AV1, ~8 hours runtime, near completion
+- **A Haunting in Venice (2023)**: 32GB ISO extract -> AV1, ~8 hours runtime, near completion
 
-Estimated completion: 8-12 hours per file (CPU-limited by design for maximum compression).
+Estimated completion: Imminent (8+ hours elapsed, CPU-limited by design for maximum compression).
 
-### Git-Tracked Tdarr Configuration ✓
+### Git-Tracked Tdarr Configuration (COMPLETE)
 
 Created portable, git-tracked Tdarr config structure:
 - `config/tdarr/flows/` - 4 SVT-AV1 flow definitions (JSON)
@@ -26,7 +26,7 @@ Created portable, git-tracked Tdarr config structure:
 
 **Commit**: `e7be722` - Pushed to origin/main
 
-### ROM Acquisition Agent Completed ✓
+### ROM Acquisition Agent Completed
 
 6 NZBs prepared for download:
 - SMT V Vengeance (NSW): 15.29 GB
@@ -36,7 +36,7 @@ Created portable, git-tracked Tdarr config structure:
 - Suikoden II BugFix (PSX): 392 MB
 
 **Location**: `/var/mnt/fast8tb/Local/downloads/roms/nzbs/`
-**Status**: Pending manual SABnzbd UI processing (API had issues)
+**Status**: Awaiting manual SABnzbd UI upload (6 files pending)
 
 ### Tdarr Queue System Issue (Deferred)
 
@@ -61,7 +61,7 @@ Major infrastructure overhaul completed:
 - **Created docs/INDEX.md with comprehensive navigation**
 - **Archived stale docs to docs/archive/**
 - **Completed EOL/deprecated tools audit** (Readarr RETIRED)
-- **Fixed Prowlarr category sync for Mylar** (7030→7000)
+- **Fixed Prowlarr category sync for Mylar** (7030->7000)
 
 ---
 
@@ -117,13 +117,14 @@ Tailscale enabled for stable remote access despite ISP IP rotation:
 
 ### Readarr is RETIRED (June 27, 2025)
 
-**Action Required**: Replace with Bookshelf fork
+**Status**: Container not running (disabled). Security auth issue now moot.
+**Recommendation**: Migrate to Bookshelf fork when CPU frees up
 - GitHub repository archived and read-only
 - LinuxServer.io deprecated the image
 - Current version `develop-0.4.18.2805-ls157` receives NO security updates
 - Documented in `docs/decisions/2025-12-29-stack-health-audit.md`
 
-### USB Drive Content Discovery (NEW - 02:30 EST)
+### USB Drive Content Discovery (COMPLETE - 1.6TB Importable)
 
 Five USB drives connected with valuable legacy content:
 
@@ -134,6 +135,12 @@ Five USB drives connected with valuable legacy content:
 | `Slow_2TB_2` | USB SSD | 1.9TB | 854GB Anime (64 series) | **Sonarr import candidate** |
 | `Slow_2TB_1` | USB SSD | 1.9TB | Emulation/ROMs backup | Keep separate |
 | `JoeTerabyte` | NVMe thumb | 1TB | Mostly empty/junk | Wipe & repurpose |
+
+**Dedup Analysis Complete**:
+- 117 monitored-missing movies identified
+- 257 unique movies total
+- 23 unique anime series
+- **1.6TB importable content ready**
 
 **Architecture Decision**: Do NOT integrate slow drives into fast NVMe pool. Use as "inform & import" - scan, copy to pool, repurpose drives.
 
@@ -148,7 +155,7 @@ Five USB drives connected with valuable legacy content:
 | `LoudnessAnalysisBehavior` | `asap` | `scheduled` | Batches analysis |
 | `MusicAnalysisBehavior` | `asap` | `scheduled` | Batches analysis |
 
-**Result**: GPU utilization doubled (10% → 19%), thermals dropped 84°C → 83°C
+**Result**: GPU utilization doubled (10% -> 19%), thermals dropped 84C -> 83C
 
 ### Doctor Who Collection Needs Reorganization
 
@@ -319,10 +326,10 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Archive stale audit reports to docs/archive/
 - [x] Create MANGA_INTEGRATION_STATUS.md with gap analysis
 - [x] Complete EOL/deprecated tools audit (found: Readarr RETIRED)
-- [x] Fix Prowlarr category for Mylar (7030→7000)
+- [x] Fix Prowlarr category for Mylar (7030->7000)
 - [x] Analyze Doctor Who collection organization issues
 - [x] Create Suwayomi chapter organizer script (tools/suwayomi-organizer.sh)
-- [x] Create Readarr → Bookshelf migration script (tools/migrate-readarr-to-bookshelf.sh)
+- [x] Create Readarr -> Bookshelf migration script (tools/migrate-readarr-to-bookshelf.sh)
 - [x] Research and document manga collection topology (MANGA_COLLECTION_TOPOLOGY.md)
 - [x] Deep thinker adversarial review of topology (COMPLETE - a7452e9)
 - [x] Apply Plex CPU optimizations (ScannerLowPriority, BackgroundPreset, AnalysisBehavior)
@@ -330,13 +337,16 @@ Storage: 8TB NVMe (fast8tb) + 41TB MergerFS pool
 - [x] Create manga pipeline scripts (mylar-post-processor, komga-collection-sync, flatten-manga)
 - [x] Deep thinker system optimization analysis (SVT-AV1 vs GPU decision)
 - [x] Create SVT-AV1 Production v3 flow with adversarial review fixes
-- [x] Fix MergerFS CPU spike (286% → 0-34%) with RAM caching
+- [x] Fix MergerFS CPU spike (286% -> 0-34%) with RAM caching
 - [x] Configure Tailscale for stable remote access (IP: 100.115.21.9)
 - [x] Create mergerfs mount script and systemd service
 - [x] Update docs/advanced/performance.md with SVT-AV1 and MergerFS sections
 - [x] Update docs/networking.md with Tailscale configuration
 - [x] Create tdarr-flows/README.md with flow documentation
-- [ ] USB content deduplication analysis (PENDING)
+- [x] USB content deduplication analysis - COMPLETE (1.6TB importable: 117 monitored-missing, 257 unique movies, 23 unique anime)
+- [x] Documentation cleanup - COMPLETE (46 files renamed to lowercase-hyphens, commit c858d9c)
+- [x] Manga pipeline fixes - COMPLETE (Manga-Weekly dir created, SABnzbd post-processor wired)
+- [x] Tdarr config sync - COMPLETE (git-tracked flows/libraries with sync script)
 - [ ] Lidarr bootstrap with 235 artists (PENDING)
 
 ---
@@ -354,12 +364,12 @@ User handed off control for overnight autonomous operation. Directives:
 **Critical Finding**: Deep thinker analysis confirmed Tdarr was using `libx265` (CPU software encoding) instead of `hevc_vaapi` (GPU hardware encoding). This explained the 135+ load average and 100% CPU utilization.
 
 **Verification Steps Completed**:
-1. ✅ VAAPI is available in Tdarr container (`vainfo` shows AMD 780M with HEVC encode support)
-2. ✅ DRI devices mounted correctly (`/dev/dri/renderD128` accessible)
-3. ✅ FFmpeg VAAPI test successful inside container: `hevc_vaapi` encoder works at `4.57x` speed
-4. ✅ Tdarr node reports `hevc_vaapi-true-true` (encoder enabled AND working)
-5. ⚠️ Switched libraries from Flow mode to Plugin mode with `Tdarr_Plugin_00td_action_transcode`
-6. ⚠️ Workers not spawning (0 running) despite correct configuration
+1. VAAPI is available in Tdarr container (`vainfo` shows AMD 780M with HEVC encode support)
+2. DRI devices mounted correctly (`/dev/dri/renderD128` accessible)
+3. FFmpeg VAAPI test successful inside container: `hevc_vaapi` encoder works at `4.57x` speed
+4. Tdarr node reports `hevc_vaapi-true-true` (encoder enabled AND working)
+5. Switched libraries from Flow mode to Plugin mode with `Tdarr_Plugin_00td_action_transcode`
+6. Workers not spawning (0 running) despite correct configuration
 
 **Current Blocker**:
 - FATAL errors during file scanning: `TypeError: Cannot read properties of undefined (reading 'on')`
@@ -369,7 +379,7 @@ User handed off control for overnight autonomous operation. Directives:
 - **Root Cause Under Investigation**: JavaScript runtime error in `scanFilesInternal`
 
 **System Impact**:
-- Load average dropped from **135 → 43** (Tdarr not transcoding = less CPU)
+- Load average dropped from **135 -> 43** (Tdarr not transcoding = less CPU)
 - Need to fix worker dispatch to utilize VAAPI properly
 
 ### Completed During Overnight Session
@@ -400,6 +410,7 @@ User handed off control for overnight autonomous operation. Directives:
 ## Active Git Commits (This Session)
 
 ```
+c858d9c docs: rename 46 files to lowercase-hyphens convention
 b1e7c1d feat(tools): add USB import tools for Lidarr and Radarr
 2911ca9 docs: overnight session - USB inventory and Tdarr error analysis
 a7452e9 docs(manga): adversarial review - edge cases, 4-digit padding, migration phases
@@ -418,29 +429,52 @@ cd8ac90 fix(tdarr): GPU-only config, monitoring tools, error recovery
 ## Next Steps
 
 ### Immediate (Priority Order)
-1. Install mergerfs systemd service for boot persistence:
+1. **Post-transcode**: Move completed AV1 files to pool, start next batch
+2. ROM NZBs: Upload 6 files to SABnzbd manually
+3. Install mergerfs systemd service for boot persistence:
    ```bash
    sudo cp ~/.local/bin/mergerfs-pool.service /etc/systemd/system/
    sudo systemctl daemon-reload
    sudo systemctl enable mergerfs-pool.service
    ```
-2. Configure Plex network settings for Tailscale (custom URLs, LAN networks)
-3. Verify SVT-AV1 encoding is producing expected 65-80% size reductions
 
 ### Short-Term
-1. Replace Readarr with Bookshelf fork (see `docs/decisions/2025-12-29-stack-health-audit.md`)
-2. Reorganize Doctor Who collection (manual curation required)
-3. Test Mylar search with new Prowlarr category
+1. **Bookshelf migration prep** when CPU frees up (Readarr replacement)
+2. **USB content import** (1.6TB) - 117 missing movies, 257 unique, 23 anime
+3. Reorganize Doctor Who collection (manual curation required)
+4. Test Mylar search with new Prowlarr category
 
 ### Medium-Term
-1. Run Komf metadata enrichment on manga collection
-2. Wire manga-torrent-searcher agent for weekly chapter automation
-3. Upgrade Recyclarr to Remux + WEB 2160p profile
+1. Lidarr bootstrap with 235 artists from USB
+2. Run Komf metadata enrichment on manga collection
+3. Wire manga-torrent-searcher agent for weekly chapter automation
+4. Upgrade Recyclarr to Remux + WEB 2160p profile
 
 ### Completed This Session
 - [x] Adversarial topology review (23 weaknesses analyzed, addressed)
 - [x] 4-digit padding update in suwayomi-organizer.sh
 - [x] Edge case naming conventions documented
+- [x] USB content dedup analysis (1.6TB importable)
+- [x] Documentation cleanup (46 files renamed)
+- [x] Manga pipeline fixes (Manga-Weekly, SABnzbd post-processor)
+- [x] Tdarr config sync (git-tracked)
+
+---
+
+## Pending Items
+
+### ROM NZBs (6 files awaiting manual upload)
+**Location**: `/var/mnt/fast8tb/Local/downloads/roms/nzbs/`
+- SMT V Vengeance (NSW): 15.29 GB
+- Vagrant Story (PSX): 167.7 MB
+- Legend of Mana (PSX): 455 MB
+- Mega Man Legends 1 & 2 (PSX): 568 MB total
+- Suikoden II BugFix (PSX): 392 MB
+
+### Readarr Status
+- Container not running (disabled)
+- Security auth issue now moot
+- **Recommendation**: Migrate to Bookshelf fork when CPU frees up
 
 ---
 
