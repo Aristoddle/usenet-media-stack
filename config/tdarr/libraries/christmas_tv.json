@@ -1,0 +1,815 @@
+{
+    "_id": "RG04kKCkz",
+    "priority": 5,
+    "name": "Christmas TV",
+    "folder": "/pool/christmas-tv",
+    "foldersToIgnore": "",
+    "foldersToIgnoreCaseInsensitive": false,
+    "folderWatchScanInterval": 30,
+    "scannerThreadCount": 2,
+    "cache": "/temp",
+    "output": ".",
+    "folderToFolderConversion": false,
+    "folderToFolderConversionDeleteSource": false,
+    "folderToFolderRecordHistory": true,
+    "copyIfConditionsMet": false,
+    "container": ".mkv",
+    "containerFilter": "mkv,mp4,mov,m4v,mpg,mpeg,avi,flv,webm,wmv,vob,evo,iso,m2ts,ts",
+    "createdAt": 1675837380368,
+    "folderWatching": true,
+    "useFsEvents": true,
+    "scheduledScanFindNew": true,
+    "processLibrary": true,
+    "processTranscodes": true,
+    "processHealthChecks": true,
+    "scanOnStart": true,
+    "exifToolScan": true,
+    "mediaInfoScan": true,
+    "ffprobeShowData": false,
+    "isDirectoryLibrary": false,
+    "closedCaptionScan": true,
+    "scanButtons": true,
+    "scanFound": "Files found:0",
+    "navItemSelected": "navSourceFolder",
+    "pluginIDs": [
+        {
+            "_id": "plugin1",
+            "id": "Tdarr_Plugin_MC93_MigzImageRemoval",
+            "checked": true,
+            "source": "Community",
+            "priority": 0,
+            "InputsDB": {}
+        },
+        {
+            "_id": "plugin2",
+            "id": "Tdarr_Plugin_lmg1_Reorder_Streams",
+            "checked": true,
+            "source": "Community",
+            "priority": 1,
+            "InputsDB": {}
+        },
+        {
+            "_id": "plugin3",
+            "id": "Tdarr_Plugin_MC93_Migz1FFMPEG_CPU",
+            "checked": true,
+            "source": "Community",
+            "priority": 2,
+            "InputsDB": {}
+        },
+        {
+            "_id": "plugin4",
+            "id": "Tdarr_Plugin_MC93_Migz1FFMPEG",
+            "checked": false,
+            "source": "Community",
+            "priority": 3,
+            "InputsDB": {}
+        },
+        {
+            "_id": "plugin5",
+            "id": "Tdarr_Plugin_a9he_New_file_size_check",
+            "checked": true,
+            "source": "Community",
+            "priority": 4,
+            "InputsDB": {}
+        }
+    ],
+    "pluginCommunity": true,
+    "handbrake": true,
+    "ffmpeg": false,
+    "handbrakescan": true,
+    "ffmpegscan": false,
+    "preset": "-Z \"Very Fast 1080p30\"",
+    "decisionMaker": {
+        "settingsPlugin": false,
+        "settingsFlows": true,
+        "settingsVideo": false,
+        "videoExcludeSwitch": true,
+        "video_codec_names_exclude": [
+            {
+                "codec": "hevc",
+                "checked": false
+            },
+            {
+                "codec": "h264",
+                "checked": true
+            }
+        ],
+        "video_size_range_include": {
+            "min": 0,
+            "max": 100000
+        },
+        "video_height_range_include": {
+            "min": 0,
+            "max": 3000
+        },
+        "video_width_range_include": {
+            "min": 0,
+            "max": 4000
+        },
+        "settingsAudio": false,
+        "audioExcludeSwitch": true,
+        "audio_codec_names_exclude": [
+            {
+                "codec": "mp3",
+                "checked": true
+            },
+            {
+                "codec": "aac",
+                "checked": false
+            }
+        ],
+        "audio_size_range_include": {
+            "min": 0,
+            "max": 10
+        }
+    },
+    "schedule": [
+        {
+            "_id": "Sun:00-01",
+            "checked": true
+        },
+        {
+            "_id": "Sun:01-02",
+            "checked": true
+        },
+        {
+            "_id": "Sun:02-03",
+            "checked": true
+        },
+        {
+            "_id": "Sun:03-04",
+            "checked": true
+        },
+        {
+            "_id": "Sun:04-05",
+            "checked": true
+        },
+        {
+            "_id": "Sun:05-06",
+            "checked": true
+        },
+        {
+            "_id": "Sun:06-07",
+            "checked": true
+        },
+        {
+            "_id": "Sun:07-08",
+            "checked": true
+        },
+        {
+            "_id": "Sun:08-09",
+            "checked": true
+        },
+        {
+            "_id": "Sun:09-10",
+            "checked": true
+        },
+        {
+            "_id": "Sun:10-11",
+            "checked": true
+        },
+        {
+            "_id": "Sun:11-12",
+            "checked": true
+        },
+        {
+            "_id": "Sun:12-13",
+            "checked": true
+        },
+        {
+            "_id": "Sun:13-14",
+            "checked": true
+        },
+        {
+            "_id": "Sun:14-15",
+            "checked": true
+        },
+        {
+            "_id": "Sun:15-16",
+            "checked": true
+        },
+        {
+            "_id": "Sun:16-17",
+            "checked": true
+        },
+        {
+            "_id": "Sun:17-18",
+            "checked": true
+        },
+        {
+            "_id": "Sun:18-19",
+            "checked": true
+        },
+        {
+            "_id": "Sun:19-20",
+            "checked": true
+        },
+        {
+            "_id": "Sun:20-21",
+            "checked": true
+        },
+        {
+            "_id": "Sun:21-22",
+            "checked": true
+        },
+        {
+            "_id": "Sun:22-23",
+            "checked": true
+        },
+        {
+            "_id": "Sun:23-00",
+            "checked": true
+        },
+        {
+            "_id": "Mon:00-01",
+            "checked": true
+        },
+        {
+            "_id": "Mon:01-02",
+            "checked": true
+        },
+        {
+            "_id": "Mon:02-03",
+            "checked": true
+        },
+        {
+            "_id": "Mon:03-04",
+            "checked": true
+        },
+        {
+            "_id": "Mon:04-05",
+            "checked": true
+        },
+        {
+            "_id": "Mon:05-06",
+            "checked": true
+        },
+        {
+            "_id": "Mon:06-07",
+            "checked": true
+        },
+        {
+            "_id": "Mon:07-08",
+            "checked": true
+        },
+        {
+            "_id": "Mon:08-09",
+            "checked": true
+        },
+        {
+            "_id": "Mon:09-10",
+            "checked": true
+        },
+        {
+            "_id": "Mon:10-11",
+            "checked": true
+        },
+        {
+            "_id": "Mon:11-12",
+            "checked": true
+        },
+        {
+            "_id": "Mon:12-13",
+            "checked": true
+        },
+        {
+            "_id": "Mon:13-14",
+            "checked": true
+        },
+        {
+            "_id": "Mon:14-15",
+            "checked": true
+        },
+        {
+            "_id": "Mon:15-16",
+            "checked": true
+        },
+        {
+            "_id": "Mon:16-17",
+            "checked": true
+        },
+        {
+            "_id": "Mon:17-18",
+            "checked": true
+        },
+        {
+            "_id": "Mon:18-19",
+            "checked": true
+        },
+        {
+            "_id": "Mon:19-20",
+            "checked": true
+        },
+        {
+            "_id": "Mon:20-21",
+            "checked": true
+        },
+        {
+            "_id": "Mon:21-22",
+            "checked": true
+        },
+        {
+            "_id": "Mon:22-23",
+            "checked": true
+        },
+        {
+            "_id": "Mon:23-00",
+            "checked": true
+        },
+        {
+            "_id": "Tue:00-01",
+            "checked": true
+        },
+        {
+            "_id": "Tue:01-02",
+            "checked": true
+        },
+        {
+            "_id": "Tue:02-03",
+            "checked": true
+        },
+        {
+            "_id": "Tue:03-04",
+            "checked": true
+        },
+        {
+            "_id": "Tue:04-05",
+            "checked": true
+        },
+        {
+            "_id": "Tue:05-06",
+            "checked": true
+        },
+        {
+            "_id": "Tue:06-07",
+            "checked": true
+        },
+        {
+            "_id": "Tue:07-08",
+            "checked": true
+        },
+        {
+            "_id": "Tue:08-09",
+            "checked": true
+        },
+        {
+            "_id": "Tue:09-10",
+            "checked": true
+        },
+        {
+            "_id": "Tue:10-11",
+            "checked": true
+        },
+        {
+            "_id": "Tue:11-12",
+            "checked": true
+        },
+        {
+            "_id": "Tue:12-13",
+            "checked": true
+        },
+        {
+            "_id": "Tue:13-14",
+            "checked": true
+        },
+        {
+            "_id": "Tue:14-15",
+            "checked": true
+        },
+        {
+            "_id": "Tue:15-16",
+            "checked": true
+        },
+        {
+            "_id": "Tue:16-17",
+            "checked": true
+        },
+        {
+            "_id": "Tue:17-18",
+            "checked": true
+        },
+        {
+            "_id": "Tue:18-19",
+            "checked": true
+        },
+        {
+            "_id": "Tue:19-20",
+            "checked": true
+        },
+        {
+            "_id": "Tue:20-21",
+            "checked": true
+        },
+        {
+            "_id": "Tue:21-22",
+            "checked": true
+        },
+        {
+            "_id": "Tue:22-23",
+            "checked": true
+        },
+        {
+            "_id": "Tue:23-00",
+            "checked": true
+        },
+        {
+            "_id": "Wed:00-01",
+            "checked": true
+        },
+        {
+            "_id": "Wed:01-02",
+            "checked": true
+        },
+        {
+            "_id": "Wed:02-03",
+            "checked": true
+        },
+        {
+            "_id": "Wed:03-04",
+            "checked": true
+        },
+        {
+            "_id": "Wed:04-05",
+            "checked": true
+        },
+        {
+            "_id": "Wed:05-06",
+            "checked": true
+        },
+        {
+            "_id": "Wed:06-07",
+            "checked": true
+        },
+        {
+            "_id": "Wed:07-08",
+            "checked": true
+        },
+        {
+            "_id": "Wed:08-09",
+            "checked": true
+        },
+        {
+            "_id": "Wed:09-10",
+            "checked": true
+        },
+        {
+            "_id": "Wed:10-11",
+            "checked": true
+        },
+        {
+            "_id": "Wed:11-12",
+            "checked": true
+        },
+        {
+            "_id": "Wed:12-13",
+            "checked": true
+        },
+        {
+            "_id": "Wed:13-14",
+            "checked": true
+        },
+        {
+            "_id": "Wed:14-15",
+            "checked": true
+        },
+        {
+            "_id": "Wed:15-16",
+            "checked": true
+        },
+        {
+            "_id": "Wed:16-17",
+            "checked": true
+        },
+        {
+            "_id": "Wed:17-18",
+            "checked": true
+        },
+        {
+            "_id": "Wed:18-19",
+            "checked": true
+        },
+        {
+            "_id": "Wed:19-20",
+            "checked": true
+        },
+        {
+            "_id": "Wed:20-21",
+            "checked": true
+        },
+        {
+            "_id": "Wed:21-22",
+            "checked": true
+        },
+        {
+            "_id": "Wed:22-23",
+            "checked": true
+        },
+        {
+            "_id": "Wed:23-00",
+            "checked": true
+        },
+        {
+            "_id": "Thur:00-01",
+            "checked": true
+        },
+        {
+            "_id": "Thur:01-02",
+            "checked": true
+        },
+        {
+            "_id": "Thur:02-03",
+            "checked": true
+        },
+        {
+            "_id": "Thur:03-04",
+            "checked": true
+        },
+        {
+            "_id": "Thur:04-05",
+            "checked": true
+        },
+        {
+            "_id": "Thur:05-06",
+            "checked": true
+        },
+        {
+            "_id": "Thur:06-07",
+            "checked": true
+        },
+        {
+            "_id": "Thur:07-08",
+            "checked": true
+        },
+        {
+            "_id": "Thur:08-09",
+            "checked": true
+        },
+        {
+            "_id": "Thur:09-10",
+            "checked": true
+        },
+        {
+            "_id": "Thur:10-11",
+            "checked": true
+        },
+        {
+            "_id": "Thur:11-12",
+            "checked": true
+        },
+        {
+            "_id": "Thur:12-13",
+            "checked": true
+        },
+        {
+            "_id": "Thur:13-14",
+            "checked": true
+        },
+        {
+            "_id": "Thur:14-15",
+            "checked": true
+        },
+        {
+            "_id": "Thur:15-16",
+            "checked": true
+        },
+        {
+            "_id": "Thur:16-17",
+            "checked": true
+        },
+        {
+            "_id": "Thur:17-18",
+            "checked": true
+        },
+        {
+            "_id": "Thur:18-19",
+            "checked": true
+        },
+        {
+            "_id": "Thur:19-20",
+            "checked": true
+        },
+        {
+            "_id": "Thur:20-21",
+            "checked": true
+        },
+        {
+            "_id": "Thur:21-22",
+            "checked": true
+        },
+        {
+            "_id": "Thur:22-23",
+            "checked": true
+        },
+        {
+            "_id": "Thur:23-00",
+            "checked": true
+        },
+        {
+            "_id": "Fri:00-01",
+            "checked": true
+        },
+        {
+            "_id": "Fri:01-02",
+            "checked": true
+        },
+        {
+            "_id": "Fri:02-03",
+            "checked": true
+        },
+        {
+            "_id": "Fri:03-04",
+            "checked": true
+        },
+        {
+            "_id": "Fri:04-05",
+            "checked": true
+        },
+        {
+            "_id": "Fri:05-06",
+            "checked": true
+        },
+        {
+            "_id": "Fri:06-07",
+            "checked": true
+        },
+        {
+            "_id": "Fri:07-08",
+            "checked": true
+        },
+        {
+            "_id": "Fri:08-09",
+            "checked": true
+        },
+        {
+            "_id": "Fri:09-10",
+            "checked": true
+        },
+        {
+            "_id": "Fri:10-11",
+            "checked": true
+        },
+        {
+            "_id": "Fri:11-12",
+            "checked": true
+        },
+        {
+            "_id": "Fri:12-13",
+            "checked": true
+        },
+        {
+            "_id": "Fri:13-14",
+            "checked": true
+        },
+        {
+            "_id": "Fri:14-15",
+            "checked": true
+        },
+        {
+            "_id": "Fri:15-16",
+            "checked": true
+        },
+        {
+            "_id": "Fri:16-17",
+            "checked": true
+        },
+        {
+            "_id": "Fri:17-18",
+            "checked": true
+        },
+        {
+            "_id": "Fri:18-19",
+            "checked": true
+        },
+        {
+            "_id": "Fri:19-20",
+            "checked": true
+        },
+        {
+            "_id": "Fri:20-21",
+            "checked": true
+        },
+        {
+            "_id": "Fri:21-22",
+            "checked": true
+        },
+        {
+            "_id": "Fri:22-23",
+            "checked": true
+        },
+        {
+            "_id": "Fri:23-00",
+            "checked": true
+        },
+        {
+            "_id": "Sat:00-01",
+            "checked": true
+        },
+        {
+            "_id": "Sat:01-02",
+            "checked": true
+        },
+        {
+            "_id": "Sat:02-03",
+            "checked": true
+        },
+        {
+            "_id": "Sat:03-04",
+            "checked": true
+        },
+        {
+            "_id": "Sat:04-05",
+            "checked": true
+        },
+        {
+            "_id": "Sat:05-06",
+            "checked": true
+        },
+        {
+            "_id": "Sat:06-07",
+            "checked": true
+        },
+        {
+            "_id": "Sat:07-08",
+            "checked": true
+        },
+        {
+            "_id": "Sat:08-09",
+            "checked": true
+        },
+        {
+            "_id": "Sat:09-10",
+            "checked": true
+        },
+        {
+            "_id": "Sat:10-11",
+            "checked": true
+        },
+        {
+            "_id": "Sat:11-12",
+            "checked": true
+        },
+        {
+            "_id": "Sat:12-13",
+            "checked": true
+        },
+        {
+            "_id": "Sat:13-14",
+            "checked": true
+        },
+        {
+            "_id": "Sat:14-15",
+            "checked": true
+        },
+        {
+            "_id": "Sat:15-16",
+            "checked": true
+        },
+        {
+            "_id": "Sat:16-17",
+            "checked": true
+        },
+        {
+            "_id": "Sat:17-18",
+            "checked": true
+        },
+        {
+            "_id": "Sat:18-19",
+            "checked": true
+        },
+        {
+            "_id": "Sat:19-20",
+            "checked": true
+        },
+        {
+            "_id": "Sat:20-21",
+            "checked": true
+        },
+        {
+            "_id": "Sat:21-22",
+            "checked": true
+        },
+        {
+            "_id": "Sat:22-23",
+            "checked": true
+        },
+        {
+            "_id": "Sat:23-00",
+            "checked": true
+        }
+    ],
+    "totalHealthCheckCount": 0,
+    "totalTranscodeCount": 0,
+    "sizeDiff": 0,
+    "holdNewFiles": false,
+    "holdFor": 3600,
+    "holdForDisplayUnit": "hours",
+    "pluginStackOverview": true,
+    "filterResolutionsSkip": "",
+    "filterCodecsSkip": "",
+    "filterContainersSkip": "",
+    "processPluginsSequentially": true,
+    "flowId": "svt_av1_optimized",
+    "folderWatcherScanInterval": 60,
+    "enabled": 1,
+    "folderWatch": 1
+}

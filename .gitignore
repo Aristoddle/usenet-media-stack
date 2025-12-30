@@ -79,6 +79,16 @@ volumes/
 !config/templates/
 !config/examples/
 
+# Allow Tdarr git-tracked configuration (flows, libraries, scripts)
+!config/tdarr/
+config/tdarr/server/
+config/tdarr/configs/
+config/tdarr/logs/
+!config/tdarr/flows/
+!config/tdarr/libraries/
+!config/tdarr/*.sh
+!config/tdarr/*.md
+
 # Allow documentation but ignore build artifacts
 !README.md
 !docs/

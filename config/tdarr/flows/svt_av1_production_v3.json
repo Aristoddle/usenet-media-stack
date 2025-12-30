@@ -1,0 +1,314 @@
+{
+    "_id": "svt_av1_production_v3",
+    "name": "SVT-AV1 Production v3 (Fixed)",
+    "description": "Production SVT-AV1 with all fixes: thread mgmt (lp=2), film-grain=8, proper VAAPI decode, correct plugin names. Skips AV1/VP9, bloated HEVC.",
+    "priority": 0,
+    "flowPlugins": [
+        {
+            "name": "Input File",
+            "sourceRepo": "Community",
+            "pluginName": "inputFile",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "input_001",
+            "position": {
+                "x": 500,
+                "y": 50
+            },
+            "inputsDB": {}
+        },
+        {
+            "name": "Skip if AV1",
+            "sourceRepo": "Community",
+            "pluginName": "checkVideoCodec",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "checkAV1_002",
+            "position": {
+                "x": 500,
+                "y": 150
+            },
+            "inputsDB": {
+                "codecsToProcess": "av1"
+            }
+        },
+        {
+            "name": "Skip if VP9",
+            "sourceRepo": "Community",
+            "pluginName": "checkVideoCodec",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "checkVP9_003",
+            "position": {
+                "x": 350,
+                "y": 250
+            },
+            "inputsDB": {
+                "codecsToProcess": "vp9"
+            }
+        },
+        {
+            "name": "Check if HEVC",
+            "sourceRepo": "Community",
+            "pluginName": "checkVideoCodec",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "checkHEVC_004",
+            "position": {
+                "x": 200,
+                "y": 350
+            },
+            "inputsDB": {
+                "codecsToProcess": "hevc"
+            }
+        },
+        {
+            "name": "HEVC Bitrate >6Mbps",
+            "sourceRepo": "Community",
+            "pluginName": "checkVideoBitrate",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "checkBitrate_005",
+            "position": {
+                "x": 100,
+                "y": 450
+            },
+            "inputsDB": {
+                "unit": "kbps",
+                "greaterThan": "6000",
+                "lessThan": ""
+            }
+        },
+        {
+            "name": "FFmpeg Start",
+            "sourceRepo": "Community",
+            "pluginName": "ffmpegCommandStart",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "ffmpegStart_006",
+            "position": {
+                "x": 500,
+                "y": 550
+            },
+            "inputsDB": {
+                "inputArgs": "-hwaccel vaapi -hwaccel_device /dev/dri/renderD128"
+            }
+        },
+        {
+            "name": "SVT-AV1 Encode",
+            "sourceRepo": "Community",
+            "pluginName": "ffmpegCommandCustomArguments",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "customArgs_007",
+            "position": {
+                "x": 500,
+                "y": 650
+            },
+            "inputsDB": {
+                "customArguments": "-map 0 -c:v libsvtav1 -crf 30 -preset 5 -pix_fmt yuv420p10le -svtav1-params tune=0:enable-overlays=1:scd=1:film-grain=8:keyint=10s:lp=2:pin=0 -c:a copy -c:s copy -max_muxing_queue_size 9999"
+            }
+        },
+        {
+            "name": "Set Container MKV",
+            "sourceRepo": "Community",
+            "pluginName": "ffmpegCommandSetContainer",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "setContainer_008",
+            "position": {
+                "x": 500,
+                "y": 750
+            },
+            "inputsDB": {
+                "container": "mkv"
+            }
+        },
+        {
+            "name": "Execute FFmpeg",
+            "sourceRepo": "Community",
+            "pluginName": "ffmpegCommandExecute",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "ffmpegExec_009",
+            "position": {
+                "x": 500,
+                "y": 850
+            },
+            "inputsDB": {}
+        },
+        {
+            "name": "Compare File Size",
+            "sourceRepo": "Community",
+            "pluginName": "compareFileSizeRatio",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "compareSize_010",
+            "position": {
+                "x": 500,
+                "y": 950
+            },
+            "inputsDB": {}
+        },
+        {
+            "name": "Replace Original",
+            "sourceRepo": "Community",
+            "pluginName": "replaceOriginalFile",
+            "version": "1.0.0",
+            "fpEnabled": true,
+            "id": "replace_011",
+            "position": {
+                "x": 650,
+                "y": 1050
+            },
+            "inputsDB": {}
+        }
+    ],
+    "flowEdges": [
+        {
+            "source": "input_001",
+            "sourceHandle": "1",
+            "target": "checkAV1_002",
+            "targetHandle": null,
+            "id": "e01",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkAV1_002",
+            "sourceHandle": "1",
+            "target": "replace_011",
+            "targetHandle": null,
+            "id": "e02",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkAV1_002",
+            "sourceHandle": "2",
+            "target": "checkVP9_003",
+            "targetHandle": null,
+            "id": "e03",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkVP9_003",
+            "sourceHandle": "1",
+            "target": "replace_011",
+            "targetHandle": null,
+            "id": "e04",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkVP9_003",
+            "sourceHandle": "2",
+            "target": "checkHEVC_004",
+            "targetHandle": null,
+            "id": "e05",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkHEVC_004",
+            "sourceHandle": "1",
+            "target": "checkBitrate_005",
+            "targetHandle": null,
+            "id": "e06",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkHEVC_004",
+            "sourceHandle": "2",
+            "target": "ffmpegStart_006",
+            "targetHandle": null,
+            "id": "e07",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkBitrate_005",
+            "sourceHandle": "1",
+            "target": "ffmpegStart_006",
+            "targetHandle": null,
+            "id": "e08",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "checkBitrate_005",
+            "sourceHandle": "2",
+            "target": "replace_011",
+            "targetHandle": null,
+            "id": "e09",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "ffmpegStart_006",
+            "sourceHandle": "1",
+            "target": "customArgs_007",
+            "targetHandle": null,
+            "id": "e10",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "customArgs_007",
+            "sourceHandle": "1",
+            "target": "setContainer_008",
+            "targetHandle": null,
+            "id": "e11",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "setContainer_008",
+            "sourceHandle": "1",
+            "target": "ffmpegExec_009",
+            "targetHandle": null,
+            "id": "e12",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "ffmpegExec_009",
+            "sourceHandle": "1",
+            "target": "compareSize_010",
+            "targetHandle": null,
+            "id": "e13",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "ffmpegExec_009",
+            "sourceHandle": "2",
+            "target": "replace_011",
+            "targetHandle": null,
+            "id": "e15",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "compareSize_010",
+            "sourceHandle": "1",
+            "target": "replace_011",
+            "targetHandle": null,
+            "id": "e14",
+            "animated": true,
+            "type": "smoothstep"
+        },
+        {
+            "source": "compareSize_010",
+            "sourceHandle": "2",
+            "target": "replace_011",
+            "targetHandle": null,
+            "id": "e16",
+            "animated": true,
+            "type": "smoothstep"
+        }
+    ],
+    "isUiLocked": false
+}
