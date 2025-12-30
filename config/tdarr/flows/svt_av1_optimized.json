@@ -1,7 +1,7 @@
 {
     "_id": "svt_av1_optimized",
     "name": "SVT-AV1 Optimized (Storage Max)",
-    "description": "Maximum compression with SVT-AV1 preset 5, CRF 30. Uses VAAPI for decode acceleration. Skips existing AV1 only. Transcodes ALL other codecs (H.264, HEVC, MPEG2, etc) regardless of bitrate.",
+    "description": "Maximum compression with SVT-AV1 preset 5, CRF 30. CPU-only (no VAAPI). Skips existing AV1 only. Transcodes ALL other codecs (H.264, HEVC, MPEG2, etc) regardless of bitrate.",
     "priority": 0,
     "flowPlugins": [
         {
@@ -33,7 +33,7 @@
             }
         },
         {
-            "name": "FFmpeg Start (VAAPI Decode)",
+            "name": "FFmpeg Start (CPU)",
             "sourceRepo": "Community",
             "pluginName": "ffmpegCommandStart",
             "version": "1.0.0",
@@ -44,7 +44,7 @@
                 "y": 300
             },
             "inputsDB": {
-                "inputArgs": "-hwaccel vaapi -hwaccel_device /dev/dri/renderD128 -hwaccel_output_format vaapi"
+                "inputArgs": ""
             }
         },
         {
