@@ -921,6 +921,45 @@ services:
     ports:
       - 6800:6800
     restart: unless-stopped
+  # MakeMKV - Blu-ray/DVD ISO extraction pipeline
+  # Extracts main title from ISOs for Tdarr transcoding
+  # Stage 1: ISO → MKV (lossless), Stage 2: Tdarr MKV → AV1
+  makemkv:
+    <<: *network_tweaks
+    image: jlesage/makemkv:latest
+    container_name: makemkv
+    hostname: makemkv
+    environment:
+      - USER_ID=1000
+      - GROUP_ID=1000
+      - TZ=America/Los_Angeles
+      # Auto-fetch latest beta key (valid for 2 months)
+      - MAKEMKV_KEY=BETA
+      # Disable disc ripper (we only process ISOs)
+      - AUTO_DISC_RIPPER=0
+    volumes:
+      - ${CONFIG_ROOT:-/srv/usenet/config}/makemkv:/config:rw,z
+      # Read ISOs from pool/movies (read-only for safety)
+      - ${POOL_ROOT:-/var/mnt/pool}:/pool:ro
+      # Write extracted MKVs to staging area
+      - ${DOWNLOADS_ROOT:-/srv/usenet/downloads}/makemkv-output:/output:rw,z
+    ports:
+      - 5800:5800  # Web GUI
+      - 5900:5900  # VNC (optional)
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    logging:
+      driver: json-file
+      options: *id002
   tautulli:
     <<: *network_tweaks
     image: lscr.io/linuxserver/tautulli:latest

@@ -118,7 +118,7 @@
     {
       "name": "Keep Original (encode grew)",
       "sourceRepo": "Community",
-      "pluginName": "keepOriginalFile",
+      "pluginName": "setOriginalFile",
       "version": "1.0.0",
       "fpEnabled": true,
       "id": "keepOrig_011",

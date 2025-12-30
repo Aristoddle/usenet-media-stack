@@ -137,7 +137,9 @@
     {"source": "customArgs_007", "sourceHandle": "1", "target": "setContainer_008", "targetHandle": null, "id": "e11", "animated": true, "type": "smoothstep"},
     {"source": "setContainer_008", "sourceHandle": "1", "target": "ffmpegExec_009", "targetHandle": null, "id": "e12", "animated": true, "type": "smoothstep"},
     {"source": "ffmpegExec_009", "sourceHandle": "1", "target": "compareSize_010", "targetHandle": null, "id": "e13", "animated": true, "type": "smoothstep"},
-    {"source": "compareSize_010", "sourceHandle": "1", "target": "replace_011", "targetHandle": null, "id": "e14", "animated": true, "type": "smoothstep"}
+    {"source": "ffmpegExec_009", "sourceHandle": "2", "target": "replace_011", "targetHandle": null, "id": "e15", "animated": true, "type": "smoothstep"},
+    {"source": "compareSize_010", "sourceHandle": "1", "target": "replace_011", "targetHandle": null, "id": "e14", "animated": true, "type": "smoothstep"},
+    {"source": "compareSize_010", "sourceHandle": "2", "target": "replace_011", "targetHandle": null, "id": "e16", "animated": true, "type": "smoothstep"}
   ],
   "isUiLocked": false
 }

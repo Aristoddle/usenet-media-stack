@@ -1,0 +1,29 @@
+[Unit]
+Description=Blu-ray ISO to MKV Processor (MakeMKV Pipeline)
+Documentation=file:///var/home/deck/Documents/Code/media-automation/usenet-media-stack/docs/STORAGE_AND_REMOTE_ACCESS.md
+After=docker.service mergerfs-pool.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=deck
+Group=deck
+WorkingDirectory=/var/home/deck/Documents/Code/media-automation/usenet-media-stack
+
+# Environment
+Environment=POOL_ROOT=/var/mnt/pool
+Environment=MAKEMKV_OUTPUT=/var/mnt/fast8tb/Local/downloads/makemkv-output
+Environment=MAKEMKV_MIN_LENGTH=3600
+
+# Watch mode - continuously monitors for new ISOs
+ExecStart=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/iso-to-mkv-processor.sh --watch
+
+Restart=on-failure
+RestartSec=30
+
+# Security hardening
+NoNewPrivileges=true
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target
