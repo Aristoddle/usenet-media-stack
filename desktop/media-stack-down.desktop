@@ -1,0 +1,35 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Media Stack - Stop
+GenericName=Stop Media Stack
+Comment=Gracefully shut down all media services
+Icon=system-shutdown
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-down.sh
+Terminal=true
+Categories=System;Utility;
+Keywords=media;docker;stop;shutdown;
+StartupNotify=true
+
+# KDE-specific
+X-KDE-StartupNotify=true
+
+# Steam Deck / Gamescope compatibility
+X-Flatpak-RenamedFrom=media-stack-down
+
+Actions=quick;force;status;
+
+[Desktop Action quick]
+Name=Quick Stop (30s timeout)
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-down.sh --quick
+Icon=media-playback-stop
+
+[Desktop Action force]
+Name=Force Stop (Emergency)
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-down.sh --force
+Icon=dialog-warning
+
+[Desktop Action status]
+Name=Check Active Jobs
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-down.sh --status
+Icon=dialog-information

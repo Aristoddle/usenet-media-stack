@@ -1,0 +1,30 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Media Stack - Local
+GenericName=Local Media Stack
+Comment=Start local services only (comics, books, audiobooks - no external drives needed)
+Icon=folder-documents
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-up-local.sh
+Terminal=true
+Categories=System;Utility;
+Keywords=media;docker;komga;kavita;audiobookshelf;comics;books;
+StartupNotify=true
+
+# KDE-specific
+X-KDE-StartupNotify=true
+
+# Steam Deck / Gamescope compatibility
+X-Flatpak-RenamedFrom=media-stack-local
+
+Actions=status;upgrade;
+
+[Desktop Action status]
+Name=Show Status
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-up-local.sh --status
+Icon=dialog-information
+
+[Desktop Action upgrade]
+Name=Upgrade to Full Stack
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-up-local.sh --upgrade
+Icon=go-up

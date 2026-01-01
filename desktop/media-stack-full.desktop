@@ -1,0 +1,30 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Media Stack - Full
+GenericName=Full Media Stack
+Comment=Start all media services (requires external drive pool)
+Icon=server-database
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-up-full.sh --local-on-fail
+Terminal=true
+Categories=System;Utility;
+Keywords=media;docker;plex;sonarr;radarr;tdarr;
+StartupNotify=true
+
+# KDE-specific
+X-KDE-StartupNotify=true
+
+# Steam Deck / Gamescope compatibility
+X-Flatpak-RenamedFrom=media-stack-full
+
+Actions=force;check;
+
+[Desktop Action force]
+Name=Start (Skip Checks)
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-up-full.sh --force
+Icon=dialog-warning
+
+[Desktop Action check]
+Name=Check Storage Only
+Exec=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-up-full.sh --check-only
+Icon=drive-harddisk
