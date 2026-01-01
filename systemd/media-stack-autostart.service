@@ -1,0 +1,33 @@
+[Unit]
+Description=Media Stack Auto-Start (detects drive mode)
+Documentation=file:///var/home/deck/Documents/Code/media-automation/usenet-media-stack/docs/BOOT_AND_LAUNCHERS.md
+
+# Start after Docker is ready, but don't block graphical session
+After=docker.service network-online.target
+Wants=docker.service
+
+# Don't require the pool - we'll detect if it's available
+# RequiresMountsFor=/var/mnt/fast8tb
+
+# This is a user service, runs as deck
+# If drives aren't attached, we still want to boot successfully
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# The autostart script handles detection and mode selection
+ExecStart=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-autostart.sh
+
+# On stop, gracefully shut down whatever mode we're in
+ExecStop=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/stack-down.sh --quick
+
+# Don't fail the boot if this fails
+SuccessExitStatus=0 1
+
+# Timeouts - don't hang boot
+TimeoutStartSec=120
+TimeoutStopSec=60
+
+[Install]
+WantedBy=default.target
