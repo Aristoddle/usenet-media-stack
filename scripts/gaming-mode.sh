@@ -38,6 +38,21 @@ warn() { echo -e "${YELLOW}[warning]${NC} $*"; }
 error() { echo -e "${RED}[error]${NC} $*" >&2; }
 success() { echo -e "${GREEN}[ok]${NC} $*"; }
 
+# Check if Docker daemon is accessible
+check_docker() {
+    if ! command -v docker &>/dev/null; then
+        warn "Docker not found in PATH"
+        return 1
+    fi
+    if ! docker ps &>/dev/null 2>&1; then
+        if ! sudo docker ps &>/dev/null 2>&1; then
+            warn "Cannot access Docker daemon"
+            return 1
+        fi
+    fi
+    return 0
+}
+
 # Check if Tdarr is reachable
 check_tdarr() {
     if ! curl -s --connect-timeout 2 "${TDARR_URL}/api/v2/status" >/dev/null 2>&1; then
@@ -150,6 +165,7 @@ kill_transcodes() {
 
 # Stop high-CPU containers
 stop_heavy_containers() {
+    check_docker || return 0
     log "Stopping CPU-intensive containers..."
 
     # MakeMKV - ISO ripping (4 CPU cores)
@@ -165,6 +181,7 @@ stop_heavy_containers() {
 
 # Start containers that were stopped
 start_heavy_containers() {
+    check_docker || return 0
     log "Starting containers..."
 
     sudo docker start makemkv >/dev/null 2>&1 && success "Started makemkv" || warn "makemkv start failed (may not exist)"

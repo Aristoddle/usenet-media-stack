@@ -143,11 +143,8 @@ start_local_services() {
     echo "local" > "$STATE_DIR/stack-mode"
     date +%s > "$STATE_DIR/stack-started"
 
-    # Build the service list for docker compose
-    local services_arg="${LOCAL_SERVICES[*]}"
-
     # Start only local services
-    if sudo -E docker compose up -d ${LOCAL_SERVICES[@]}; then
+    if sudo -E docker compose up -d "${LOCAL_SERVICES[@]}"; then
         echo ""
         success "Local services started!"
         echo ""
