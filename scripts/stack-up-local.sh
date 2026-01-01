@@ -296,6 +296,7 @@ EOF
 main() {
     local show_status_only=false
     local upgrade=false
+    local quiet=false
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -305,6 +306,10 @@ main() {
                 ;;
             --upgrade)
                 upgrade=true
+                shift
+                ;;
+            --quiet|-q)
+                quiet=true
                 shift
                 ;;
             -h|--help)
@@ -319,6 +324,11 @@ main() {
         esac
     done
 
+    # In quiet mode, suppress interactive prompts
+    if [[ "$quiet" == "true" ]]; then
+        export MEDIA_STACK_QUIET=1
+    fi
+
     echo -e "${BOLD}=== Media Stack - Local Mode ===${NC}"
     echo ""
 
@@ -331,8 +341,8 @@ main() {
         exit 0
     fi
 
-    # Check if pool is available (offer upgrade)
-    if check_pool_available; then
+    # Check if pool is available (offer upgrade - but not in quiet mode)
+    if check_pool_available && [[ "$quiet" != "true" ]]; then
         echo -e "${GREEN}Notice: External pool IS available!${NC}"
         echo ""
 
