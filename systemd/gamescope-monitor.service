@@ -1,0 +1,21 @@
+[Unit]
+Description=Gamescope Monitor (auto-pause media stack)
+Documentation=file:///var/home/deck/Documents/Code/media-automation/usenet-media-stack/docs/BOOT_AND_LAUNCHERS.md
+
+# Start after media stack is up
+After=media-stack-autostart.service
+
+[Service]
+Type=simple
+ExecStart=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/gamescope-monitor.sh daemon
+
+# Restart if it crashes
+Restart=on-failure
+RestartSec=10
+
+# Low priority - don't interfere with gaming
+Nice=19
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target

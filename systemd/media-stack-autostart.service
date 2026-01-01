@@ -4,7 +4,7 @@ Documentation=file:///var/home/deck/Documents/Code/media-automation/usenet-media
 
 # Start after Docker is ready, but don't block graphical session
 After=docker.service network-online.target
-Wants=docker.service
+Wants=docker.service network-online.target
 
 # Don't require the pool - we'll detect if it's available
 # RequiresMountsFor=/var/mnt/fast8tb

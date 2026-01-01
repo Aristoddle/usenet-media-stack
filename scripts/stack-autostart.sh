@@ -47,24 +47,37 @@ log() {
 # DETECTION FUNCTIONS
 # =============================================================================
 
-# Check if Docker daemon is accessible
+# Check if Docker daemon is accessible (with retry for boot race condition)
 check_docker() {
     if ! command -v docker &>/dev/null; then
         log "ERROR: Docker not found"
         return 1
     fi
 
-    # Try without sudo first (rootless Docker)
-    if docker ps &>/dev/null 2>&1; then
-        return 0
-    fi
+    local max_attempts=5
+    local attempt=1
 
-    # Try with sudo
-    if sudo docker ps &>/dev/null 2>&1; then
-        return 0
-    fi
+    while [[ $attempt -le $max_attempts ]]; do
+        # Try without sudo first (rootless Docker)
+        if docker ps &>/dev/null 2>&1; then
+            [[ $attempt -gt 1 ]] && log "Docker ready after $attempt attempts"
+            return 0
+        fi
 
-    log "ERROR: Cannot access Docker daemon"
+        # Try with sudo
+        if sudo docker ps &>/dev/null 2>&1; then
+            [[ $attempt -gt 1 ]] && log "Docker ready after $attempt attempts (sudo)"
+            return 0
+        fi
+
+        if [[ $attempt -lt $max_attempts ]]; then
+            log "Docker not ready, waiting... (attempt $attempt/$max_attempts)"
+            sleep $((attempt * 2))  # Exponential backoff: 2, 4, 6, 8 seconds
+        fi
+        ((attempt++))
+    done
+
+    log "ERROR: Cannot access Docker daemon after $max_attempts attempts"
     return 1
 }
 
