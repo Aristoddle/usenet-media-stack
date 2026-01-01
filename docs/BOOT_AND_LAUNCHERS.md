@@ -388,4 +388,63 @@ These are cleared on shutdown and don't persist across reboots.
 ./scripts/gaming-mode.sh enable
 ./scripts/gaming-mode.sh disable
 ./scripts/gaming-mode.sh status
+
+# Systemd autostart
+systemctl --user start media-stack-autostart   # Manual trigger
+systemctl --user stop media-stack-autostart    # Stop stack
+systemctl --user disable media-stack-autostart # Disable on boot
 ```
+
+## Systemd Auto-Start Service
+
+The `media-stack-autostart.service` automatically detects boot mode and starts the appropriate stack.
+
+### Installation
+
+```bash
+# Copy service file
+mkdir -p ~/.config/systemd/user/
+cp systemd/media-stack-autostart.service ~/.config/systemd/user/
+
+# Enable service
+systemctl --user daemon-reload
+systemctl --user enable media-stack-autostart.service
+```
+
+### Boot Detection Logic
+
+The service runs `scripts/stack-autostart.sh` which:
+
+1. Checks for Docker daemon availability
+2. Counts attached external drives (by label in `/dev/disk/by-label/`)
+3. Counts mounted drives (at `/var/mnt/Fast_*`)
+4. Checks MergerFS pool status
+
+**Decision Matrix:**
+
+| Drives Attached | Drives Mounted | Pool Status | Boot Mode |
+|-----------------|----------------|-------------|-----------|
+| 0               | -              | -           | LOCAL     |
+| 1-2             | -              | -           | LOCAL     |
+| 3+              | <3             | -           | LOCAL     |
+| 3+              | 3+             | Not mounted | LOCAL     |
+| 3+              | 3+             | Mounted     | **FULL**  |
+
+### State Files
+
+After boot, check the detected mode:
+
+```bash
+cat /tmp/media-stack/stack-mode    # "full" or "local"
+cat /tmp/media-stack/start-method  # "autostart" or "manual"
+cat /tmp/media-stack/autostart.log # Full decision log
+```
+
+### Why This Design?
+
+The Steam Deck is primarily a gaming device. The autostart system follows these principles:
+
+1. **Never block boot** - Failures are logged but don't prevent graphical session
+2. **Default to minimal** - If uncertain, start LOCAL mode (fewer services, less RAM)
+3. **Gaming-first** - Quick boot without heavy containers when undocked
+4. **Transparent decisions** - All logic logged to `/tmp/media-stack/autostart.log`
