@@ -85,6 +85,11 @@ services:
     ports:
       - "5000:5000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ============================================================================
   # KOMGA - Manga/Comics Server
@@ -108,6 +113,11 @@ services:
     ports:
       - "8081:25600"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:25600/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ============================================================================
   # KOMF - Metadata Fetcher for Komga/Kavita
@@ -160,6 +170,11 @@ services:
     ports:
       - "4567:4567"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4567/api/v1/settings/about"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ============================================================================
   # PROWLARR - Indexer Manager (No Storage Dependencies)
@@ -208,6 +223,11 @@ services:
     ports:
       - "8787:8787"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ============================================================================
   # MYLAR3 - Comics Management
@@ -230,6 +250,11 @@ services:
     ports:
       - "8090:8090"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # ============================================================================
   # SABNZBD-PORTABLE - Usenet Downloader for Travel Mode

@@ -15,12 +15,11 @@
 1) Reboot to apply staged rpm-ostree layer (Docker).
 2) Enable Docker daemon: `sudo systemctl enable --now docker`.
 3) Add user to docker group: `sudo usermod -aG docker $USER && newgrp docker`.
-4) Start stacks (preferred: systemd units):
-   - Main stack: `sudo systemctl enable --now media-stack.service`
-   - Reading stack: `sudo systemctl enable --now media-reading-stack.service`
-   - Comics-only (optional): `docker compose -f docker-compose.komga.yml up -d`
-   - Note: systemd units set `COMPOSE_PROJECT_NAME=media-main` and `media-reading` to prevent `--remove-orphans`
-     from tearing down the other stack.
+4) Start stacks (preferred: smart-start or systemd):
+   - **Smart Start (recommended):** `./scripts/smart-start.sh up` - auto-detects storage and starts appropriate stack
+   - Reading stack only: `docker compose -f docker-compose.reading.yml up -d`
+   - Full stack (with pool): `docker compose up -d`
+   - Note: Reading stack includes Komga+Komf+Kavita+Audiobookshelf. No separate comics-only file needed.
 
 ## Healthchecks to keep/restore
 - Bazarr, Overseerr, Plex, Tdarr, Prowlarr: http healthchecks (`curl -f http://localhost:<port>` with 30s interval, 10s timeout, 3 retries) in compose.

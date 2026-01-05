@@ -1,17 +1,18 @@
 # Komga + Komf Quickstart (Comics/OPDS)
 
-This project ships a reusable compose file to stand up Komga (library + OPDS) and Komf (metadata enrichment; UI labeled **Komelia**) on any host.
+Komga (library + OPDS) and Komf (metadata enrichment; UI labeled **Komelia**) are part of the reading stack.
 
 ## TL;DR
 ```bash
-cp -r config/komga-example ./config/komga   # optional: seed config
-cp -r config/komf-example ./config/komf     # optional: seed config
-COMICS_ROOT=/srv/usenet/books/Comics \
-CONFIG_ROOT=/srv/usenet/config \
-KOMGA_TMP=/srv/usenet/config/komga/tmp \
-KOMGA_PORT=8081 \
-KOMF_PORT=8085 \
-docker compose -f docker-compose.komga.yml up -d
+# Configure paths in .env
+cp .env.example .env
+# Edit COMICS_ROOT, CONFIG_ROOT
+
+# Start reading stack (includes Komga + Komf)
+docker compose -f docker-compose.reading.yml up -d
+
+# Or use smart-start for auto-detection
+./scripts/smart-start.sh up
 ```
 
 Then:

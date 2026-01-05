@@ -33,8 +33,9 @@ cp .env.example .env   # fill in your API keys (Prowlarr/NZBs, etc.)
 ```
 
 ## First bring-up (after choosing runtime)
-- **Podman (Bazzite, now):** Comics only: `podman compose -f docker-compose.komga.yml up -d` (Komga+Komf). Audiobookshelf is in `docker-compose.reading.yml` post-reboot if desired.
-- **Docker (post-reboot):** `docker compose -f docker-compose.komga.yml up -d` (comics), plus `docker compose -f docker-compose.reading.yml up -d` (Audiobookshelf), then `docker compose up -d` for the main stack.
+- **Reading Stack (portable):** `docker compose -f docker-compose.reading.yml up -d` - includes Komga, Kavita, Audiobookshelf, Prowlarr, and portable download clients. Works without external drive pool.
+- **Full Stack (with pool):** `docker compose up -d` - adds Plex, Sonarr, Radarr, Tdarr, and pool-dependent services.
+- **Smart Start (auto-detect):** `./scripts/smart-start.sh up` - detects available storage and starts appropriate stack.
 
 ## Verify
 - Komga: `http://localhost:8081` (after comics sync, add library `/comics`).
