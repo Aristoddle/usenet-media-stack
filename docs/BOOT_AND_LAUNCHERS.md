@@ -299,6 +299,60 @@ Called by mergerfs-pool.service after mount:
 - Verifies mount health inside containers
 - Reports any failures
 
+### pool-health-monitor.sh (NEW: 2026-01-04)
+
+Runtime monitoring for hot-unplug detection. Runs as a daemon to protect data during drive disconnection.
+
+**Purpose**: Detect when external drive bays are disconnected and gracefully stop full-stack services before I/O errors or data corruption occur.
+
+**Enable the service**:
+```bash
+# Install and start the monitor
+sudo cp systemd/pool-health-monitor.service /etc/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now pool-health-monitor.service
+
+# Check status
+systemctl --user status pool-health-monitor.service
+```
+
+**Modes**:
+```bash
+# One-shot health check
+./scripts/pool-health-monitor.sh --check
+
+# Show current status
+./scripts/pool-health-monitor.sh --status
+
+# Daemon mode (for systemd)
+./scripts/pool-health-monitor.sh --daemon
+```
+
+**How it works**:
+1. Polls every 10 seconds (configurable via `POLL_INTERVAL`)
+2. Checks if drives are attached (`/dev/disk/by-label/Fast_*`)
+3. Checks if drives are mounted (`/var/mnt/Fast_*`)
+4. Checks if pool is responsive (`timeout 5s ls /var/mnt/pool`)
+5. On state change, takes action:
+
+| State Change | Action |
+|--------------|--------|
+| healthy → unmounted | Stop full stack, notify user |
+| healthy → stale | Stop full stack (I/O timeout detected) |
+| healthy → degraded | Log warning, continue |
+| unmounted → healthy | Log recovery (no auto-upgrade*) |
+
+\* Note: Auto-upgrade from portable→full requires manual `./scripts/smart-start.sh restart`
+
+**State files** (in `/tmp/media-stack/`):
+```
+pool-state        # Current: healthy, degraded, stale, unmounted
+pool-health.log   # Event log for debugging
+pool-degraded     # Timestamp of last degradation event
+```
+
+**Desktop notifications**: Uses `notify-send` if available.
+
 ## Troubleshooting
 
 ### Launcher doesn't appear in menu
