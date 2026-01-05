@@ -1,0 +1,30 @@
+[Unit]
+Description=Media Stack Pool Health Monitor
+Documentation=file:///var/home/deck/Documents/Code/media-automation/usenet-media-stack/docs/reading-stack.md
+After=docker.service mergerfs-pool.service media-stack-autostart.service
+Wants=docker.service
+
+# Only start if we're in full mode (pool was available at boot)
+ConditionPathExists=/tmp/media-stack/stack-mode
+
+[Service]
+Type=simple
+ExecStart=/var/home/deck/Documents/Code/media-automation/usenet-media-stack/scripts/pool-health-monitor.sh --daemon
+Restart=on-failure
+RestartSec=30
+
+# Environment
+Environment=POLL_INTERVAL=10
+
+# Resource limits (this is a lightweight monitor)
+MemoryMax=64M
+CPUQuota=5%
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/tmp/media-stack
+
+[Install]
+WantedBy=multi-user.target

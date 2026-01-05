@@ -11,10 +11,15 @@
 # - Default to local mode if uncertain
 # - Video/transcode tools only start with explicit full mode
 # - Fast, non-interactive, systemd-friendly
+#
+# NOTE: This script now delegates to smart-start.sh for actual startup.
+# The detection logic here is for systemd state tracking; smart-start.sh
+# handles the docker-compose operations.
 
 set -euo pipefail
 
-STACK_ROOT="/var/home/deck/Documents/Code/media-automation/usenet-media-stack"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_ROOT="$(dirname "$SCRIPT_DIR")"
 LOG_FILE="/tmp/media-stack/autostart.log"
 STATE_DIR="/tmp/media-stack"
 
@@ -171,7 +176,7 @@ decide_boot_mode() {
 # =============================================================================
 
 start_local_stack() {
-    log "Starting LOCAL stack (no video/transcode services)..."
+    log "Starting LOCAL stack (reading services only, no video/transcode)..."
 
     cd "$STACK_ROOT"
 
@@ -180,9 +185,10 @@ start_local_stack() {
     echo "autostart" > "$STATE_DIR/start-method"
     date +%s > "$STATE_DIR/stack-started"
 
-    # Start local-only services
-    if "$STACK_ROOT/scripts/stack-up-local.sh" --quiet 2>&1 | tee -a "$LOG_FILE"; then
-        log "LOCAL stack started successfully"
+    # Delegate to smart-start.sh which handles docker compose operations
+    # smart-start.sh will detect available storage and start appropriate services
+    if "$SCRIPT_DIR/smart-start.sh" up 2>&1 | tee -a "$LOG_FILE"; then
+        log "LOCAL stack started successfully via smart-start.sh"
         return 0
     else
         log "WARNING: LOCAL stack start had issues (non-fatal)"
@@ -200,13 +206,14 @@ start_full_stack() {
     echo "autostart" > "$STATE_DIR/start-method"
     date +%s > "$STATE_DIR/stack-started"
 
-    # Start full stack (skip interactive prompts)
-    if "$STACK_ROOT/scripts/stack-up-full.sh" --force 2>&1 | tee -a "$LOG_FILE"; then
-        log "FULL stack started successfully"
+    # Delegate to smart-start.sh which handles docker compose operations
+    # smart-start.sh will detect pool availability and start all services
+    if "$SCRIPT_DIR/smart-start.sh" up 2>&1 | tee -a "$LOG_FILE"; then
+        log "FULL stack started successfully via smart-start.sh"
         return 0
     else
-        log "WARNING: FULL stack start had issues, falling back to LOCAL"
-        start_local_stack
+        log "WARNING: FULL stack start had issues (non-fatal)"
+        # Note: smart-start.sh has its own fallback logic, so we don't retry here
         return 0  # Don't fail boot
     fi
 }

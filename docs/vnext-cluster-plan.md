@@ -56,7 +56,7 @@
 - Backup old volume (create backup dir first): `mkdir -p /srv/komga/backup` (or a user-writable path) then `podman run --rm -v <VOL>:/from -v /srv/komga/backup:/backup alpine sh -c "cd /from && tar cf /backup/komga-config.tar ."`
 - Ensure bind paths writable in rootless mode: either use a user-owned path (e.g., `$HOME/.local/share/komga/config` and `/tmp/komga`) or `sudo mkdir -p /srv/komga/{config,tmp,backup} && sudo chown -R $(id -u):$(id -g) /srv/komga`.
 - Migrate to bind mounts: `podman run --rm -v <VOL>:/from -v /srv/komga/config:/to alpine sh -c "cd /from && tar cf - . | (cd /to && tar xf -)"` (repeat for `/tmp` if needed). On SELinux hosts keep `:Z` in compose; on non-SELinux hosts it is ignored.
-- Update `docker-compose.komga.yml` + `.env` to use bind mounts (`COMICS_ROOT`, `KOMGA_CONFIG=/srv/komga/config`, `KOMGA_TMP=/srv/komga/tmp` or `$HOME/.local/share/...`); recreate with compose (Podman or Docker).
+- Update `docker-compose.reading.yml` + `.env` to use bind mounts (`COMICS_ROOT`, `CONFIG_ROOT`, etc.); recreate with compose (Podman or Docker). ✅ DONE - reading stack now uses bind mounts via environment variables.
 - Verify: login with existing user; libraries present; Komf reaches Komga; scan succeeds; thumbnails intact; check logs for errors.
 - Rollback (if needed): stop service, recreate container pointing back to the saved Podman volume or untar the backup into a fresh bind; keep the original volume until stable for several days.
 
@@ -75,7 +75,7 @@
 - Avoid: legacy `podman-compose` python tool; compose features outside v3.9 core (e.g., experimental secrets drivers, swarm-only networking assumptions) when running on Podman.
 
 ## Definition of Done (post-reboot)
-- Fresh clone + `.env` → `docker compose -f docker-compose.komga.yml up -d` (or `podman compose ...`) succeeds.
+- Fresh clone + `.env` → `docker compose -f docker-compose.reading.yml up -d` (or `./scripts/smart-start.sh up`) succeeds.
 - Komga/Komf survive reboot with mounts present; if mounts absent, services do not corrupt state and recover automatically once mounts return.
 - Migration validated: existing user login works, libraries present, scan succeeds, Komf enrichment works, thumbnails intact.
 - Backup/restore tested once (using the tar backup) on a throwaway path.
