@@ -86,7 +86,7 @@ Gracefully shuts down with job awareness:
 These mount from `/var/mnt/pool` (the MergerFS union of external drives):
 
 ```
-sonarr, radarr, lidarr, bazarr, readarr, whisparr, mylar
+sonarr, radarr, lidarr, bazarr, readarr (⚠️ DEPRECATED), whisparr, mylar
 tdarr, tdarr-node
 plex, tautulli, stash
 sabnzbd, transmission, aria2

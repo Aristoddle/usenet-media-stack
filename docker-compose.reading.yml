@@ -202,8 +202,10 @@ services:
       retries: 3
 
   # ============================================================================
-  # READARR - eBook Management
+  # READARR - eBook Management (⚠️ DEPRECATED - June 2025)
   # Access: http://localhost:8787
+  # WARNING: Readarr was retired June 27, 2025. This image is unmaintained.
+  # Consider migrating to Bookshelf. See: docs/decisions/2025-12-30-bookshelf-migration.md
   # ============================================================================
   readarr:
     <<: *network_tweaks

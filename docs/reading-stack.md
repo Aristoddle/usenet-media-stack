@@ -15,7 +15,7 @@ The reading stack operates independently of the external drive pool, making it p
 | **Audiobookshelf** | Audiobook streaming | 13378 | ✓ |
 | **Suwayomi** | Manga downloader | 4567 | ✓ |
 | **Prowlarr** | Indexer manager | 9696 | ✓ |
-| **Readarr** | eBook management | 8787 | ✓ |
+| **Readarr** | eBook management | 8787 | ✓ ⚠️ DEPRECATED |
 | **Mylar** | Comics management | 8090 | ✓ |
 | **SABnzbd-Portable** | Usenet downloads | 8180 | ✓ (NEW) |
 | **Transmission-Portable** | Torrent fallback | 9092 | ✓ (NEW) |
@@ -182,8 +182,28 @@ mkdir -p /var/mnt/fast8tb/Local/downloads/{complete,incomplete}
 docker logs sabnzbd-portable
 ```
 
+## Deprecation Notices
+
+### Readarr ⚠️
+
+**Status**: RETIRED (June 27, 2025)
+
+Readarr is included for backwards compatibility but receives NO security updates. The current image (`linuxserver/readarr:develop-0.4.18.2805-ls157`) is pinned and unmaintained.
+
+**Recommended replacement**: [Bookshelf](https://github.com/Bookshelf-team/Bookshelf) (community fork)
+
+**Migration guide**: See [Bookshelf Migration Decision](./decisions/2025-12-30-bookshelf-migration.md)
+
+For new setups, consider:
+- **Audiobookshelf** for audiobooks (already included)
+- **Kavita** for ebooks (already included)
+- **Calibre-Web** for ebook management (not in stack, but compatible)
+
+---
+
 ## Related Documentation
 
 - [Storage Architecture](./storage/architecture.md) - mergerfs pool design
 - [Boot and Launchers](./BOOT_AND_LAUNCHERS.md) - systemd integration
 - [Manga Acquisition](./manga-acquisition-pipeline.md) - Suwayomi workflows
+- [Stack Health Audit](./decisions/2025-12-29-stack-health-audit.md) - Service status decisions
