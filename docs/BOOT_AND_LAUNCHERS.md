@@ -448,3 +448,92 @@ The Steam Deck is primarily a gaming device. The autostart system follows these 
 2. **Default to minimal** - If uncertain, start LOCAL mode (fewer services, less RAM)
 3. **Gaming-first** - Quick boot without heavy containers when undocked
 4. **Transparent decisions** - All logic logged to `/tmp/media-stack/autostart.log`
+
+---
+
+## 2026-01-04 Updates
+
+### Race Condition Fix
+
+The `media-stack-autostart.service` now includes proper systemd ordering:
+
+```ini
+# Added to [Unit] section
+After=mergerfs-pool.service
+```
+
+This ensures:
+- systemd waits for mergerfs to mount before starting media stack
+- USB drive enumeration (5-15 seconds) completes first
+- No more incorrect LOCAL mode detection when bays are connected
+
+Additionally, `stack-autostart.sh` now waits up to 30 seconds (6 attempts × 5s) for mergerfs.
+
+### Travel Downloads (NEW)
+
+The reading stack (`docker-compose.reading.yml`) now includes download clients:
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| sabnzbd-portable | 8180 | Usenet downloads to internal drive |
+| transmission-portable | 9092 | Torrent fallback to internal drive |
+
+Configure Prowlarr to use these for one-off downloads while traveling:
+- Usenet: `http://sabnzbd-portable:8080` or `localhost:8180`
+- Torrents: `http://transmission-portable:9091` or `localhost:9092`
+
+### Capability Matrix
+
+| Capability | Travel Mode | Full Mode |
+|------------|-------------|-----------|
+| Read Comics/Manga | ✓ Komga | ✓ Komga |
+| Read eBooks | ✓ Kavita | ✓ Kavita |
+| Listen Audiobooks | ✓ ABS | ✓ ABS |
+| Browse/Search | ✓ Prowlarr | ✓ Prowlarr |
+| One-off Downloads | ✓ SABnzbd-Portable | ✓ SABnzbd |
+| TV/Movie Management | ✗ | ✓ Sonarr/Radarr |
+| Plex Streaming | ✗ | ✓ |
+| Transcoding | ✗ | ✓ Tdarr |
+
+### Alternative: smart-start.sh
+
+A newer, simpler script is available:
+
+```bash
+# Compose-file based startup (recommended)
+./scripts/smart-start.sh up      # Auto-detect and start
+./scripts/smart-start.sh down    # Stop all
+./scripts/smart-start.sh status  # Show storage + containers
+./scripts/smart-start.sh detect  # Just show detected profile
+```
+
+This uses Docker Compose files directly instead of service-by-service:
+- `docker-compose.reading.yml` for travel mode
+- `docker-compose.yml` for full mode (adds to reading stack)
+
+---
+
+## Bazzite-Specific Configuration
+
+### Docker Group on rpm-ostree
+
+On Bazzite (Fedora rpm-ostree), the docker group is defined in `/usr/lib/group` (immutable).
+Standard `usermod` doesn't work. Instead:
+
+```bash
+# Add override to /etc/group (writable overlay)
+echo "docker:x:956:deck" | sudo tee -a /etc/group
+
+# Verify
+getent group docker
+# Should show: docker:x:956:deck
+
+# Requires logout/login to take effect
+# Until then, use: sudo docker ...
+```
+
+### Why This Matters
+
+- Docker socket is owned by `root:docker` with 660 permissions
+- User must be in `docker` group for socket access without sudo
+- On immutable systems, group modifications require the overlay approach
