@@ -337,12 +337,20 @@ systemctl --user status pool-health-monitor.service
 
 | State Change | Action |
 |--------------|--------|
-| healthy → unmounted | Stop full stack, notify user |
-| healthy → stale | Stop full stack (I/O timeout detected) |
+| healthy → unmounted | **Graceful drain** → Stop full stack, notify user |
+| healthy → stale | **Graceful drain** → Stop full stack (I/O timeout detected) |
 | healthy → degraded | Log warning, continue |
 | unmounted → healthy | Log recovery (no auto-upgrade*) |
 
 \* Note: Auto-upgrade from portable→full requires manual `./scripts/smart-start.sh restart`
+
+**Graceful drain sequence** (protects active downloads/transcodes):
+1. Pause SABnzbd queue (via API)
+2. Pause Transmission (set speed limit to 0)
+3. Stop Tdarr node (prevent new transcodes)
+4. Wait up to 10s for I/O to settle (`sync`)
+5. Stop containers with 30s timeout
+6. Force kill only as last resort
 
 **State files** (in `/tmp/media-stack/`):
 ```

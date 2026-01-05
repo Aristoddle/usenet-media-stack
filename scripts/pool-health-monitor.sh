@@ -124,7 +124,66 @@ get_attached_drives() {
 # REACTION FUNCTIONS
 # =============================================================================
 
-# Stop full-stack services gracefully
+# Pause download clients to stop new writes (best-effort, don't block on failure)
+pause_download_clients() {
+    log_info "Pausing download clients to prevent new writes..."
+
+    # SABnzbd - pause queue
+    # API: http://localhost:8080/api?mode=pause&apikey=KEY
+    local sab_api_key
+    sab_api_key=$(grep -oP 'api_key\s*=\s*\K\S+' /var/mnt/fast8tb/config/sabnzbd/sabnzbd.ini 2>/dev/null || echo "")
+    if [[ -n "$sab_api_key" ]]; then
+        if curl -sf "http://localhost:8080/api?mode=pause&apikey=$sab_api_key" --max-time 5 >/dev/null 2>&1; then
+            log_info "SABnzbd paused"
+        else
+            log_warn "SABnzbd pause failed (may not be running)"
+        fi
+    fi
+
+    # Transmission - set speed limit to 0 (effectively pauses)
+    # RPC: http://localhost:9091/transmission/rpc
+    if curl -sf "http://localhost:9091/transmission/rpc" \
+        -H "Content-Type: application/json" \
+        -d '{"method":"session-set","arguments":{"speed-limit-down-enabled":true,"speed-limit-down":0,"speed-limit-up-enabled":true,"speed-limit-up":0}}' \
+        --max-time 5 >/dev/null 2>&1; then
+        log_info "Transmission paused"
+    else
+        log_warn "Transmission pause failed (may not be running)"
+    fi
+
+    # Tdarr - pause nodes (stop accepting new jobs)
+    # Note: Tdarr doesn't have a simple pause API, but stopping the node containers
+    # will prevent new transcodes from starting
+    if docker stop tdarr-node --time 10 >/dev/null 2>&1; then
+        log_info "Tdarr node stopped"
+    fi
+}
+
+# Wait for active I/O to settle
+wait_for_io_settle() {
+    local max_wait=${1:-10}  # Default 10 seconds
+    log_info "Waiting up to ${max_wait}s for I/O to settle..."
+
+    # Sync filesystem buffers
+    sync
+
+    # Brief wait for in-flight operations
+    local waited=0
+    while [[ $waited -lt $max_wait ]]; do
+        # Check if pool is still accessible (might already be gone)
+        if ! timeout 2s ls /var/mnt/pool >/dev/null 2>&1; then
+            log_warn "Pool already inaccessible, skipping I/O wait"
+            break
+        fi
+        sleep 2
+        ((waited+=2))
+    done
+
+    # Final sync attempt
+    sync 2>/dev/null || true
+}
+
+# Stop full-stack services gracefully with drain
 stop_full_stack() {
     log_warn "Stopping full stack services due to pool health issue..."
 
@@ -132,15 +191,30 @@ stop_full_stack() {
     echo "pool-degraded" > "$STATE_DIR/stack-mode"
     date +%s > "$STATE_DIR/pool-degraded"
 
+    # === GRACEFUL DRAIN PHASE ===
+    # 1. Pause download clients to stop new writes
+    pause_download_clients
+
+    # 2. Wait for active I/O to settle (max 10s - don't wait too long, pool may be dying)
+    wait_for_io_settle 10
+
+    # === STOP PHASE ===
     cd "$STACK_ROOT"
 
-    # Stop only the main stack (not reading stack)
-    # Use timeout to prevent hanging if containers are already in bad state
-    if timeout 60s docker compose -f docker-compose.yml down --remove-orphans 2>&1 | tee -a "$LOG_FILE"; then
+    # 3. Stop containers with graceful timeout
+    log_info "Stopping full stack containers..."
+    if timeout 90s docker compose -f docker-compose.yml stop --timeout 30 2>&1 | tee -a "$LOG_FILE"; then
+        log_info "Containers stopped gracefully"
+    else
+        log_warn "Graceful stop timed out, forcing..."
+    fi
+
+    # 4. Remove containers (faster since already stopped)
+    if timeout 30s docker compose -f docker-compose.yml down --remove-orphans 2>&1 | tee -a "$LOG_FILE"; then
         log_info "Full stack stopped successfully"
     else
-        log_error "Full stack stop timed out or failed - containers may need manual cleanup"
-        # Force kill if graceful stop failed
+        log_error "Full stack stop failed - containers may need manual cleanup"
+        # Force kill as last resort
         docker compose -f docker-compose.yml kill 2>/dev/null || true
     fi
 }
