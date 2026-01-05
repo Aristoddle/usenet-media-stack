@@ -1,0 +1,232 @@
+# READING STACK - Portable Media Services
+# =============================================================================
+# These services work with the internal 8TB drive only (no external bays needed)
+# Used for: Books, Comics/Manga, Audiobooks
+#
+# Storage Requirements:
+#   - /var/mnt/fast8tb/Cloud/OneDrive/Books/* - Reading content
+#   - /var/mnt/fast8tb/config/* - Service configurations
+#
+# Services:
+#   - Audiobookshelf (13378) - Audiobook streaming
+#   - Kavita (5000) - eBooks and Comics reader
+#   - Komga (8081) - Manga/Comics server
+#   - Komf (8085) - Metadata fetcher for Komga/Kavita
+#   - Suwayomi (4567) - Manga downloader
+#   - Prowlarr (9696) - Indexer (no storage deps)
+#
+# Usage:
+#   docker compose -f docker-compose.reading.yml up -d
+#   OR via systemd: systemctl --user start media-reading-stack
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: 50m
+    max-file: "3"
+
+x-network-tweaks: &network_tweaks
+  dns:
+    - 1.1.1.1
+    - 1.0.0.1
+  dns_opt:
+    - use-vc
+  sysctls:
+    - net.ipv6.conf.all.disable_ipv6=1
+    - net.ipv6.conf.default.disable_ipv6=1
+
+services:
+  # ============================================================================
+  # AUDIOBOOKSHELF - Audiobook/Podcast Server
+  # Access: http://localhost:13378
+  # ============================================================================
+  audiobookshelf:
+    <<: *network_tweaks
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    hostname: audiobookshelf
+    logging: *default-logging
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ${AUDIOBOOKSHELF_CONFIG:-/var/mnt/fast8tb/config/audiobookshelf}:/config:rw,z
+      - ${AUDIOBOOKSHELF_CONFIG:-/var/mnt/fast8tb/config/audiobookshelf}/metadata:/metadata:rw,z
+      - ${AUDIOBOOKS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Audiobooks}:/audiobooks:rw,z
+      - ${EBOOKS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/eBooks}:/ebooks:rw,z
+      # Downloads fallback to internal drive in portable mode
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+    ports:
+      - "13378:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================================================
+  # KAVITA - eBooks & Comics Reader
+  # Access: http://localhost:5000
+  # ============================================================================
+  kavita:
+    <<: *network_tweaks
+    image: jvmilazz0/kavita:latest
+    container_name: kavita
+    logging: *default-logging
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/kavita:/kavita/config:rw,z
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+      - ${EBOOKS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/eBooks}:/books:rw,z
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  # ============================================================================
+  # KOMGA - Manga/Comics Server
+  # Access: http://localhost:8081
+  # ============================================================================
+  komga:
+    <<: *network_tweaks
+    image: ghcr.io/gotson/komga:1.23.6
+    container_name: komga
+    user: "1000:1000"
+    security_opt:
+      - label:disable
+    logging: *default-logging
+    environment:
+      - JAVA_OPTS=-Xms4g -Xmx8g -Djava.io.tmpdir=/config/tmp
+      - KOMGA_LIBRARIES_SCAN_CRON=0 0 * * * *
+      - KOMGA_CORS_ALLOWED_ORIGINS=http://localhost:8085,http://127.0.0.1:8085,http://192.168.6.167:8085
+    volumes:
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/komga:/config:rw,z
+    ports:
+      - "8081:25600"
+    restart: unless-stopped
+
+  # ============================================================================
+  # KOMF - Metadata Fetcher for Komga/Kavita
+  # Access: http://localhost:8085
+  # ============================================================================
+  komf:
+    <<: *network_tweaks
+    image: sndxr/komf:1.3.0
+    container_name: komf
+    logging: *default-logging
+    environment:
+      - KOMGA_BASE_URI=http://komga:25600
+      - KOMF_KOMGA_USER=${KOMF_KOMGA_USER:-j3lanzone@gmail.com}
+      - KOMF_KOMGA_PASSWORD=${KOMF_KOMGA_PASSWORD}
+      - KOMF_KAVITA_BASE_URI=http://kavita:5000
+      - KOMF_KAVITA_API_KEY=${KOMF_KAVITA_API_KEY}
+      - KOMF_MAL_CLIENT_ID=${KOMF_MAL_CLIENT_ID}
+      - KOMF_COMICVINE_API_KEY=${KOMF_COMICVINE_API_KEY}
+      - KOMF_MANGAUPDATES_USERNAME=${KOMF_MANGAUPDATES_USERNAME:-}
+      - KOMF_MANGAUPDATES_PASSWORD=${KOMF_MANGAUPDATES_PASSWORD:-}
+      - KOMF_MANGADEX_CLIENT_ID=${KOMF_MANGADEX_CLIENT_ID:-}
+      - KOMF_MANGADEX_CLIENT_SECRET=${KOMF_MANGADEX_CLIENT_SECRET:-}
+      - KOMF_ANILIST_CLIENT_ID=${KOMF_ANILIST_CLIENT_ID:-}
+      - KOMF_ANILIST_CLIENT_SECRET=${KOMF_ANILIST_CLIENT_SECRET:-}
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/komf:/config:rw,z
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+    depends_on:
+      - komga
+      - kavita
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+
+  # ============================================================================
+  # SUWAYOMI - Manga Downloader (Tachidesk)
+  # Access: http://localhost:4567
+  # ============================================================================
+  suwayomi:
+    <<: *network_tweaks
+    image: ghcr.io/suwayomi/suwayomi-server:stable
+    container_name: suwayomi
+    logging: *default-logging
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      # Downloads to staging on internal drive (portable mode)
+      - ${SUWAYOMI_DOWNLOADS_PORTABLE:-/var/mnt/fast8tb/Local/downloads/suwayomi-chapters}:/home/suwayomi/.local/share/Tachidesk/downloads:rw,z
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/suwayomi:/home/suwayomi/.local/share/Tachidesk:rw,z
+    ports:
+      - "4567:4567"
+    restart: unless-stopped
+
+  # ============================================================================
+  # PROWLARR - Indexer Manager (No Storage Dependencies)
+  # Access: http://localhost:9696
+  # ============================================================================
+  prowlarr:
+    <<: *network_tweaks
+    image: docker.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    hostname: prowlarr
+    logging: *default-logging
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/prowlarr:/config:rw,z
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================================================
+  # READARR - eBook Management
+  # Access: http://localhost:8787
+  # ============================================================================
+  readarr:
+    <<: *network_tweaks
+    image: linuxserver/readarr:develop-0.4.18.2805-ls157
+    container_name: readarr
+    hostname: readarr
+    logging: *default-logging
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/readarr:/config:rw,z
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+      - ${EBOOKS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/eBooks}:/books:rw,z
+      - ${BOOKS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books}:/books-all:rw,z
+    ports:
+      - "8787:8787"
+    restart: unless-stopped
+
+  # ============================================================================
+  # MYLAR3 - Comics Management
+  # Access: http://localhost:8090
+  # ============================================================================
+  mylar:
+    <<: *network_tweaks
+    image: docker.io/linuxserver/mylar3:latest
+    container_name: mylar
+    hostname: mylar
+    logging: *default-logging
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/mylar:/config:rw,z
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+      - ${COMICS_ROOT:-/var/mnt/fast8tb/Cloud/OneDrive/Books/Comics}:/comics:rw,z
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
