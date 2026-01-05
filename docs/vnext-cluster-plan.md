@@ -18,7 +18,7 @@
 - Swarm still supported (Mirantis committed through 2030) but **rootless Swarm is unsupported** because overlay networking is unavailable in rootless Docker. [Mirantis LTS](https://www.mirantis.com/blog/mirantis-guarantees-long-term-support-for-swarm/) · [Docker rootless limitations](https://docs.docker.com/engine/security/rootless/#known-limitations)
 
 ## Near-term steps (before cluster work)
-1) Make Komga/Komf runtime-agnostic: bind-mount `/config` and `/tmp`; drive paths via `.env` and `docker-compose.komga.yml`.
+1) ✅ **DONE**: Komga/Komf now in `docker-compose.reading.yml` (portable stack). Bind-mounts `/config`; paths via `.env`.
 2) Keep compose as single source of truth; run with `podman compose` today, `docker compose` after reboot.
 3) Post-reboot: enable Docker service + docker group; optional: keep Podman for dev/testing.
 4) Stop generating single-container systemd units; prefer Quadlet or a user service that runs `podman compose up -d`. [Podman systemd deprecation](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html)
