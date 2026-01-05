@@ -138,10 +138,20 @@ decide_boot_mode() {
     if [[ "$attached" -ge "$MIN_DRIVES_FOR_FULL" ]]; then
         # Drives attached - try to ensure they're mounted
         if [[ "$mounted" -lt "$attached" ]]; then
-            log "Drives attached but not all mounted, attempting mount..."
-            sudo systemctl start mergerfs-pool.service 2>/dev/null || true
-            sleep 2
-            mounted=$(count_mounted_drives)
+            log "Drives attached but not all mounted, waiting for mergerfs..."
+            # USB enumeration can take 5-15 seconds; systemd ordering should handle this
+            # but we wait a bit more just in case
+            local wait_attempts=0
+            while [[ $wait_attempts -lt 6 ]]; do
+                sudo systemctl start mergerfs-pool.service 2>/dev/null || true
+                sleep 5
+                mounted=$(count_mounted_drives)
+                if check_pool_mounted; then
+                    log "Pool mounted after $((wait_attempts * 5 + 5)) seconds"
+                    break
+                fi
+                ((wait_attempts++))
+            done
         fi
 
         if [[ "$mounted" -ge "$MIN_DRIVES_FOR_FULL" ]] && check_pool_mounted; then

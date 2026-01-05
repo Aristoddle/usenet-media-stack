@@ -230,3 +230,62 @@ services:
     ports:
       - "8090:8090"
     restart: unless-stopped
+
+  # ============================================================================
+  # SABNZBD-PORTABLE - Usenet Downloader for Travel Mode
+  # Access: http://localhost:8180
+  # Downloads to internal drive, not pool - enables one-off downloads while traveling
+  # ============================================================================
+  sabnzbd-portable:
+    <<: *network_tweaks
+    image: linuxserver/sabnzbd:latest
+    container_name: sabnzbd-portable
+    hostname: sabnzbd-portable
+    logging: *default-logging
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/sabnzbd-portable:/config:rw,z
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}/incomplete:/incomplete-downloads:rw,z
+    ports:
+      - "8180:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api?mode=version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================================================
+  # TRANSMISSION-PORTABLE - Torrent Client for Travel Mode
+  # Access: http://localhost:9092
+  # Fallback when usenet misses - downloads to internal drive
+  # ============================================================================
+  transmission-portable:
+    <<: *network_tweaks
+    image: linuxserver/transmission:latest
+    container_name: transmission-portable
+    hostname: transmission-portable
+    logging: *default-logging
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - TRANSMISSION_WEB_HOME=/config/flood-for-transmission/
+    volumes:
+      - ${CONFIG_ROOT:-/var/mnt/fast8tb/config}/transmission-portable:/config:rw,z
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}:/downloads:rw,z
+      - ${DOWNLOADS_ROOT_PORTABLE:-/var/mnt/fast8tb/Local/downloads}/watch:/watch:rw,z
+    ports:
+      - "9092:9091"
+      - "51414:51413"
+      - "51414:51413/udp"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/transmission/web/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

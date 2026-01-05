@@ -6,6 +6,11 @@ Documentation=file:///var/home/deck/Documents/Code/media-automation/usenet-media
 After=docker.service network-online.target
 Wants=docker.service network-online.target
 
+# CRITICAL: Wait for mergerfs pool if bays are connected
+# This prevents race condition where we detect local mode while pool is still mounting
+After=mergerfs-pool.service
+# Don't REQUIRE it - we want to boot even if pool fails or bays disconnected
+
 # Don't require the pool - we'll detect if it's available
 # RequiresMountsFor=/var/mnt/fast8tb
 
