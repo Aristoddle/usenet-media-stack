@@ -141,14 +141,27 @@ pause_download_clients() {
     fi
 
     # Transmission - set speed limit to 0 (effectively pauses)
-    # RPC: http://localhost:9091/transmission/rpc
-    if curl -sf "http://localhost:9091/transmission/rpc" \
+    # RPC requires X-Transmission-Session-Id header (CSRF protection)
+    # First call returns 409 with session ID, second call uses it
+    local tx_session tx_response
+    tx_response=$(curl -sf "http://localhost:9091/transmission/rpc" \
         -H "Content-Type: application/json" \
-        -d '{"method":"session-set","arguments":{"speed-limit-down-enabled":true,"speed-limit-down":0,"speed-limit-up-enabled":true,"speed-limit-up":0}}' \
-        --max-time 5 >/dev/null 2>&1; then
-        log_info "Transmission paused"
+        -d '{}' --max-time 5 -D - 2>/dev/null || echo "")
+
+    tx_session=$(echo "$tx_response" | grep -oP 'X-Transmission-Session-Id: \K\S+' || echo "")
+
+    if [[ -n "$tx_session" ]]; then
+        if curl -sf "http://localhost:9091/transmission/rpc" \
+            -H "Content-Type: application/json" \
+            -H "X-Transmission-Session-Id: $tx_session" \
+            -d '{"method":"session-set","arguments":{"speed-limit-down-enabled":true,"speed-limit-down":0,"speed-limit-up-enabled":true,"speed-limit-up":0}}' \
+            --max-time 5 >/dev/null 2>&1; then
+            log_info "Transmission paused"
+        else
+            log_warn "Transmission pause command failed"
+        fi
     else
-        log_warn "Transmission pause failed (may not be running)"
+        log_warn "Transmission not responding (may not be running)"
     fi
 
     # Tdarr - pause nodes (stop accepting new jobs)
@@ -190,6 +203,19 @@ should_auto_upgrade() {
     if [[ "$auto_upgrade" != "true" ]]; then
         log_info "Auto-upgrade disabled (AUTO_UPGRADE_ON_RECOVERY=$auto_upgrade)"
         return 1
+    fi
+
+    # Rate limit: don't upgrade if we upgraded within last 60 seconds
+    # Prevents spam if pool flaps (healthy→unmounted→healthy)
+    local last_upgrade upgrade_cooldown=60
+    if [[ -f "$STATE_DIR/stack-started" ]]; then
+        last_upgrade=$(cat "$STATE_DIR/stack-started" 2>/dev/null || echo 0)
+        local now=$(date +%s)
+        local elapsed=$((now - last_upgrade))
+        if [[ $elapsed -lt $upgrade_cooldown ]]; then
+            log_info "Upgrade rate limited (${elapsed}s since last upgrade, cooldown ${upgrade_cooldown}s)"
+            return 1
+        fi
     fi
 
     # Check current mode - only upgrade if in local/portable mode
