@@ -340,9 +340,14 @@ systemctl --user status pool-health-monitor.service
 | healthy → unmounted | **Graceful drain** → Stop full stack, notify user |
 | healthy → stale | **Graceful drain** → Stop full stack (I/O timeout detected) |
 | healthy → degraded | Log warning, continue |
-| unmounted → healthy | Log recovery (no auto-upgrade*) |
+| unmounted → healthy | **Auto-upgrade** to full mode (if enabled) |
 
-\* Note: Auto-upgrade from portable→full requires manual `./scripts/smart-start.sh restart`
+**Auto-upgrade behavior** (NEW):
+- When pool recovers from `unmounted` → `healthy`
+- If currently in portable/local mode
+- Automatically starts full stack via `smart-start.sh`
+- Controlled by `AUTO_UPGRADE_ON_RECOVERY=true` (default: enabled)
+- Disable with: `AUTO_UPGRADE_ON_RECOVERY=false` in systemd environment
 
 **Graceful drain sequence** (protects active downloads/transcodes):
 1. Pause SABnzbd queue (via API)

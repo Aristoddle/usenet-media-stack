@@ -159,6 +159,52 @@ pause_download_clients() {
     fi
 }
 
+# Start full stack (upgrade from portable mode)
+start_full_stack() {
+    log_info "Starting full stack services (upgrading from portable mode)..."
+
+    cd "$STACK_ROOT"
+
+    # Record mode change
+    echo "full" > "$STATE_DIR/stack-mode"
+    echo "auto-upgrade" > "$STATE_DIR/start-method"
+    date +%s > "$STATE_DIR/stack-started"
+
+    # Use smart-start.sh which handles the compose operations
+    if "$SCRIPT_DIR/smart-start.sh" up 2>&1 | tee -a "$LOG_FILE"; then
+        log_info "Full stack started successfully"
+        notify_user "Media Stack Upgraded" "Full stack now running (pool recovered)"
+        return 0
+    else
+        log_error "Full stack start failed - staying in portable mode"
+        echo "local" > "$STATE_DIR/stack-mode"
+        notify_user "Upgrade Failed" "Could not start full stack - check logs"
+        return 1
+    fi
+}
+
+# Check if we should auto-upgrade to full mode
+should_auto_upgrade() {
+    # Check if auto-upgrade is enabled (default: true)
+    local auto_upgrade="${AUTO_UPGRADE_ON_RECOVERY:-true}"
+    if [[ "$auto_upgrade" != "true" ]]; then
+        log_info "Auto-upgrade disabled (AUTO_UPGRADE_ON_RECOVERY=$auto_upgrade)"
+        return 1
+    fi
+
+    # Check current mode - only upgrade if in local/portable mode
+    local current_mode
+    current_mode=$(cat "$STATE_DIR/stack-mode" 2>/dev/null || echo "unknown")
+
+    if [[ "$current_mode" == "local" || "$current_mode" == "pool-degraded" ]]; then
+        log_info "Currently in $current_mode mode - eligible for upgrade"
+        return 0
+    fi
+
+    # Already in full mode or unknown state
+    return 1
+}
+
 # Wait for active I/O to settle
 wait_for_io_settle() {
     local max_wait=${1:-10}  # Default 10 seconds
@@ -268,6 +314,16 @@ do_health_check() {
             healthy)
                 notify_user "Media Pool Healthy" "$mounted drives mounted, pool responsive"
                 echo "$pool_state" > "$STATE_DIR/pool-state"
+
+                # Check if we should auto-upgrade from portable to full mode
+                if [[ "$PREV_POOL_STATE" == "unmounted" || "$PREV_POOL_STATE" == "unknown" ]]; then
+                    if should_auto_upgrade; then
+                        log_info "Pool recovered - attempting auto-upgrade to full mode"
+                        start_full_stack || log_warn "Auto-upgrade failed, continuing in current mode"
+                    else
+                        log_info "Pool recovered but auto-upgrade skipped (not in portable mode or disabled)"
+                    fi
+                fi
                 ;;
             degraded)
                 notify_user "Media Pool Degraded" "Only $mounted of $attached drives mounted"

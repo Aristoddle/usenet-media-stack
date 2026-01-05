@@ -15,6 +15,7 @@ RestartSec=30
 
 # Environment
 Environment=POLL_INTERVAL=10
+Environment=AUTO_UPGRADE_ON_RECOVERY=true
 
 # Resource limits (this is a lightweight monitor)
 MemoryMax=64M
